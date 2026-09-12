@@ -106,11 +106,12 @@
   .steps .n{font:600 12px "IBM Plex Mono";color:var(--green);letter-spacing:.08em;padding-top:2px}
   .steps b{font-weight:600}
   .steps p{margin:2px 0 0;color:var(--ink2);font-size:14px}
-  .stats{display:flex;margin:30px 0 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .stats{display:flex;margin:30px 0 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
   .stat{flex:1;padding:14px 16px;border-left:1px solid var(--line)}
   .stat:first-child{border-left:0}
   .stat b{display:block;font:600 21px "IBM Plex Mono";letter-spacing:-.02em}
   .stat span{font:600 10px "IBM Plex Mono";letter-spacing:.18em;color:var(--ink2)}
+  .fx-line{display:flex;justify-content:center;margin:12px 0 46px}
 
   .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 16px}
   .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
@@ -136,7 +137,6 @@
   .receipt-body{background:var(--card);border-radius:12px 12px 0 0;padding:4px 18px 14px}
   .receipt::after{content:"";position:absolute;top:100%;left:0;width:100%;height:8px;
     background:conic-gradient(from 135deg at 50% 0,var(--card) 90deg,transparent 90deg) 0 0/12px 8px repeat-x}
-  /* header row: toggle and delete are SIBLINGS — never nested buttons (WebKit swallows those taps) */
   .rec-headrow{display:flex;align-items:center;gap:2px;padding-left:2px}
   .rec-head{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;
     padding:15px 0 12px;text-align:left;cursor:pointer}
@@ -158,6 +158,7 @@
   .rl-mult{font:500 12px "IBM Plex Mono";color:var(--ink2)}
   .rl-total{font:600 13.5px "IBM Plex Mono";grid-row:span 2}
   .rl-meta{font:500 11px "IBM Plex Mono";color:var(--ink2);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .rl-usd{color:var(--amber)}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--c,#999);display:inline-block;flex:none}
   .exp.warn{color:var(--amber)} .exp.bad{color:var(--red)}
   .rl-del{border:none;background:none;color:#C4BAA4;cursor:pointer;padding:6px;border-radius:8px;grid-column:3;justify-self:end}
@@ -191,6 +192,8 @@
 
   .fld{display:block;margin-bottom:13px}
   .fld>span{display:block;font:600 10.5px "IBM Plex Mono";letter-spacing:.16em;color:var(--ink2);margin-bottom:6px}
+  .fld-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .fld-head>span{margin-bottom:0}
   .in{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#FFFDF6;
     color:var(--ink);font:500 16px "IBM Plex Sans";transition:border-color .12s, box-shadow .12s}
   .in:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.14)}
@@ -200,7 +203,15 @@
   .price-wrap{position:relative}
   .price-wrap::before{content:"₱";position:absolute;left:12px;top:50%;transform:translateY(-50%);
     font:600 14px "IBM Plex Mono";color:var(--ink2);pointer-events:none}
+  .price-wrap.usd::before{content:"$"}
   .price-wrap .in{padding-left:30px;font-family:"IBM Plex Mono"}
+  .fx-hint{margin-top:6px;font:500 11.5px "IBM Plex Mono";color:var(--green);letter-spacing:.02em}
+
+  /* currency mini-toggle */
+  .cur-seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:2px}
+  .cur-seg button{border:none;background:transparent;padding:4px 11px;border-radius:999px;
+    font:600 12.5px "IBM Plex Mono";color:var(--ink2);cursor:pointer}
+  .cur-seg button.on{background:var(--ink);color:var(--paper)}
 
   .bc-label{display:block;font:600 10.5px "IBM Plex Mono";letter-spacing:.16em;color:var(--ink2);margin-bottom:6px}
   .bc-block{display:flex;align-items:center;gap:14px;background:var(--paper-2);border:1px dashed var(--line);
@@ -237,6 +248,7 @@
   .cf-row .k{font:600 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);padding-top:3px;flex:none}
   .cf-row .v{font:500 13.5px "IBM Plex Sans";text-align:right;overflow-wrap:anywhere}
   .cf-row .v.mono{font-family:"IBM Plex Mono"}
+  .cf-row .v .usd-note{color:var(--amber)}
   .cf-actions{display:flex;flex-direction:column;align-items:center;gap:10px}
   .bigcheck{width:64px;height:64px;border-radius:50%;border:none;background:var(--green);color:#F5F1E4;
     display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--green-deep);transition:.1s}
@@ -343,10 +355,11 @@
       <ol class="steps">
         <li><span class="n">01</span><div><b>Pick your store</b><p>Puregold, SM, Robinsons — or add your own sukan spot.</p></div></li>
         <li><span class="n">02</span><div><b>Scan the barcode</b><p>Hold the code inside the frame, 10–15 cm away. Known products fill in automatically.</p></div></li>
-        <li><span class="n">03</span><div><b>Confirm &amp; keep going</b><p>Price, quantity, expiry, category — then straight to the next item.</p></div></li>
+        <li><span class="n">03</span><div><b>Confirm &amp; keep going</b><p>Price in ₱ or $, quantity, expiry, category — then the next item.</p></div></li>
       </ol>
 
       <div class="stats" id="stats"></div>
+      <div class="fx-line"><button id="fx-open" class="linkbtn"></button></div>
     </div>
   </section>
 
@@ -393,6 +406,19 @@
       <input id="new-store-input" class="in" placeholder="e.g. Landers Superstore" autocomplete="off">
     </label>
     <button type="submit" id="store-continue" class="btn primary wide"><span id="store-continue-label">Continue</span><span class="ic" data-ico="arrow"></span></button>
+  </form>
+</div>
+
+<!-- ============ MODAL: exchange-rate settings ============ -->
+<div class="overlay" id="m-fx">
+  <form class="modal" id="fx-form" role="dialog" aria-modal="true" aria-labelledby="fx-title" style="width:min(400px,100%)">
+    <button type="button" class="x" id="fx-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
+    <h2 class="modal-title" id="fx-title">Exchange rate</h2>
+    <p class="modal-sub">Used when you enter a price in dollars. Changing it only affects <b>future</b> entries — past records keep the rate they were saved with.</p>
+    <label class="fld" id="fld-rate"><span>1 USD = ? PHP</span>
+      <input id="rate-input" class="in" type="number" min="0.0001" step="0.0001" inputmode="decimal" placeholder="58.00">
+    </label>
+    <button type="submit" class="btn primary wide">Save rate</button>
   </form>
 </div>
 
@@ -455,9 +481,17 @@
       <input id="item-name" class="in" autocomplete="off" placeholder="e.g. Lucky Me Pancit Canton">
     </div>
 
-    <label class="fld" id="fld-price"><span>PRICE</span>
-      <div class="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-    </label>
+    <div class="fld" id="fld-price">
+      <div class="fld-head">
+        <span>PRICE · TOTALS IN PESO</span>
+        <div class="cur-seg" role="group" aria-label="Price currency">
+          <button type="button" id="cur-php" class="on">₱</button>
+          <button type="button" id="cur-usd">$</button>
+        </div>
+      </div>
+      <div class="price-wrap" id="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+      <div class="fx-hint" id="fx-hint" hidden></div>
+    </div>
 
     <div class="fld"><span>QUANTITY</span>
       <div class="qty-row">
@@ -491,6 +525,7 @@
       <div class="cf-row"><span class="k">PRODUCT</span><span class="v" id="cf-name"></span></div>
       <div class="cf-row"><span class="k">CATEGORY</span><span class="v" id="cf-cat"></span></div>
       <div class="cf-row"><span class="k">QTY × PRICE</span><span class="v mono" id="cf-line"></span></div>
+      <div class="cf-row" id="cf-entered-row" hidden><span class="k">ENTERED</span><span class="v mono" id="cf-entered"></span></div>
       <div class="cf-row"><span class="k">EXPIRY</span><span class="v mono" id="cf-exp"></span></div>
       <div class="cf-row"><span class="k">LINE TOTAL</span><span class="v mono" id="cf-total" style="font-weight:600;font-size:15px"></span></div>
     </div>
@@ -527,6 +562,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
 const uid = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,6);
 const PHP = new Intl.NumberFormat('en-PH', {style:'currency', currency:'PHP'});
 const money = n => PHP.format(n);
+const usd = n => '$' + (+n).toFixed(2);
 const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 function fmtDate(iso){ if(!iso) return '—'; const [y,m,d] = iso.split('-').map(Number); return `${pad(d)} ${MONTHS[m-1]} ${y}`; }
@@ -560,6 +596,7 @@ const ico = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 /* ================= data ================= */
 const DB_KEY = 'shelf-life.v1';
 const DEFAULT_STORES = ['Puregold','Royal','SM','Robinsons','Shopwise'];
+const DEFAULT_RATE = 58;
 const CATS = ['Frozen','Produce','Toiletries','Snacks','Misc','Canned','Processed','Cleaning',
               'Storage','Organizing','Beverages','Dairy','Bakery','Condiments','Household','Pet Care'];
 const CAT_COLOR = {Frozen:'#4C7EA8',Produce:'#4C8A46',Toiletries:'#8A6FA8',Snacks:'#B97A1E',Misc:'#7A7466',
@@ -570,12 +607,14 @@ let db;
 function load(){
   try { db = JSON.parse(localStorage.getItem(DB_KEY)); } catch(e){ db = null; }
   if(!db || !Array.isArray(db.stores) || !Array.isArray(db.sessions)){
-    db = { stores:[...DEFAULT_STORES], sessions:[], draft:null };
+    db = { stores:[...DEFAULT_STORES], sessions:[], draft:null, rate:DEFAULT_RATE };
   }
   if(!('draft' in db)) db.draft = null;
+  if(typeof db.rate !== 'number' || !(db.rate > 0)) db.rate = DEFAULT_RATE;
 }
 const save = () => { try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){} };
 load();
+const rate = () => db.rate;
 
 let run = db.draft;
 let lastCat = 'Misc';
@@ -583,7 +622,7 @@ let pendingItem = null, cfdCb = null;
 const ui = { tab:'home', group:'session', sort:'new', open:new Set(), freshId:null };
 
 /* ---- totals helpers ---- */
-const lineTotal = it => it.price * it.qty;
+const lineTotal = it => it.price * it.qty;      // price is ALWAYS stored in PHP
 const sessionTotal = s => s.items.reduce((a, it) => a + lineTotal(it), 0);
 function runTotals(){
   let n = 0, sum = 0;
@@ -591,9 +630,7 @@ function runTotals(){
   return { n, sum };
 }
 
-/* ---- product memory: most recent name recorded for a barcode ----
-   Derived from real records (current run first, then saved sessions,
-   newest first) — so deleting records also removes the memory. */
+/* ---- product memory: most recent name recorded for a barcode ---- */
 function findKnownProduct(barcode){
   if(run){
     for(let i = run.items.length - 1; i >= 0; i--){
@@ -646,7 +683,7 @@ function buildHeroBars(){
     '<i class="g" style="width:3px"></i><i class="g" style="width:3px"></i>';
 }
 
-/* ================= beeps (iOS-safe: prime the context on first touch) ================= */
+/* ================= beeps (iOS-safe) ================= */
 let actx;
 function primeAudio(){
   try{
@@ -696,6 +733,7 @@ function renderHome(){
     <div class="stat"><b>${t.runs}</b><span>RUNS</span></div>
     <div class="stat"><b>${t.items}</b><span>ITEMS</span></div>
     <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>`;
+  $('#fx-open').textContent = `1 USD = ₱${(+rate()).toFixed(2)} · change`;
   const bar = $('#active-run');
   if(run){
     const rt = runTotals();
@@ -760,26 +798,43 @@ function startRun(store){
   openScanner();
 }
 
-/* ================= scanner =================
-   Own pipeline: one getUserMedia stream → <video> preview → frame pump (~9fps).
-   Each tick crops around the viewfinder band (more pixels on the code) or uses
-   the full frame, then runs the best available engine:
-     1. ZBar WASM  — retail-grade 1D decoding, lazy-loaded from CDN
-     2. BarcodeDetector — native, ONLY on Chromium/Android (absent on iOS)
-     3. ZXing low-level MultiFormatReader — universal fallback, with inverted passes */
+/* ================= exchange-rate settings ================= */
+ $('#fx-open').addEventListener('click', ()=>{
+  $('#rate-input').value = +rate();
+  $('#fld-rate').classList.remove('err');
+  openModal('m-fx');
+  closeFn['m-fx'] = ()=> shut($('#m-fx'));
+});
+ $('#fx-x').addEventListener('click', ()=> shut($('#m-fx')));
+ $('#fx-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = parseFloat($('#rate-input').value);
+  if(isNaN(v) || v <= 0){
+    const f = $('#fld-rate');
+    f.classList.remove('err'); void f.offsetWidth; f.classList.add('err');
+    const i = $('#rate-input'); i.classList.add('shake'); setTimeout(()=>i.classList.remove('shake'),400); i.focus();
+    return;
+  }
+  db.rate = Math.round(v * 10000) / 10000;
+  save();
+  shut($('#m-fx'));
+  renderHome();
+  toast(`Rate saved — 1 USD = ₱${db.rate.toFixed(2)} (future entries)`, {icon:true});
+});
+
+/* ================= scanner ================= */
 const S = {
   stream:null, track:null, running:false, busy:false, tick:0, pump:null,
   crop:document.createElement('canvas'), full:document.createElement('canvas'),
   detector:null, nativeFormats:[],
-  zbar:null, zbarState:'none',     // 'none' | 'loading' | 'ready'
+  zbar:null, zbarState:'none',
   devices:[], devIdx:-1,
 };
 let scanLock=false, torchTrack=null, torchOn=false, wakeLock=null, zbarFails=0;
 
-/* ---------- engine 1: ZBar (WASM) ---------- */
 function ensureZbar(){
   if(S.zbarState === 'ready' || zbarFails >= 2) return;
-  if(S.zbarState !== 'none') return;      // already loading
+  if(S.zbarState !== 'none') return;
   S.zbarState = 'loading';
   const urls = [
     'https://cdn.jsdelivr.net/npm/zbar-wasm@1.2.1/dist/index.js',
@@ -819,7 +874,6 @@ async function zbarText(canvas){
   return null;
 }
 
-/* ---------- engine 2: native BarcodeDetector (Chromium only) ---------- */
 async function setupNative(){
   if(S.detector || !('BarcodeDetector' in window)) return;
   try{
@@ -841,7 +895,6 @@ async function nativeText(canvas){
   return null;
 }
 
-/* ---------- engine 3: ZXing (low-level) ---------- */
 let zxReader = null;
 function ensureZx(){
   if(zxReader) return true;
@@ -880,17 +933,14 @@ function zxText(canvas, alsoInvert){
   return null;
 }
 
-/* ---------- frame pump ---------- */
 function bandRect(video){
   const vw = video.videoWidth, vh = video.videoHeight;
   if(!vw || !vh) return null;
   const dw = video.clientWidth, dh = video.clientHeight;
   if(!dw || !dh) return null;
-  // map the on-screen band into video pixels (object-fit: cover math)
   const scale = Math.max(dw / vw, dh / vh);
   const offX = (vw * scale - dw) / 2, offY = (vh * scale - dh) / 2;
   const bh = Math.min(190, dh * 0.55), by = (dh - bh) / 2;
-  // analysis region is wider than the visual band so codes poking past the brackets still read
   const bx = dw * 0.04, bw = dw * 0.92;
   const sx = (bx + offX) / scale, sy = (by + offY) / scale;
   const sw = bw / scale, sh = bh / scale;
@@ -913,7 +963,7 @@ async function pumpTick(){
   if(!video.videoWidth || scanLock || !S.running || document.hidden) return;
   S.tick++;
   const rect = bandRect(video);
-  const useCrop = rect && (S.tick % 2 === 1);   // odd ticks: band crop; even ticks: full frame
+  const useCrop = rect && (S.tick % 2 === 1);
   const target = drawTo(useCrop ? S.crop : S.full, video, useCrop ? rect : null);
   let text = null;
   if(S.zbarState === 'ready') text = await zbarText(target);
@@ -932,7 +982,6 @@ function startPump(){
 }
 function stopPump(){ if(S.pump){ clearInterval(S.pump); S.pump = null; } }
 
-/* ---------- camera ---------- */
 async function openStream(deviceId){
   try{ S.stream && S.stream.getTracks().forEach(t => t.stop()); }catch(e){}
   const video = { width:{ideal:1920}, height:{ideal:1080} };
@@ -1039,7 +1088,7 @@ async function openScanner(){
   scanLock = false; S.tick = 0; S.running = true;
   if(matchMedia('(hover:hover) and (pointer:fine)').matches) $('#scan-code').focus();
   requestWakeLock();
-  ensureZbar();          // upgrade to the retail-grade engine in the background
+  ensureZbar();
   await setupNative();
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     scanError("This browser can't expose the camera here (an HTTPS page is required). Type the barcode below instead.");
@@ -1098,12 +1147,12 @@ function finishRun(){
 }
 
 /* ================= item modal ================= */
-let currentQty = 1, pendingCat = 'Misc';
+let currentQty = 1, pendingCat = 'Misc', curEntry = 'PHP';   // 'PHP' | 'USD'
 
 function applyKnownName(known){
   const lbl = $('#fld-name-label');
   if(known){
-    $('#item-name').value = known.name;      // input always holds the effective name
+    $('#item-name').value = known.name;
     $('#name-known-text').textContent = known.name;
     lbl.textContent = 'PRODUCT NAME · SAVED';
     $('#name-known').hidden = false;
@@ -1122,19 +1171,40 @@ function applyKnownName(known){
   setTimeout(()=> $('#item-name').focus(), 60);
 });
 
+/* currency toggle + live conversion hint */
+function setCurrency(c){
+  curEntry = c;
+  $('#cur-php').classList.toggle('on', c === 'PHP');
+  $('#cur-usd').classList.toggle('on', c === 'USD');
+  $('#price-wrap').classList.toggle('usd', c === 'USD');
+  $('#item-price').placeholder = '0.00';
+  updateFxHint();
+}
+function updateFxHint(){
+  const hint = $('#fx-hint');
+  if(curEntry !== 'USD'){ hint.hidden = true; return; }
+  const v = parseFloat($('#item-price').value);
+  if(isNaN(v) || v < 0){ hint.hidden = true; return; }
+  hint.hidden = false;
+  hint.textContent = `≈ ${money(v * rate())} at 1 USD = ₱${(+rate()).toFixed(2)}`;
+}
+ $('#cur-php').addEventListener('click', ()=> setCurrency('PHP'));
+ $('#cur-usd').addEventListener('click', ()=> setCurrency('USD'));
+ $('#item-price').addEventListener('input', updateFxHint);
+
 function openItemModal(barcode){
   $('#item-barcode').textContent = barcode;
   $('#item-bars').innerHTML = barsHTML(barcode, 30);
   $('#item-price').value = '';
   $('#fld-name').classList.remove('err'); $('#fld-price').classList.remove('err');
+  setCurrency('PHP');                       // each scan starts in peso
   const known = findKnownProduct(barcode);
   applyKnownName(known);
   buildExpSelects();
-  buildChips(known ? known.cat : lastCat);   // known product → its usual category
+  buildChips(known ? known.cat : lastCat);
   setQty(1);
   openModal('m-item');
   closeFn['m-item'] = ()=>{ shut($('#m-item')); openScanner(); };
-  // focus the first field you'd actually type in
   setTimeout(()=> $(known ? '#item-price' : '#item-name').focus(), 120);
 }
  $('#item-x').addEventListener('click', closeTop);
@@ -1169,7 +1239,6 @@ function buildChips(selected){
   $$('.chip', $('#cat-chips')).forEach(c => { c.classList.toggle('on', c === b); c.setAttribute('aria-pressed', c === b); });
 });
 
-/* quantity — select with 1–99, styled like the date fields */
 function buildQtySelect(){
   $('#qty-select').innerHTML = Array.from({length:99}, (_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
 }
@@ -1183,20 +1252,36 @@ function setQty(q){
 
  $('#item-save').addEventListener('click', ()=>{
   const name = $('#item-name').value.trim();
-  const price = parseFloat($('#item-price').value);
+  const entered = parseFloat($('#item-price').value);
   let ok = true;
   if(!name){ flash($('#fld-name')); ok = false; }
-  if(isNaN(price) || price < 0){ flash($('#fld-price')); ok = false; }
+  if(isNaN(entered) || entered < 0){ flash($('#fld-price')); ok = false; }
   if(!ok) return;
-  pendingItem = {
-    barcode: $('#item-barcode').textContent,
-    name, price, qty: currentQty, cat: pendingCat,
-    exp: `${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}`
-  };
+
+  // canonical price is always PHP — USD is converted at today's rate on save
+  let item;
+  if(curEntry === 'USD'){
+    const php = Math.round(entered * rate() * 100) / 100;
+    item = { barcode:$('#item-barcode').textContent, name, price:php, qty:currentQty,
+             cat:pendingCat, cur:'USD', orig:entered,
+             exp:`${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}` };
+  } else {
+    item = { barcode:$('#item-barcode').textContent, name, price:entered, qty:currentQty,
+             cat:pendingCat,
+             exp:`${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}` };
+  }
+  pendingItem = item;
+
   $('#cf-barcode').textContent = pendingItem.barcode;
   $('#cf-name').textContent = pendingItem.name;
   $('#cf-cat').innerHTML = `<span class="dot" style="--c:${CAT_COLOR[pendingCat] || '#999'};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(pendingCat)}`;
   $('#cf-line').textContent = `${pendingItem.qty} × ${money(pendingItem.price)}`;
+  if(pendingItem.cur === 'USD'){
+    $('#cf-entered-row').hidden = false;
+    $('#cf-entered').innerHTML = `<span class="usd-note">${usd(pendingItem.orig)}</span> @ ₱${(+rate()).toFixed(2)}`;
+  } else {
+    $('#cf-entered-row').hidden = true;
+  }
   $('#cf-exp').textContent = fmtDate(pendingItem.exp);
   $('#cf-total').textContent = money(pendingItem.price * pendingItem.qty);
   openModal('m-confirm');
@@ -1216,7 +1301,7 @@ function flash(f){
   db.draft = run; save();
   const added = pendingItem; pendingItem = null;
   shut($('#m-confirm')); shut($('#m-item'));
-  toast(`${added.name} added — ${money(added.price * added.qty)}`, {icon:true});
+  toast(`${added.name} added — ${money(added.price * added.qty)}${added.cur === 'USD' ? ` (${usd(added.orig)})` : ''}`, {icon:true});
   updateScanCount();
   openScanner();
 });
@@ -1249,10 +1334,11 @@ function expBadge(exp){
 }
 
 function itemLineHTML(it, sessionId, idx, meta){
+  const usdNote = it.cur === 'USD' && it.orig != null ? ` <span class="rl-usd">· ${usd(it.orig)}</span>` : '';
   return `<div class="rec-line">
     <div>
       <div class="rl-name">${esc(it.name)}</div>
-      <div class="rl-meta"><span class="dot" style="--c:${CAT_COLOR[it.cat] || '#999'}"></span>${esc(it.cat)} · ${esc(it.barcode)} · ${expBadge(it.exp)}</div>
+      <div class="rl-meta"><span class="dot" style="--c:${CAT_COLOR[it.cat] || '#999'}"></span>${esc(it.cat)} · ${esc(it.barcode)} · ${expBadge(it.exp)}${usdNote}</div>
     </div>
     <div class="rl-total">${money(lineTotal(it))}</div>
     <button class="rl-del" data-act="del-item" data-sid="${sessionId}" data-idx="${idx}" aria-label="Delete item">${ico('trash')}</button>
@@ -1374,14 +1460,15 @@ function askConfirm({title, body, yes='Delete', onYes}){
 /* ================= CSV export ================= */
  $('#btn-export').addEventListener('click', ()=>{
   if(!db.sessions.length){ toast('Nothing to export yet — scan something first'); return; }
-  const rows = [['session_id','date','time','store','barcode','product','category','unit_price','qty','line_total','expiry_date']];
+  const rows = [['session_id','date','time','store','barcode','product','category','unit_price_php','qty','line_total_php','expiry_date','entry_currency','entry_amount']];
   [...db.sessions].sort((a,b) => a.ts - b.ts).forEach(s => {
     const d = new Date(s.ts);
     const date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
     s.items.forEach(it => rows.push([
       s.id, date, time, s.store, it.barcode, it.name, it.cat,
-      it.price.toFixed(2), it.qty, lineTotal(it).toFixed(2), it.exp || ''
+      it.price.toFixed(2), it.qty, lineTotal(it).toFixed(2), it.exp || '',
+      it.cur || 'PHP', it.cur === 'USD' ? it.orig.toFixed(2) : it.price.toFixed(2)
     ]));
   });
   const cell = v => { v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
@@ -1407,6 +1494,7 @@ function askConfirm({title, body, yes='Delete', onYes}){
       { barcode:'4800047200017', name:'Selecta Reali Ice Cream 1.3L',       price:289.00, qty:1, cat:'Frozen',   exp:dOff(5) },
       { barcode:'4800123456789', name:'Bear Brand Swak Pack 33g',           price:17.00, qty:2, cat:'Beverages', exp:dOff(180) },
       { barcode:'4806012300014', name:'Chicharon ni Mang Jose 90g',         price:38.50, qty:1, cat:'Snacks',    exp:dOff(-3) },
+      { barcode:'0012345678905', name:'Imported Granola Bars (4-pack)',     price:639.62, qty:1, cat:'Snacks',   exp:dOff(150), cur:'USD', orig:11.99 },
     ]
   });
   save(); setTab('records'); renderHome();
@@ -1420,8 +1508,6 @@ buildExpSelects();
 buildChips(lastCat);
 renderHome();
 setTab('home');
-/* Preload the retail-grade ZBar engine during idle time so it's ready
-   the moment the scanner opens (also warms it up for the home-screen app). */
 const idle = window.requestIdleCallback || (fn => setTimeout(fn, 1500));
 idle(() => ensureZbar());
 </script>
