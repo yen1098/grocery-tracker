@@ -136,15 +136,17 @@
   .receipt-body{background:var(--card);border-radius:12px 12px 0 0;padding:4px 18px 14px}
   .receipt::after{content:"";position:absolute;top:100%;left:0;width:100%;height:8px;
     background:conic-gradient(from 135deg at 50% 0,var(--card) 90deg,transparent 90deg) 0 0/12px 8px repeat-x}
-  .rec-head{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:15px 0 12px;text-align:left;cursor:pointer}
+  /* header row: toggle and delete are SIBLINGS — never nested buttons (WebKit swallows those taps) */
+  .rec-headrow{display:flex;align-items:center;gap:2px;padding-left:2px}
+  .rec-head{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;
+    padding:15px 0 12px;text-align:left;cursor:pointer}
   .rec-hl{flex:1;min-width:0}
   .rec-store{font:600 19px "Fraunces";letter-spacing:-.01em}
   .rec-meta{font:500 11px "IBM Plex Mono";letter-spacing:.08em;color:var(--ink2);margin-top:3px;text-transform:uppercase}
-  .rec-right{display:flex;align-items:center;gap:8px}
-  .rec-total{font:600 16px "IBM Plex Mono"}
-  .rec-chev{color:var(--ink2);transition:transform .25s}
+  .rec-total{font:600 16px "IBM Plex Mono";flex:none}
+  .rec-chev{color:var(--ink2);transition:transform .25s;flex:none}
   .receipt.open .rec-chev{transform:rotate(180deg)}
-  .rec-del{border:none;background:none;color:#B9AE97;cursor:pointer;padding:6px;border-radius:8px;display:grid;place-items:center}
+  .rec-del{flex:none;border:none;background:none;color:#B9AE97;cursor:pointer;padding:8px;border-radius:8px;display:grid;place-items:center}
   .rec-del:hover{color:var(--red);background:rgba(196,64,42,.08)}
   .rec-rule{border:0;border-top:1px dashed var(--line);margin:0}
   .rec-items{display:none}
@@ -208,7 +210,14 @@
   .bc-num{flex:1;font:600 15px "IBM Plex Mono";letter-spacing:.12em;overflow-wrap:anywhere}
   .bc-lock{color:var(--ink2);flex:none}.bc-lock svg{width:15px;height:15px;display:block}
 
-  /* quantity — select styled like the date fields, native vertical wheel on iOS */
+  .name-known{display:flex;align-items:center;gap:10px;background:var(--paper-2);
+    border:1px dashed var(--line);border-radius:10px;padding:11px 13px}
+  .nk-name{flex:1;font-weight:600;font-size:15px;overflow-wrap:anywhere}
+  .nk-tag{flex:none;font:600 9px "IBM Plex Mono";letter-spacing:.14em;color:var(--green);
+    background:rgba(46,107,69,.1);border-radius:999px;padding:3px 8px}
+  .nk-edit{flex:none;border:none;background:none;color:var(--green);font:600 12.5px "IBM Plex Sans";
+    text-decoration:underline;cursor:pointer;padding:4px}
+
   .qty-row{display:flex;gap:8px;align-items:stretch}
   .qty-row .btn{flex:0 0 auto;padding:10px 14px}
   #qty-select{flex:1;text-align:center;font-family:"IBM Plex Mono";font-weight:600}
@@ -279,6 +288,7 @@
   .scan-hint{margin:0;padding:0 16px 14px;padding-bottom:calc(env(safe-area-inset-bottom) + 14px);
     text-align:center;font:500 10.5px "IBM Plex Mono";letter-spacing:.16em;color:#A79E8C;
     display:flex;flex-direction:column;gap:3px}
+  #scan-count{color:#F2EDE0;font-weight:600}
   #scan-engine{opacity:.75}
 
   #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);transform:translateX(-50%);
@@ -332,7 +342,7 @@
 
       <ol class="steps">
         <li><span class="n">01</span><div><b>Pick your store</b><p>Puregold, SM, Robinsons — or add your own sukan spot.</p></div></li>
-        <li><span class="n">02</span><div><b>Scan the barcode</b><p>Hold the code inside the frame, 10–15 cm away. Zoom in for small labels.</p></div></li>
+        <li><span class="n">02</span><div><b>Scan the barcode</b><p>Hold the code inside the frame, 10–15 cm away. Known products fill in automatically.</p></div></li>
         <li><span class="n">03</span><div><b>Confirm &amp; keep going</b><p>Price, quantity, expiry, category — then straight to the next item.</p></div></li>
       </ol>
 
@@ -416,7 +426,7 @@
     </form>
     <p class="scan-hint">
       <span>FILL THE FRAME · HOLD 10–15 CM · SLIGHT TILT AVOIDS GLARE</span>
-      <span id="scan-count">0 ITEMS IN THIS RUN</span>
+      <span id="scan-count">0 ITEMS · ₱0.00 THIS RUN</span>
       <span id="scan-engine"></span>
     </p>
   </div>
@@ -427,7 +437,7 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="item-title">
     <button type="button" class="x" id="item-x" aria-label="Discard and rescan"><span class="ic" data-ico="x"></span></button>
     <h2 class="modal-title" id="item-title">Item details</h2>
-    <p class="modal-sub">Everything is editable except the code.</p>
+    <p class="modal-sub">Everything is editable except the code — saved products fill their name in automatically.</p>
 
     <span class="bc-label">BARCODE · READ ONLY</span>
     <div class="bc-block">
@@ -436,9 +446,14 @@
       <span class="bc-lock" title="Read only"><span class="ic" data-ico="lock"></span></span>
     </div>
 
-    <label class="fld" id="fld-name"><span>PRODUCT NAME</span>
+    <div class="fld" id="fld-name"><span id="fld-name-label">PRODUCT NAME</span>
+      <div class="name-known" id="name-known" hidden>
+        <span class="nk-name" id="name-known-text"></span>
+        <span class="nk-tag">SAVED</span>
+        <button type="button" class="nk-edit" id="name-known-edit">Edit</button>
+      </div>
       <input id="item-name" class="in" autocomplete="off" placeholder="e.g. Lucky Me Pancit Canton">
-    </label>
+    </div>
 
     <label class="fld" id="fld-price"><span>PRICE</span>
       <div class="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
@@ -567,6 +582,32 @@ let lastCat = 'Misc';
 let pendingItem = null, cfdCb = null;
 const ui = { tab:'home', group:'session', sort:'new', open:new Set(), freshId:null };
 
+/* ---- totals helpers ---- */
+const lineTotal = it => it.price * it.qty;
+const sessionTotal = s => s.items.reduce((a, it) => a + lineTotal(it), 0);
+function runTotals(){
+  let n = 0, sum = 0;
+  if(run) run.items.forEach(it => { n += 1; sum += lineTotal(it); });
+  return { n, sum };
+}
+
+/* ---- product memory: most recent name recorded for a barcode ----
+   Derived from real records (current run first, then saved sessions,
+   newest first) — so deleting records also removes the memory. */
+function findKnownProduct(barcode){
+  if(run){
+    for(let i = run.items.length - 1; i >= 0; i--){
+      if(run.items[i].barcode === barcode) return run.items[i];
+    }
+  }
+  for(const s of db.sessions){
+    for(let i = s.items.length - 1; i >= 0; i--){
+      if(s.items[i].barcode === barcode) return s.items[i];
+    }
+  }
+  return null;
+}
+
 /* ================= toasts ================= */
 function toast(msg, opts={}){
   const t = document.createElement('div');
@@ -657,9 +698,10 @@ function renderHome(){
     <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>`;
   const bar = $('#active-run');
   if(run){
+    const rt = runTotals();
     bar.hidden = false;
     $('#ar-store').textContent = run.store;
-    $('#ar-meta').textContent = `${run.items.length} ITEM${run.items.length===1?'':'S'} SCANNED`;
+    $('#ar-meta').textContent = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} SO FAR`;
     $('#btn-start').innerHTML = `<span class="ic">${ico('scan')}</span>Resume scan`;
   } else {
     bar.hidden = true;
@@ -1024,7 +1066,8 @@ function onDecode(text){
 }
 function closeScan(){ stopScan(); shut($('#m-scan')); renderHome(); }
 function updateScanCount(){
-  $('#scan-count').textContent = `${run ? run.items.length : 0} ITEM${run && run.items.length===1 ? '' : 'S'} IN THIS RUN`;
+  const rt = runTotals();
+  $('#scan-count').textContent = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} THIS RUN`;
 }
  $('#scan-close').addEventListener('click', closeScan);
  $('#scan-finish').addEventListener('click', finishRun);
@@ -1057,18 +1100,42 @@ function finishRun(){
 /* ================= item modal ================= */
 let currentQty = 1, pendingCat = 'Misc';
 
+function applyKnownName(known){
+  const lbl = $('#fld-name-label');
+  if(known){
+    $('#item-name').value = known.name;      // input always holds the effective name
+    $('#name-known-text').textContent = known.name;
+    lbl.textContent = 'PRODUCT NAME · SAVED';
+    $('#name-known').hidden = false;
+    $('#item-name').hidden = true;
+  } else {
+    $('#item-name').value = '';
+    lbl.textContent = 'PRODUCT NAME';
+    $('#name-known').hidden = true;
+    $('#item-name').hidden = false;
+  }
+}
+ $('#name-known-edit').addEventListener('click', ()=>{
+  $('#name-known').hidden = true;
+  $('#item-name').hidden = false;
+  $('#fld-name-label').textContent = 'PRODUCT NAME';
+  setTimeout(()=> $('#item-name').focus(), 60);
+});
+
 function openItemModal(barcode){
   $('#item-barcode').textContent = barcode;
   $('#item-bars').innerHTML = barsHTML(barcode, 30);
-  $('#item-name').value = '';
   $('#item-price').value = '';
   $('#fld-name').classList.remove('err'); $('#fld-price').classList.remove('err');
+  const known = findKnownProduct(barcode);
+  applyKnownName(known);
   buildExpSelects();
-  buildChips(lastCat);
+  buildChips(known ? known.cat : lastCat);   // known product → its usual category
   setQty(1);
   openModal('m-item');
   closeFn['m-item'] = ()=>{ shut($('#m-item')); openScanner(); };
-  setTimeout(()=> $('#item-name').focus(), 120);
+  // focus the first field you'd actually type in
+  setTimeout(()=> $(known ? '#item-price' : '#item-name').focus(), 120);
 }
  $('#item-x').addEventListener('click', closeTop);
 
@@ -1135,7 +1202,11 @@ function setQty(q){
   openModal('m-confirm');
   closeFn['m-confirm'] = ()=> shut($('#m-confirm'));
 });
-function flash(f){ f.classList.add('err'); const i = $('input', f); i.classList.add('shake'); setTimeout(()=>{ i.classList.remove('shake'); f.classList.remove('err'); }, 900); i.focus(); }
+function flash(f){
+  f.classList.remove('err'); void f.offsetWidth; f.classList.add('err');
+  const i = $('input', f);
+  if(i){ i.classList.add('shake'); setTimeout(()=> i.classList.remove('shake'), 400); i.focus(); }
+}
 
  $('#cf-back').addEventListener('click', ()=> shut($('#m-confirm')));
  $('#cf-yes').addEventListener('click', ()=>{
@@ -1176,8 +1247,6 @@ function expBadge(exp){
   const info = expInfo(exp);
   return `<span class="exp ${info.cls}">EXP ${fmtShort(exp)}${info.label ? ' · ' + info.label : ''}</span>`;
 }
-const lineTotal = it => it.price * it.qty;
-const sessionTotal = s => s.items.reduce((a, it) => a + lineTotal(it), 0);
 
 function itemLineHTML(it, sessionId, idx, meta){
   return `<div class="rec-line">
@@ -1204,17 +1273,17 @@ function renderRecords(){
       const open = ui.open.has(s.id);
       return `<article class="receipt${open ? ' open' : ''}${s.id === ui.freshId ? ' fresh' : ''}" data-sid="${s.id}">
         <div class="receipt-body">
-          <button class="rec-head" data-act="toggle">
-            <div class="rec-hl">
-              <div class="rec-store">${esc(s.store)}</div>
-              <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}</div>
-            </div>
-            <div class="rec-right">
+          <div class="rec-headrow">
+            <button class="rec-head" data-act="toggle">
+              <div class="rec-hl">
+                <div class="rec-store">${esc(s.store)}</div>
+                <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}</div>
+              </div>
               <span class="rec-total">${money(sessionTotal(s))}</span>
               <span class="rec-chev ic">${ico('chev')}</span>
-              <span class="rec-del" data-act="del-session" data-sid="${s.id}" role="button" aria-label="Delete session">${ico('trash')}</span>
-            </div>
-          </button>
+            </button>
+            <button class="rec-del" data-act="del-session" data-sid="${s.id}" aria-label="Delete session">${ico('trash')}</button>
+          </div>
           <div class="rec-items">
             <hr class="rec-rule">
             ${s.items.map((it,i) => itemLineHTML(it, s.id, i)).join('')}
