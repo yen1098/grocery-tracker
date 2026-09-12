@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#F4EEE1">
 <title>Shelf Life — a grocery ledger</title>
 
+<!-- iOS home-screen app -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shelf Life">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -34,12 +40,13 @@
   }
   body.no-scroll{overflow:hidden}
   ::selection{background:rgba(46,107,69,.25)}
-  button{font:inherit;color:inherit}
+  button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
 
-  header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
   .top-in{display:flex;align-items:center;justify-content:space-between;height:60px}
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
   .tabs{display:flex;gap:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:4px}
@@ -183,7 +190,7 @@
   .fld{display:block;margin-bottom:13px}
   .fld>span{display:block;font:600 10.5px "IBM Plex Mono";letter-spacing:.16em;color:var(--ink2);margin-bottom:6px}
   .in{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#FFFDF6;
-    color:var(--ink);font:500 15px "IBM Plex Sans";transition:border-color .12s, box-shadow .12s}
+    color:var(--ink);font:500 16px "IBM Plex Sans";transition:border-color .12s, box-shadow .12s}
   .in:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.14)}
   .fld.err .in{border-color:var(--red);box-shadow:0 0 0 3px rgba(196,64,42,.12)}
   .shake{animation:shake .3s}
@@ -201,18 +208,10 @@
   .bc-num{flex:1;font:600 15px "IBM Plex Mono";letter-spacing:.12em;overflow-wrap:anywhere}
   .bc-lock{color:var(--ink2);flex:none}.bc-lock svg{width:15px;height:15px;display:block}
 
-  .qty-head{display:flex;justify-content:space-between;align-items:baseline}
-  .qty-head b{font:600 14px "IBM Plex Mono"}
-  .qty-strip{display:flex;gap:4px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 0;margin-top:4px;
-    scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
-    mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
-  .qty-strip::-webkit-scrollbar{display:none}
-  .qty-cell{flex:0 0 44px;height:44px;scroll-snap-align:center;display:grid;place-items:center;
-    border:1px solid var(--line);border-radius:10px;background:#FFFDF6;font:600 14.5px "IBM Plex Mono";
-    cursor:pointer;user-select:none}
-  .qty-cell.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-  .qty-btns{display:flex;gap:6px}
-  .qty-btns .btn{padding:8px 10px}
+  /* quantity — select styled like the date fields, native vertical wheel on iOS */
+  .qty-row{display:flex;gap:8px;align-items:stretch}
+  .qty-row .btn{flex:0 0 auto;padding:10px 14px}
+  #qty-select{flex:1;text-align:center;font-family:"IBM Plex Mono";font-weight:600}
 
   .exp-row{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px}
   .exp-row .in{padding:10px 26px 10px 10px;font-family:"IBM Plex Mono";font-size:14px}
@@ -244,8 +243,9 @@
   /* ---------- scanner ---------- */
   #m-scan{background:#121110;padding:0;place-items:stretch;
     backdrop-filter:none;-webkit-backdrop-filter:none}
-  .scan-stage{width:min(560px,100%);margin:0 auto;height:100dvh;display:flex;flex-direction:column}
-  .scan-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;color:#F2EDE0}
+  .scan-stage{width:min(560px,100%);margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column}
+  .scan-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;
+    padding-top:calc(env(safe-area-inset-top) + 14px);color:#F2EDE0}
   .scan-title{font:600 11px "IBM Plex Mono";letter-spacing:.24em;color:#A79E8C}
   .scan-store{font:600 21px "Fraunces";margin-top:2px}
   .scan-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
@@ -255,7 +255,6 @@
   #zoom-slider{width:104px;accent-color:#A9700F;cursor:pointer}
   .cam-wrap{position:relative;flex:1;min-height:260px;background:#000;overflow:hidden}
   #scan-video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
-  /* soft guide dim OUTSIDE the band only — the band is the analyzed region */
   .dim{position:absolute;background:rgba(8,7,5,.38);pointer-events:none}
   .dim.top{top:0;left:0;right:0;height:calc(50% - 95px)}
   .dim.bot{bottom:0;left:0;right:0;height:calc(50% - 95px)}
@@ -274,15 +273,17 @@
     color:#F2EDE0;background:rgba(13,11,8,.94);font-size:14.5px}
   .scan-manual{display:flex;gap:8px;padding:12px 16px;background:#1D1915}
   .scan-manual input{flex:1;min-width:0;background:#26221C;border:1px solid #3A342B;color:#F2EDE0;
-    border-radius:10px;padding:11px 12px;font:500 14px "IBM Plex Mono"}
+    border-radius:10px;padding:11px 12px;font:500 16px "IBM Plex Mono"}
   .scan-manual input::placeholder{color:#8B8271}
   .scan-manual input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.25)}
-  .scan-hint{margin:0;padding:0 16px 14px;text-align:center;font:500 10.5px "IBM Plex Mono";
-    letter-spacing:.16em;color:#A79E8C;display:flex;flex-direction:column;gap:3px}
+  .scan-hint{margin:0;padding:0 16px 14px;padding-bottom:calc(env(safe-area-inset-bottom) + 14px);
+    text-align:center;font:500 10.5px "IBM Plex Mono";letter-spacing:.16em;color:#A79E8C;
+    display:flex;flex-direction:column;gap:3px}
   #scan-engine{opacity:.75}
 
-  #toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:200;display:flex;
-    flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:92vw}
+  #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);transform:translateX(-50%);
+    z-index:200;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
+    width:max-content;max-width:92vw}
   .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
     border-radius:999px;font:500 13.5px "IBM Plex Sans";box-shadow:0 10px 26px rgba(0,0,0,.3);
     opacity:0;transform:translateY(10px);transition:.25s;max-width:92vw}
@@ -443,11 +444,10 @@
       <div class="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
     </label>
 
-    <div class="fld">
-      <div class="qty-head"><span>QUANTITY</span><b id="qty-cur">1</b></div>
-      <div class="qty-strip" id="qty-strip" tabindex="0" aria-label="Quantity — scroll or use the buttons"></div>
-      <div class="qty-btns">
+    <div class="fld"><span>QUANTITY</span>
+      <div class="qty-row">
         <button type="button" class="btn" id="qty-minus" aria-label="Decrease quantity"><span class="ic" data-ico="minus"></span></button>
+        <select id="qty-select" class="in" aria-label="Quantity"></select>
         <button type="button" class="btn" id="qty-plus" aria-label="Increase quantity"><span class="ic" data-ico="plus"></span></button>
       </div>
     </div>
@@ -605,11 +605,19 @@ function buildHeroBars(){
     '<i class="g" style="width:3px"></i><i class="g" style="width:3px"></i>';
 }
 
-/* ================= beeps ================= */
+/* ================= beeps (iOS-safe: prime the context on first touch) ================= */
 let actx;
-function beep(){
+function primeAudio(){
   try{
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if(actx.state === 'suspended') actx.resume();
+  }catch(e){}
+}
+document.addEventListener('pointerdown', primeAudio, {once:true});
+function beep(){
+  try{
+    primeAudio();
+    if(!actx || actx.state !== 'running') return;
     [0, .13].forEach(t => {
       const o = actx.createOscillator(), g = actx.createGain();
       o.type = 'square'; o.frequency.value = 1244;
@@ -712,10 +720,10 @@ function startRun(store){
 
 /* ================= scanner =================
    Own pipeline: one getUserMedia stream → <video> preview → frame pump (~9fps).
-   Each tick crops to the viewfinder band (more pixels on the code) or uses the
-   full frame, then runs the best available engine:
+   Each tick crops around the viewfinder band (more pixels on the code) or uses
+   the full frame, then runs the best available engine:
      1. ZBar WASM  — retail-grade 1D decoding, lazy-loaded from CDN
-     2. BarcodeDetector — native, ONLY when it truly supports 1D formats
+     2. BarcodeDetector — native, ONLY on Chromium/Android (absent on iOS)
      3. ZXing low-level MultiFormatReader — universal fallback, with inverted passes */
 const S = {
   stream:null, track:null, running:false, busy:false, tick:0, pump:null,
@@ -724,11 +732,11 @@ const S = {
   zbar:null, zbarState:'none',     // 'none' | 'loading' | 'ready'
   devices:[], devIdx:-1,
 };
-let scanLock=false, torchTrack=null, torchOn=false, wakeLock=null;
+let scanLock=false, torchTrack=null, torchOn=false, wakeLock=null, zbarFails=0;
 
 /* ---------- engine 1: ZBar (WASM) ---------- */
 function ensureZbar(){
-  if(S.zbarState === 'ready') return;
+  if(S.zbarState === 'ready' || zbarFails >= 2) return;
   if(S.zbarState !== 'none') return;      // already loading
   S.zbarState = 'loading';
   const urls = [
@@ -741,12 +749,12 @@ function ensureZbar(){
         const m = await import(u);
         if(m && typeof m.locate === 'function'){
           S.zbar = m; S.zbarState = 'ready';
-          setEngineLine('ZBAR LOADED');
+          setEngineLine();
           return;
         }
       }catch(e){ /* try next mirror */ }
     }
-    S.zbarState = 'none';
+    S.zbarState = 'none'; zbarFails++;
     setEngineLine();
   })();
 }
@@ -769,14 +777,13 @@ async function zbarText(canvas){
   return null;
 }
 
-/* ---------- engine 2: native BarcodeDetector ---------- */
+/* ---------- engine 2: native BarcodeDetector (Chromium only) ---------- */
 async function setupNative(){
   if(S.detector || !('BarcodeDetector' in window)) return;
   try{
     const sup = await window.BarcodeDetector.getSupportedFormats();
     const want = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','codabar'];
     S.nativeFormats = want.filter(f => sup.includes(f));
-    // only take over if this build genuinely handles retail 1D codes
     if(S.nativeFormats.length) S.detector = new window.BarcodeDetector({ formats: S.nativeFormats });
   }catch(e){}
 }
@@ -841,10 +848,11 @@ function bandRect(video){
   const scale = Math.max(dw / vw, dh / vh);
   const offX = (vw * scale - dw) / 2, offY = (vh * scale - dh) / 2;
   const bh = Math.min(190, dh * 0.55), by = (dh - bh) / 2;
-  const bx = dw * 0.09, bw = dw * 0.82;
+  // analysis region is wider than the visual band so codes poking past the brackets still read
+  const bx = dw * 0.04, bw = dw * 0.92;
   const sx = (bx + offX) / scale, sy = (by + offY) / scale;
   const sw = bw / scale, sh = bh / scale;
-  if(sw < 60 || sh < 40) return null;      // degenerate — fall back to full frame
+  if(sw < 60 || sh < 40) return null;
   return { sx, sy, sw, sh };
 }
 function drawTo(canvas, video, rect){
@@ -895,13 +903,15 @@ async function openStream(deviceId){
   S.track = S.stream.getVideoTracks()[0];
   torchTrack = S.track; torchOn = false;
   setupTorch(); setupZoom();
-  setTimeout(setEngineLine, 400);   // once dimensions are known
+  setTimeout(setEngineLine, 400);
 }
 async function listCameras(){
   try{
     const all = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
     const back = all.filter(d => /back|rear|environment|world/i.test(d.label));
     S.devices = back.length > 1 ? back : (all.length > 1 ? all : []);
+    const cur = S.track && S.track.getSettings ? S.track.getSettings().deviceId : null;
+    S.devIdx = Math.max(0, S.devices.findIndex(d => d.deviceId === cur));
     $('#cam-btn').hidden = S.devices.length < 2;
   }catch(e){ S.devices = []; $('#cam-btn').hidden = true; }
 }
@@ -975,6 +985,7 @@ function releaseWakeLock(){ try{ wakeLock && wakeLock.release(); }catch(e){} wak
 
 async function openScanner(){
   if(!run) return;
+  primeAudio();
   $('#scan-video').hidden = false; $('#scan-error').hidden = true;
   $('#scan-code').value = '';
   $('#torch-btn').hidden = true; $('#zoom-wrap').hidden = true; $('#cam-btn').hidden = true;
@@ -998,7 +1009,7 @@ async function openScanner(){
     startPump();
     setEngineLine();
   }catch(err){
-    scanError('Camera refused. Tap the padlock icon in the address bar → allow Camera → reopen. Or type the barcode below.');
+    scanError('Camera refused. Open Settings → Apps → Safari → Camera → Allow (or tap the AA/padlock in the address bar), then reopen. Or type the barcode below.');
   }
 }
 function onDecode(text){
@@ -1044,7 +1055,7 @@ function finishRun(){
 }
 
 /* ================= item modal ================= */
-let currentQty = 1, pendingCat = 'Misc', qtyStep = 48;
+let currentQty = 1, pendingCat = 'Misc';
 
 function openItemModal(barcode){
   $('#item-barcode').textContent = barcode;
@@ -1054,7 +1065,7 @@ function openItemModal(barcode){
   $('#fld-name').classList.remove('err'); $('#fld-price').classList.remove('err');
   buildExpSelects();
   buildChips(lastCat);
-  setQty(1, false);
+  setQty(1);
   openModal('m-item');
   closeFn['m-item'] = ()=>{ shut($('#m-item')); openScanner(); };
   setTimeout(()=> $('#item-name').focus(), 120);
@@ -1091,30 +1102,17 @@ function buildChips(selected){
   $$('.chip', $('#cat-chips')).forEach(c => { c.classList.toggle('on', c === b); c.setAttribute('aria-pressed', c === b); });
 });
 
-function buildQtyStrip(){
-  const strip = $('#qty-strip');
-  strip.innerHTML = Array.from({length:99}, (_,i)=>`<div class="qty-cell" data-q="${i+1}">${i+1}</div>`).join('');
-  const cells = $$('.qty-cell', strip);
-  qtyStep = cells[1].offsetLeft - cells[0].offsetLeft;
-  strip.addEventListener('scroll', ()=>{
-    const idx = Math.max(0, Math.min(98, Math.round(strip.scrollLeft / qtyStep)));
-    setQty(idx + 1, false);
-  }, {passive:true});
-  strip.addEventListener('wheel', e => { e.preventDefault(); strip.scrollLeft += e.deltaY; }, {passive:false});
-  strip.addEventListener('click', e => {
-    const c = e.target.closest('.qty-cell'); if(!c) return;
-    setQty(+c.dataset.q, true);
-  });
+/* quantity — select with 1–99, styled like the date fields */
+function buildQtySelect(){
+  $('#qty-select').innerHTML = Array.from({length:99}, (_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
 }
-function setQty(q, scroll){
-  currentQty = Math.max(1, Math.min(99, q));
-  $('#qty-cur').textContent = currentQty;
-  const strip = $('#qty-strip');
-  $$('.qty-cell', strip).forEach(c => c.classList.toggle('on', +c.dataset.q === currentQty));
-  if(scroll) strip.scrollTo({ left: (currentQty - 1) * qtyStep, behavior:'smooth' });
+function setQty(q){
+  currentQty = Math.max(1, Math.min(99, Math.round(q)));
+  $('#qty-select').value = currentQty;
 }
- $('#qty-plus').addEventListener('click', ()=> setQty(currentQty + 1, true));
- $('#qty-minus').addEventListener('click', ()=> setQty(currentQty - 1, true));
+ $('#qty-select').addEventListener('change', e => { currentQty = +e.target.value || 1; });
+ $('#qty-plus').addEventListener('click', ()=> setQty(currentQty + 1));
+ $('#qty-minus').addEventListener('click', ()=> setQty(currentQty - 1));
 
  $('#item-save').addEventListener('click', ()=>{
   const name = $('#item-name').value.trim();
@@ -1348,11 +1346,15 @@ function askConfirm({title, body, yes='Delete', onYes}){
 
 /* ================= init ================= */
 buildHeroBars();
-buildQtyStrip();
+buildQtySelect();
 buildExpSelects();
 buildChips(lastCat);
 renderHome();
 setTab('home');
+/* Preload the retail-grade ZBar engine during idle time so it's ready
+   the moment the scanner opens (also warms it up for the home-screen app). */
+const idle = window.requestIdleCallback || (fn => setTimeout(fn, 1500));
+idle(() => ensureZbar());
 </script>
 </body>
 </html>
