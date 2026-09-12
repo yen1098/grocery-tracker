@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4EEE1">
+<title>Shelf Life — a grocery ledger</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Barcode detection (camera). If this fails to load, the manual entry path still works. -->
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
+
+<style>
+  :root{
+    --paper:#F4EEE1; --paper-2:#ECE4D2; --card:#FCFAF3;
+    --ink:#221E15; --ink2:#6E6553; --line:#DCD2BC;
+    --green:#2E6B45; --green-deep:#1E4A2F;
+    --red:#C4402A; --amber:#A9700F; --laser:#FF3B30;
+    --shadow:0 1px 2px rgba(34,30,21,.06), 0 12px 32px -14px rgba(34,30,21,.22);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:400 15px/1.55 "IBM Plex Sans",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* paper grain */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:300; pointer-events:none; opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+  }
+  body.no-scroll{overflow:hidden}
+  ::selection{background:rgba(46,107,69,.25)}
+  button{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
+  .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
+  .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
+
+  /* ---------- header ---------- */
+  header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  .top-in{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+  .tabs{display:flex;gap:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:4px}
+  .tabs button{border:none;background:transparent;padding:7px 15px;border-radius:999px;font:600 13.5px "IBM Plex Sans";color:var(--ink2);cursor:pointer;transition:.15s}
+  .tabs button.on{background:var(--ink);color:var(--paper)}
+  .tabs sup{font:600 10px "IBM Plex Mono";color:inherit;margin-left:3px}
+
+  /* side notes on wide screens */
+  .side-note{display:none}
+  @media(min-width:1080px){
+    .side-note{display:block;position:fixed;bottom:26px;font:500 10px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2);opacity:.65;z-index:5}
+    .side-note.l{left:26px;transform:rotate(180deg);writing-mode:vertical-rl}
+    .side-note.r{right:26px;writing-mode:vertical-rl}
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ink);
+    background:transparent;color:var(--ink);padding:10px 16px;border-radius:10px;font:500 14.5px "IBM Plex Sans";
+    cursor:pointer;transition:transform .12s, box-shadow .12s, background .12s}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 4px 10px -4px rgba(34,30,21,.35)}
+  .btn:active{transform:translateY(0);box-shadow:none}
+  .btn.primary{background:var(--ink);color:var(--paper)}
+  .btn.accent{background:var(--green);border-color:var(--green-deep);color:#F5F1E4}
+  .btn.big{width:100%;padding:14px 24px;font-size:16px}
+  .btn.sm{padding:7px 13px;font-size:13px}
+  .btn.ghost-light{border-color:rgba(245,241,228,.4);color:#F2EDE0;background:transparent}
+  .btn.ghost-light:hover{border-color:#F2EDE0}
+  .btn.wide{width:100%}
+  .linkbtn{background:none;border:none;color:var(--green);font:600 13.5px "IBM Plex Sans";text-decoration:underline;cursor:pointer;padding:4px}
+
+  /* ---------- home ---------- */
+  .kicker{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--green);margin:38px 0 10px}
+  h1{font:600 clamp(2.1rem,7vw,3.1rem)/1.08 "Fraunces";letter-spacing:-.02em;margin:0}
+  h1 em{color:var(--green)}
+  .sub{color:var(--ink2);margin:14px 0 0;max-width:44ch}
+
+  .active-run{display:flex;align-items:center;gap:12px;margin-top:24px;padding:11px 13px;background:var(--card);
+    border:1px solid var(--line);border-left:3px solid var(--green);border-radius:12px;flex-wrap:wrap}
+  .ar-dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .ar-txt{flex:1;min-width:150px}
+  .ar-txt b{font:600 15px "Fraunces";display:block}
+  .ar-txt span{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
+
+  .hero-code{position:relative;display:flex;align-items:center;justify-content:space-between;gap:2px;width:100%;
+    height:112px;margin-top:32px;padding:12px 16px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;cursor:pointer;overflow:hidden;box-shadow:var(--shadow);transition:transform .14s}
+  .hero-code:active{transform:scale(.985)}
+  .hero-code i{background:var(--ink);height:76%;border-radius:1px}
+  .hero-code i.g{height:100%}
+  .laser{position:absolute;left:0;right:0;top:-3px;height:3px;background:var(--laser);
+    box-shadow:0 0 12px 2px rgba(255,59,48,.5);opacity:.9;animation:laser 3.2s ease-in-out infinite alternate}
+  .hero-code:hover .laser{animation-duration:1s}
+  @keyframes laser{from{transform:translateY(0)}to{transform:translateY(112px)}}
+  .hero-cap{text-align:center;font:600 10.5px "IBM Plex Mono";letter-spacing:.2em;color:var(--ink2);margin:12px 0 0}
+
+  .cta-row{margin-top:24px}
+  .steps{list-style:none;margin:36px 0 0;padding:0;border-top:1px solid var(--line)}
+  .steps li{display:flex;gap:16px;padding:14px 2px;border-bottom:1px solid var(--line)}
+  .steps .n{font:600 12px "IBM Plex Mono";color:var(--green);letter-spacing:.08em;padding-top:2px}
+  .steps b{font-weight:600}
+  .steps p{margin:2px 0 0;color:var(--ink2);font-size:14px}
+  .stats{display:flex;margin:30px 0 46px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .stat{flex:1;padding:14px 16px;border-left:1px solid var(--line)}
+  .stat:first-child{border-left:0}
+  .stat b{display:block;font:600 21px "IBM Plex Mono";letter-spacing:-.02em}
+  .stat span{font:600 10px "IBM Plex Mono";letter-spacing:.18em;color:var(--ink2)}
+
+  /* ---------- records ---------- */
+  .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 16px}
+  .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
+  .rec-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .seg{display:flex;gap:3px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .seg button{border:none;background:transparent;padding:6px 13px;border-radius:999px;font:600 12.5px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--ink);color:var(--paper)}
+  .rec-tools-right{display:flex;gap:8px;align-items:center;margin-left:auto}
+
+  select.in{appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E6553' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+  #rec-sort{padding:8px 30px 8px 12px;font-size:13px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);color:var(--ink)}
+  #rec-sort[hidden]{display:none}
+
+  .empty{border:1.5px dashed var(--line);border-radius:16px;padding:46px 24px;text-align:center;color:var(--ink2);margin-bottom:40px}
+  .empty .ic svg{width:38px;height:38px}
+  .empty h3{font:600 23px "Fraunces";color:var(--ink);margin:12px 0 6px}
+  .empty p{margin:0 0 18px}
+
+  /* receipt cards */
+  .receipt{position:relative;margin-bottom:20px;
+    filter:drop-shadow(0 1px 2px rgba(34,30,21,.09)) drop-shadow(0 12px 18px rgba(34,30,21,.10))}
+  .receipt.fresh{box-shadow:0 0 0 2.5px var(--green);border-radius:12px}
+  .receipt-body{background:var(--card);border-radius:12px 12px 0 0;padding:4px 18px 14px}
+  .receipt::after{content:"";position:absolute;top:100%;left:0;width:100%;height:8px;
+    background:conic-gradient(from 135deg at 50% 0,var(--card) 90deg,transparent 90deg) 0 0/12px 8px repeat-x}
+  .rec-head{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:15px 0 12px;text-align:left;cursor:pointer}
+  .rec-hl{flex:1;min-width:0}
+  .rec-store{font:600 19px "Fraunces";letter-spacing:-.01em}
+  .rec-meta{font:500 11px "IBM Plex Mono";letter-spacing:.08em;color:var(--ink2);margin-top:3px;text-transform:uppercase}
+  .rec-right{display:flex;align-items:center;gap:8px}
+  .rec-total{font:600 16px "IBM Plex Mono"}
+  .rec-chev{color:var(--ink2);transition:transform .25s}
+  .receipt.open .rec-chev{transform:rotate(180deg)}
+  .rec-del{border:none;background:none;color:#B9AE97;cursor:pointer;padding:6px;border-radius:8px;display:grid;place-items:center}
+  .rec-del:hover{color:var(--red);background:rgba(196,64,42,.08)}
+  .rec-rule{border:0;border-top:1px dashed var(--line);margin:0}
+  .rec-items{display:none}
+  .receipt.open .rec-items{display:block;animation:fadeIn .25s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1}}
+  .rec-line{display:grid;grid-template-columns:1fr auto auto;gap:3px 12px;align-items:center;padding:11px 0;border-bottom:1px dashed var(--line)}
+  .rec-line:last-of-type{border-bottom:0}
+  .rl-name{font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
+  .rl-mult{font:500 12px "IBM Plex Mono";color:var(--ink2)}
+  .rl-total{font:600 13.5px "IBM Plex Mono";grid-row:span 2}
+  .rl-meta{font:500 11px "IBM Plex Mono";color:var(--ink2);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--c,#999);display:inline-block;flex:none}
+  .exp.warn{color:var(--amber)} .exp.bad{color:var(--red)}
+  .rl-del{border:none;background:none;color:#C4BAA4;cursor:pointer;padding:6px;border-radius:8px;grid-column:3;justify-self:end}
+  .rl-del:hover{color:var(--red);background:rgba(196,64,42,.08)}
+  .rl-del.armed{background:var(--red);color:#fff;font:600 11px "IBM Plex Sans";padding:6px 10px}
+  .rec-foot{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0 3px;
+    border-top:1px dashed var(--line);margin-top:2px;font:600 12.5px "IBM Plex Mono";letter-spacing:.14em}
+  .rec-foot b{font-size:16.5px;letter-spacing:0}
+
+  .catgroup{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
+  .cg-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px dashed var(--line)}
+  .cg-head h3{font:600 17.5px "Fraunces";margin:0;flex:1}
+  .cg-sum{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
+  .catgroup .rec-line,.catgroup .rec-foot{margin-inline:16px;padding-inline:0}
+  .catgroup .rec-line:first-of-type{border-top:0}
+  .catgroup .rec-foot{border-top:1px dashed var(--line)}
+
+  /* ---------- modals ---------- */
+  .overlay{position:fixed;inset:0;z-index:50;background:rgba(30,26,17,.55);backdrop-filter:blur(3px);
+    display:grid;place-items:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s, visibility .2s}
+  .overlay.open{opacity:1;visibility:visible}
+  .modal{position:relative;width:min(480px,100%);background:var(--card);border-radius:16px;padding:24px 22px 20px;
+    box-shadow:0 24px 60px -18px rgba(0,0,0,.45);max-height:min(88dvh,780px);overflow:auto;
+    transform:translateY(12px) scale(.98);transition:transform .22s cubic-bezier(.2,.8,.3,1.1)}
+  .overlay.open .modal{transform:none}
+  .modal-title{font:600 24px "Fraunces";margin:0 0 4px;letter-spacing:-.01em}
+  .modal-sub{color:var(--ink2);font-size:13.5px;margin:0 0 18px}
+  .x{position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;border-radius:50%;
+    background:var(--paper-2);color:var(--ink2);cursor:pointer;display:grid;place-items:center;transition:.12s}
+  .x:hover{background:var(--ink);color:var(--paper)}
+  .x svg{width:15px;height:15px}
+
+  .fld{display:block;margin-bottom:13px}
+  .fld>span{display:block;font:600 10.5px "IBM Plex Mono";letter-spacing:.16em;color:var(--ink2);margin-bottom:6px}
+  .in{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#FFFDF6;
+    color:var(--ink);font:500 15px "IBM Plex Sans";transition:border-color .12s, box-shadow .12s}
+  .in:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.14)}
+  .fld.err .in{border-color:var(--red);box-shadow:0 0 0 3px rgba(196,64,42,.12)}
+  .shake{animation:shake .3s}
+  @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .price-wrap{position:relative}
+  .price-wrap::before{content:"₱";position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    font:600 14px "IBM Plex Mono";color:var(--ink2);pointer-events:none}
+  .price-wrap .in{padding-left:30px;font-family:"IBM Plex Mono"}
+
+  .bc-label{display:block;font:600 10.5px "IBM Plex Mono";letter-spacing:.16em;color:var(--ink2);margin-bottom:6px}
+  .bc-block{display:flex;align-items:center;gap:14px;background:var(--paper-2);border:1px dashed var(--line);
+    border-radius:10px;padding:11px 13px;margin-bottom:14px}
+  .bc-bars{display:flex;align-items:center;gap:2px;height:24px;flex:none}
+  .bc-bars i{height:100%;background:var(--ink);border-radius:.5px}
+  .bc-num{flex:1;font:600 15px "IBM Plex Mono";letter-spacing:.12em;overflow-wrap:anywhere}
+  .bc-lock{color:var(--ink2);flex:none}.bc-lock svg{width:15px;height:15px;display:block}
+
+  .qty-head{display:flex;justify-content:space-between;align-items:baseline}
+  .qty-head b{font:600 14px "IBM Plex Mono"}
+  .qty-strip{display:flex;gap:4px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 0;margin-top:4px;
+    scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+  .qty-strip::-webkit-scrollbar{display:none}
+  .qty-cell{flex:0 0 44px;height:44px;scroll-snap-align:center;display:grid;place-items:center;
+    border:1px solid var(--line);border-radius:10px;background:#FFFDF6;font:600 14.5px "IBM Plex Mono";
+    cursor:pointer;user-select:none}
+  .qty-cell.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .qty-btns{display:flex;gap:6px}
+  .qty-btns .btn{padding:8px 10px}
+
+  .exp-row{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px}
+  .exp-row .in{padding:10px 26px 10px 10px;font-family:"IBM Plex Mono";font-size:14px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{border:1px solid var(--line);background:#FFFDF6;color:var(--ink);border-radius:999px;
+    padding:7px 13px;font:500 13px "IBM Plex Sans";cursor:pointer;transition:.12s}
+  .chip:hover{border-color:var(--ink)}
+  .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+  /* confirmation modal */
+  .cf-list{border:1px dashed var(--line);border-radius:12px;background:var(--paper-2);padding:4px 14px;margin:14px 0 20px}
+  .cf-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+  .cf-row:last-child{border-bottom:0}
+  .cf-row .k{font:600 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);padding-top:3px;flex:none}
+  .cf-row .v{font:500 13.5px "IBM Plex Sans";text-align:right;overflow-wrap:anywhere}
+  .cf-row .v.mono{font-family:"IBM Plex Mono"}
+  .cf-actions{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .bigcheck{width:64px;height:64px;border-radius:50%;border:none;background:var(--green);color:#F5F1E4;
+    display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--green-deep);transition:.1s}
+  .bigcheck:hover{background:#357A4F}
+  .bigcheck:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-deep)}
+  .bigcheck svg{width:28px;height:28px}
+  .cf-label{font:600 15px "IBM Plex Sans"}
+  .cf-hint{font:400 12.5px "IBM Plex Sans";color:var(--ink2);margin:-4px 0 2px;text-align:center}
+
+  /* generic confirm (delete) */
+  .cfd-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+  .btn.danger{background:var(--red);border-color:#98311F;color:#FBF3EE}
+
+  /* ---------- scanner ---------- */
+  #m-scan{background:#171310;padding:0;place-items:stretch}
+  .scan-stage{width:min(560px,100%);margin:0 auto;height:100dvh;display:flex;flex-direction:column;transform:translateY(14px);transition:transform .22s}
+  #m-scan.open .scan-stage{transform:none}
+  .scan-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;color:#F2EDE0}
+  .scan-title{font:600 11px "IBM Plex Mono";letter-spacing:.24em;color:#A79E8C}
+  .scan-store{font:600 21px "Fraunces";margin-top:2px}
+  .scan-actions{display:flex;gap:8px;align-items:center}
+  .cam-wrap{position:relative;flex:1;min-height:260px;background:#0D0B08;overflow:hidden}
+  #scan-video{width:100%;height:100%;object-fit:cover;display:block}
+  .vf-band{position:absolute;left:9%;right:9%;top:50%;height:190px;transform:translateY(-50%);pointer-events:none}
+  .vf-band .c{position:absolute;width:30px;height:30px;border:3px solid rgba(247,244,234,.92)}
+  .c.tl{top:0;left:0;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
+  .c.tr{top:0;right:0;border-left:0;border-bottom:0;border-radius:0 8px 0 0}
+  .c.bl{bottom:0;left:0;border-right:0;border-top:0;border-radius:0 0 0 8px}
+  .c.br{bottom:0;right:0;border-left:0;border-top:0;border-radius:0 0 8px 0}
+  .scan-laser{position:absolute;left:0;right:0;top:2px;height:2.5px;background:var(--laser);
+    box-shadow:0 0 14px 3px rgba(255,59,48,.5);animation:laserScan 2.3s ease-in-out infinite alternate}
+  @keyframes laserScan{from{transform:translateY(0)}to{transform:translateY(184px)}}
+  .scan-error{position:absolute;inset:0;margin:0;display:grid;place-items:center;padding:26px;text-align:center;
+    color:#F2EDE0;background:rgba(13,11,8,.92);font-size:14.5px}
+  .scan-manual{display:flex;gap:8px;padding:12px 16px;background:#1D1915}
+  .scan-manual input{flex:1;min-width:0;background:#26221C;border:1px solid #3A342B;color:#F2EDE0;
+    border-radius:10px;padding:11px 12px;font:500 14px "IBM Plex Mono"}
+  .scan-manual input::placeholder{color:#8B8271}
+  .scan-manual input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.25)}
+  .scan-hint{margin:0;padding:0 16px 14px;text-align:center;font:500 10.5px "IBM Plex Mono";letter-spacing:.16em;color:#A79E8C}
+
+  /* toasts */
+  #toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:200;display:flex;
+    flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:92vw}
+  .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
+    border-radius:999px;font:500 13.5px "IBM Plex Sans";box-shadow:0 10px 26px rgba(0,0,0,.3);
+    opacity:0;transform:translateY(10px);transition:.25s;max-width:92vw}
+  .toast.in{opacity:1;transform:none}
+  .toast .ic{color:#8FCDA4}.toast .ic svg{width:15px;height:15px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a href="#" class="wordmark" id="wordmark">
+      <svg width="19" height="17" viewBox="0 0 20 18" aria-hidden="true"><g fill="currentColor">
+        <rect width="3" height="18"/><rect x="5" width="1.6" height="18"/><rect x="8.6" width="4.6" height="18"/>
+        <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
+      Shelf Life
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <button id="tab-home" class="on">Run</button>
+      <button id="tab-recs">Records<sup id="rec-count" hidden></sup></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HOME / RUN ============ -->
+  <section id="view-home">
+    <div class="wrap">
+      <p class="kicker">GROCERY LEDGER · LOCAL-FIRST</p>
+      <h1>Groceries,<br><em>on the record.</em></h1>
+      <p class="sub">Scan barcodes in the aisle, log price and expiry in seconds, and keep a tidy receipt for every run — exportable as CSV anytime.</p>
+
+      <div id="active-run" class="active-run" hidden>
+        <span class="ar-dot"></span>
+        <div class="ar-txt"><b id="ar-store"></b><span id="ar-meta"></span></div>
+        <button id="ar-resume" class="btn sm">Resume scan</button>
+        <button id="ar-finish" class="btn sm accent"><span class="ic" data-ico="check"></span>Finish</button>
+      </div>
+
+      <button id="hero-code" class="hero-code" aria-label="Start a grocery run"><span class="laser"></span></button>
+      <p class="hero-cap">TAP THE CODE TO START A RUN</p>
+
+      <div class="cta-row">
+        <button id="btn-start" class="btn primary big"><span class="ic" data-ico="cart"></span>Start grocery run</button>
+      </div>
+
+      <ol class="steps">
+        <li><span class="n">01</span><div><b>Pick your store</b><p>Puregold, SM, Robinsons — or add your own sukan spot.</p></div></li>
+        <li><span class="n">02</span><div><b>Scan the barcode</b><p>The camera reads EAN / UPC codes. No camera? Type the number in.</p></div></li>
+        <li><span class="n">03</span><div><b>Confirm &amp; keep going</b><p>Price, quantity, expiry, category — then straight to the next item.</p></div></li>
+      </ol>
+
+      <div class="stats" id="stats"></div>
+    </div>
+  </section>
+
+  <!-- ============ RECORDS ============ -->
+  <section id="view-records" hidden>
+    <div class="wrap">
+      <div class="rec-top"><h2>The ledger</h2></div>
+      <div class="rec-tools" id="rec-tools">
+        <div class="seg" role="tablist" aria-label="Group records">
+          <button id="seg-session" class="on">By session</button>
+          <button id="seg-cat">By category</button>
+        </div>
+        <div class="rec-tools-right">
+          <select id="rec-sort" class="in" aria-label="Sort sessions">
+            <option value="new">Newest first</option>
+            <option value="old">Oldest first</option>
+          </select>
+          <button id="btn-export" class="btn primary"><span class="ic" data-ico="download"></span>Export CSV</button>
+        </div>
+      </div>
+      <div id="rec-empty" class="empty" hidden>
+        <span class="ic" data-ico="receipt"></span>
+        <h3>No receipts yet.</h3>
+        <p>Your finished runs land here — grouped, totalled, and ready to export.</p>
+        <button id="btn-empty-start" class="btn primary"><span class="ic" data-ico="cart"></span>Start grocery run</button>
+        <div style="margin-top:10px"><button id="btn-sample" class="linkbtn">or preview with sample data</button></div>
+      </div>
+      <div id="rec-list"></div>
+    </div>
+  </section>
+</main>
+
+<span class="side-note l">LOCAL-FIRST — YOUR DATA NEVER LEAVES THIS DEVICE</span>
+<span class="side-note r">EXPORT READY · CSV · GITHUB PAGES FRIENDLY</span>
+
+<!-- ============ MODAL: store picker ============ -->
+<div class="overlay" id="m-store">
+  <form class="modal" id="store-form" role="dialog" aria-modal="true" aria-labelledby="store-title">
+    <button type="button" class="x" id="store-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
+    <h2 class="modal-title" id="store-title">Where are you shopping?</h2>
+    <p class="modal-sub">Each run is tagged with one store.</p>
+    <label class="fld"><span>STORE</span><select id="store-select" class="in"></select></label>
+    <label class="fld" id="new-store-wrap" hidden><span>NEW STORE NAME</span>
+      <input id="new-store-input" class="in" placeholder="e.g. Landers Superstore" autocomplete="off">
+    </label>
+    <button type="submit" id="store-continue" class="btn primary wide">Continue<span class="ic" data-ico="arrow"></span></button>
+  </form>
+</div>
+
+<!-- ============ MODAL: scanner ============ -->
+<div class="overlay" id="m-scan">
+  <div class="scan-stage" role="dialog" aria-modal="true" aria-label="Barcode scanner">
+    <div class="scan-top">
+      <div><div class="scan-title">SCANNING</div><div class="scan-store" id="scan-store"></div></div>
+      <div class="scan-actions">
+        <button id="scan-finish" class="btn ghost-light sm"><span class="ic" data-ico="check"></span>End run</button>
+        <button id="scan-close" class="x" style="position:static" aria-label="Close scanner"><span class="ic" data-ico="x"></span></button>
+      </div>
+    </div>
+    <div class="cam-wrap">
+      <video id="scan-video" playsinline muted></video>
+      <div class="vf-band"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+        <div class="scan-laser"></div>
+      </div>
+      <p id="scan-error" class="scan-error" hidden></p>
+    </div>
+    <form id="scan-manual">
+      <input id="scan-code" inputmode="numeric" autocomplete="off"
+             placeholder="Type the barcode — or use a USB scanner" aria-label="Barcode number">
+      <button class="btn primary" type="submit"><span class="ic" data-ico="arrow"></span>Add</button>
+    </form>
+    <p class="scan-hint" id="scan-count">0 ITEMS IN THIS RUN</p>
+  </div>
+</div>
+
+<!-- ============ MODAL: item details ============ -->
+<div class="overlay" id="m-item">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="item-title">
+    <button type="button" class="x" id="item-x" aria-label="Discard and rescan"><span class="ic" data-ico="x"></span></button>
+    <h2 class="modal-title" id="item-title">Item details</h2>
+    <p class="modal-sub">Everything is editable except the code.</p>
+
+    <span class="bc-label">BARCODE · READ ONLY</span>
+    <div class="bc-block">
+      <div class="bc-bars" id="item-bars" aria-hidden="true"></div>
+      <div class="bc-num" id="item-barcode"></div>
+      <span class="bc-lock" title="Read only"><span class="ic" data-ico="lock"></span></span>
+    </div>
+
+    <label class="fld" id="fld-name"><span>PRODUCT NAME</span>
+      <input id="item-name" class="in" autocomplete="off" placeholder="e.g. Lucky Me Pancit Canton">
+    </label>
+
+    <label class="fld" id="fld-price"><span>PRICE</span>
+      <div class="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+    </label>
+
+    <div class="fld">
+      <div class="qty-head"><span>QUANTITY</span><b id="qty-cur">1</b></div>
+      <div class="qty-strip" id="qty-strip" tabindex="0" aria-label="Quantity — scroll or use the buttons"></div>
+      <div class="qty-btns">
+        <button type="button" class="btn" id="qty-minus" aria-label="Decrease quantity"><span class="ic" data-ico="minus"></span></button>
+        <button type="button" class="btn" id="qty-plus" aria-label="Increase quantity"><span class="ic" data-ico="plus"></span></button>
+      </div>
+    </div>
+
+    <div class="fld"><span>EXPIRY DATE · DEFAULTS TO TODAY</span>
+      <div class="exp-row">
+        <select id="exp-m" class="in" aria-label="Month"></select>
+        <select id="exp-d" class="in" aria-label="Day"></select>
+        <select id="exp-y" class="in" aria-label="Year"></select>
+      </div>
+    </div>
+
+    <div class="fld"><span>CATEGORY</span><div class="chips" id="cat-chips"></div></div>
+
+    <button id="item-save" class="btn primary wide"><span class="ic" data-ico="check"></span>Save item</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: confirm item ============ -->
+<div class="overlay" id="m-confirm">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cf-title">
+    <h2 class="modal-title" id="cf-title">One last look</h2>
+    <p class="modal-sub">Check the details, then stamp it in.</p>
+    <div class="cf-list">
+      <div class="cf-row"><span class="k">BARCODE</span><span class="v mono" id="cf-barcode"></span></div>
+      <div class="cf-row"><span class="k">PRODUCT</span><span class="v" id="cf-name"></span></div>
+      <div class="cf-row"><span class="k">CATEGORY</span><span class="v" id="cf-cat"></span></div>
+      <div class="cf-row"><span class="k">QTY × PRICE</span><span class="v mono" id="cf-line"></span></div>
+      <div class="cf-row"><span class="k">EXPIRY</span><span class="v mono" id="cf-exp"></span></div>
+      <div class="cf-row"><span class="k">LINE TOTAL</span><span class="v mono" id="cf-total" style="font-weight:600;font-size:15px"></span></div>
+    </div>
+    <div class="cf-actions">
+      <button id="cf-yes" class="bigcheck" aria-label="Confirm and add"><span class="ic" data-ico="check"></span></button>
+      <span class="cf-label">Confirm &amp; add to run</span>
+      <span class="cf-hint">You'll go straight back to the scanner.</span>
+      <button id="cf-back" class="btn sm">Edit details</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: generic confirm (delete) ============ -->
+<div class="overlay" id="m-cfd">
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="cfd-title" style="width:min(400px,100%)">
+    <h2 class="modal-title" id="cfd-title">Delete?</h2>
+    <p class="modal-sub" id="cfd-body"></p>
+    <div class="cfd-actions">
+      <button id="cfd-no" class="btn">Keep it</button>
+      <button id="cfd-yes" class="btn danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ================= tiny utils ================= */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const pad = n => String(n).padStart(2,'0');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,6);
+const PHP = new Intl.NumberFormat('en-PH', {style:'currency', currency:'PHP'});
+const money = n => PHP.format(n);
+const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function fmtDate(iso){ if(!iso) return '—'; const [y,m,d] = iso.split('-').map(Number); return `${pad(d)} ${MONTHS[m-1]} ${y}`; }
+function fmtShort(iso){ const [,m,d] = iso.split('-'); return `${d} ${MONTHS[+m-1]} ${iso.slice(2,4)}`; }
+function fmtTs(ts){
+  const d = new Date(ts), now = new Date();
+  const hm = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const md = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+  return d.getFullYear() === now.getFullYear() ? `${md} · ${hm}` : `${md} ${d.getFullYear()} · ${hm}`;
+}
+/* icons */
+const PATHS = {
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  check:'<path d="M4 12.5l5 5L20 6.5"/>',
+  chev:'<path d="M6 9l6 6 6-6"/>',
+  trash:'<path d="M4 7h16M10 4h4M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  minus:'<path d="M5 12h14"/>',
+  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  download:'<path d="M12 3v12M8 11l4 4 4-4M4 21h16"/>',
+  cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 3h2l2.5 12.3a1.5 1.5 0 0 0 1.5 1.2h8a1.5 1.5 0 0 0 1.5-1.2L20.5 7H6"/>',
+  receipt:'<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4L10 21l-2-1.4L6 21zM9.5 8h5M9.5 12h5"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+};
+const ico = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[n]}</svg>`;
+ $$('[data-ico]').forEach(n => n.innerHTML = ico(n.dataset.ico));
+
+/* ================= data ================= */
+const DB_KEY = 'shelf-life.v1';
+const DEFAULT_STORES = ['Puregold','Royal','SM','Robinsons','Shopwise'];
+const CATS = ['Frozen','Produce','Toiletries','Snacks','Misc','Canned','Processed','Cleaning',
+              'Storage','Organizing','Beverages','Dairy','Bakery','Condiments','Household','Pet Care'];
+const CAT_COLOR = {Frozen:'#4C7EA8',Produce:'#4C8A46',Toiletries:'#8A6FA8',Snacks:'#B97A1E',Misc:'#7A7466',
+  Canned:'#A0522D',Processed:'#8C4A3C',Cleaning:'#3E7E7E',Storage:'#6B6B6B',Organizing:'#56638A',
+  Beverages:'#3F6FA8',Dairy:'#7C8A3E',Bakery:'#A8763E',Condiments:'#96421E',Household:'#4E6E58', 'Pet Care':'#7A5230'};
+
+let db;
+function load(){
+  try { db = JSON.parse(localStorage.getItem(DB_KEY)); } catch(e){ db = null; }
+  if(!db || !Array.isArray(db.stores) || !Array.isArray(db.sessions)){
+    db = { stores:[...DEFAULT_STORES], sessions:[], draft:null };
+  }
+  if(!('draft' in db)) db.draft = null;
+}
+const save = () => { try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){} };
+load();
+
+let run = db.draft;          // in-progress run (persists across reloads)
+let lastCat = 'Misc';        // remembers the last category within a run
+let pendingItem = null, cfdCb = null;
+const ui = { tab:'home', group:'session', sort:'new', open:new Set(), freshId:null };
+
+/* ================= toasts ================= */
+function toast(msg, opts={}){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `${opts.icon ? `<span class="ic">${ico('check')}</span>` : ''}<span>${esc(msg)}</span>`;
+  $('#toasts').append(t);
+  requestAnimationFrame(()=> t.classList.add('in'));
+  setTimeout(()=>{ t.classList.remove('in'); setTimeout(()=> t.remove(), 300); }, opts.ms || 2600);
+}
+
+/* ================= modal manager ================= */
+const stack = [];
+const closeFn = {};   // per-overlay custom close behaviour
+function openModal(id){ const m = $('#'+id); m.classList.add('open'); if(!stack.includes(m)) stack.push(m); document.body.classList.add('no-scroll'); }
+function shut(m){ m.classList.remove('open'); const i = stack.indexOf(m); if(i>-1) stack.splice(i,1); if(!stack.length) document.body.classList.remove('no-scroll'); }
+function closeTop(){ if(!stack.length) return; const m = stack[stack.length-1]; (closeFn[m.id] || (()=>shut(m)))(); }
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTop(); });
+// backdrop click
+ $$('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target === ov) closeTop(); }));
+
+/* ================= decorative barcodes ================= */
+function barsHTML(seed, max=34){
+  const s = String(seed); const w = [];
+  for(let i=0; i<s.length && w.length<max; i++){
+    const c = s.charCodeAt(i);
+    w.push((c % 3) + 1);
+    if(i % 2) w.push(((c >> 2) % 3) + 1);
+  }
+  return w.map(x => `<i style="width:${x * 1.6}px"></i>`).join('');
+}
+function buildHeroBars(){
+  const W = [3,1,2,1,1,4,1,2,3,1,1,2,1,5,1,2,1,1,3,2,1,1,4,1,2,1,3,1,1,2,4,1,1,2,1,3,2,1,1,2];
+  const c = $('#hero-code');
+  c.innerHTML = '<span class="laser"></span>' +
+    '<i class="g" style="width:3px"></i><i class="g" style="width:3px"></i>' +
+    W.map(w => `<i style="width:${w*2.4}px"></i>`).join('') +
+    '<i class="g" style="width:3px"></i><i class="g" style="width:3px"></i>';
+}
+
+/* ================= beeps ================= */
+let actx;
+function beep(){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    [0, .13].forEach(t => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'square'; o.frequency.value = 1244;
+      g.gain.setValueAtTime(.07, actx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + t + .1);
+      o.connect(g).connect(actx.destination);
+      o.start(actx.currentTime + t); o.stop(actx.currentTime + t + .11);
+    });
+  }catch(e){}
+}
+
+/* ================= tabs ================= */
+function setTab(t){
+  ui.tab = t;
+  $('#tab-home').classList.toggle('on', t === 'home');
+  $('#tab-recs').classList.toggle('on', t === 'records');
+  $('#view-home').hidden  = t !== 'home';
+  $('#view-records').hidden = t !== 'records';
+  window.scrollTo({top:0});
+  if(t === 'records') renderRecords(); else renderHome();
+}
+ $('#tab-home').addEventListener('click', ()=> setTab('home'));
+ $('#tab-recs').addEventListener('click', ()=> setTab('records'));
+ $('#wordmark').addEventListener('click', e => { e.preventDefault(); setTab('home'); });
+
+/* ================= home render ================= */
+function totals(){
+  let items = 0, spent = 0;
+  db.sessions.forEach(s => s.items.forEach(it => { items += it.qty; spent += it.price * it.qty; }));
+  return { runs: db.sessions.length, items, spent };
+}
+function renderHome(){
+  const t = totals();
+  $('#stats').innerHTML = `
+    <div class="stat"><b>${t.runs}</b><span>RUNS</span></div>
+    <div class="stat"><b>${t.items}</b><span>ITEMS</span></div>
+    <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>`;
+  // active run bar
+  const bar = $('#active-run');
+  if(run){
+    bar.hidden = false;
+    $('#ar-store').textContent = run.store;
+    $('#ar-meta').textContent = `${run.items.length} ITEM${run.items.length===1?'':'S'} SCANNED`;
+    $('#btn-start').innerHTML = `<span class="ic">${ico('scan' in PATHS ? 'receipt' : 'cart')}</span>Resume scan`;
+  } else {
+    bar.hidden = true;
+    $('#btn-start').innerHTML = `<span class="ic">${ico('cart')}</span>Start grocery run`;
+  }
+  // records badge
+  const b = $('#rec-count');
+  b.hidden = !db.sessions.length;
+  b.textContent = db.sessions.length || '';
+}
+
+/* ================= flow: start a run ================= */
+function tryStart(){
+  if(run) openScanner(); else openStoreModal();
+}
+ $('#btn-start').addEventListener('click', tryStart);
+ $('#hero-code').addEventListener('click', tryStart);
+ $('#btn-empty-start').addEventListener('click', tryStart);
+ $('#ar-resume').addEventListener('click', openScanner);
+ $('#ar-finish').addEventListener('click', finishRun);
+
+/* ---- store modal ---- */
+function openStoreModal(){
+  const sel = $('#store-select');
+  sel.innerHTML = '';
+  db.stores.forEach(s => sel.append(new Option(s, s)));
+  sel.append(new Option('+ Add a new store…', '__new'));
+  $('#new-store-wrap').hidden = true;
+  $('#new-store-input').value = '';
+  $('#store-continue').lastChild.textContent = 'Continue';
+  openModal('m-store');
+  closeFn['m-store'] = ()=> shut($('#m-store'));
+}
+ $('#store-select').addEventListener('change', e => {
+  const isNew = e.target.value === '__new';
+  $('#new-store-wrap').hidden = !isNew;
+  $('#store-continue').lastChild.textContent = isNew ? 'Create & continue' : 'Continue';
+  if(isNew) $('#new-store-input').focus();
+});
+ $('#store-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const sel = $('#store-select');
+  let store;
+  if(sel.value === '__new'){
+    store = $('#new-store-input').value.trim().replace(/\s+/g,' ');
+    if(!store){ const f = $('#new-store-input'); f.classList.add('shake'); setTimeout(()=>f.classList.remove('shake'),350); f.focus(); return; }
+    if(!db.stores.some(s => s.toLowerCase() === store.toLowerCase())){ db.stores.push(store); }
+    else store = db.stores.find(s => s.toLowerCase() === store.toLowerCase());
+  } else store = sel.value;
+  save();
+  shut($('#m-store'));
+  startRun(store);
+});
+ $('#store-x').addEventListener('click', ()=> shut($('#m-store')));
+
+function startRun(store){
+  run = { id: uid(), store, ts: Date.now(), items: [] };
+  db.draft = run; save();
+  openScanner();
+}
+
+/* ================= scanner ================= */
+let zxReader = null, scanControls = null, scanLock = false;
+
+function makeReader(){
+  const hints = new Map();
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+    ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8, ZXing.BarcodeFormat.UPC_A,
+    ZXing.BarcodeFormat.UPC_E, ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39, ZXing.BarcodeFormat.ITF
+  ]);
+  hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+  try { return new ZXing.BrowserMultiFormatReader(hints, {delayBetweenScanAttempts: 120}); }
+  catch(e){ return new ZXing.BrowserMultiFormatReader(hints); }
+}
+function stopScan(){
+  try { scanControls && scanControls.stop(); } catch(e){}
+  try { zxReader && zxReader.reset(); } catch(e){}
+  scanControls = null;
+}
+function scanError(msg){
+  $('#scan-video').hidden = true;
+  const e = $('#scan-error'); e.hidden = false; e.textContent = msg;
+}
+async function openScanner(){
+  if(!run) return;
+  $('#scan-video').hidden = false; $('#scan-error').hidden = true;
+  $('#scan-code').value = '';
+  $('#scan-store').textContent = run.store;
+  updateScanCount();
+  openModal('m-scan');
+  closeFn['m-scan'] = closeScan;
+  scanLock = false;
+  if(matchMedia('(hover:hover) and (pointer:fine)').matches) $('#scan-code').focus();
+  if(typeof ZXing === 'undefined'){
+    scanError('The barcode library could not load — check your connection, or just type the number below.');
+    return;
+  }
+  if(!zxReader) zxReader = makeReader();
+  const video = $('#scan-video');
+  try {
+    scanControls = await zxReader.decodeFromConstraints(
+      { audio:false, video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:720} } },
+      video, onDecode);
+  } catch(err){
+    try { scanControls = await zxReader.decodeFromVideoDevice(null, video, onDecode); }
+    catch(err2){ scanError('No camera available here. Type the barcode below — it works just as well.'); }
+  }
+}
+function onDecode(result){
+  if(!result || scanLock) return;
+  const text = String(result.getText() || '').trim();
+  if(!text) return;
+  scanLock = true;
+  stopScan(); beep();
+  if(navigator.vibrate) navigator.vibrate(60);
+  shut($('#m-scan'));
+  setTimeout(()=>{ openItemModal(text); scanLock = false; }, 180);
+}
+function closeScan(){ stopScan(); shut($('#m-scan')); renderHome(); }
+function updateScanCount(){
+  $('#scan-count').textContent = `${run ? run.items.length : 0} ITEM${run && run.items.length===1 ? '' : 'S'} IN THIS RUN`;
+}
+ $('#scan-close').addEventListener('click', closeScan);
+ $('#scan-finish').addEventListener('click', finishRun);
+ $('#scan-manual').addEventListener('submit', e => {
+  e.preventDefault();
+  const code = $('#scan-code').value.trim();
+  if(code.length < 3){ const f = $('#scan-code'); f.classList.add('shake'); setTimeout(()=>f.classList.remove('shake'),350); f.focus(); return; }
+  stopScan(); shut($('#m-scan')); openItemModal(code);
+});
+
+function finishRun(){
+  stopScan();
+  if(!run){ return; }
+  if(!run.items.length){
+    db.draft = null; run = null; save();
+    shut($('#m-scan')); toast('No items scanned — run discarded'); renderHome();
+    return;
+  }
+  db.sessions.unshift({ id: run.id, store: run.store, ts: run.ts, items: run.items });
+  const newId = run.id;
+  db.draft = null; run = null; save();
+  shut($('#m-scan'));
+  ui.freshId = newId; ui.open.add(newId);
+  setTimeout(()=>{ ui.freshId = null; $$('.receipt.fresh').forEach(r => r.classList.remove('fresh')); }, 2000);
+  setTab('records');
+  toast(`Run saved — ${db.sessions[0].items.length} item(s) at ${db.sessions[0].store}`, {icon:true});
+  renderHome();
+}
+
+/* ================= item modal ================= */
+let currentQty = 1, pendingCat = 'Misc', qtyStep = 48;
+
+function openItemModal(barcode){
+  $('#item-barcode').textContent = barcode;
+  $('#item-bars').innerHTML = barsHTML(barcode, 30);
+  $('#item-name').value = '';
+  $('#item-price').value = '';
+  $('#fld-name').classList.remove('err'); $('#fld-price').classList.remove('err');
+  buildExpSelects();
+  buildChips(lastCat);
+  setQty(1, false);
+  openModal('m-item');
+  closeFn['m-item'] = ()=>{ shut($('#m-item')); openScanner(); };  // discard & rescan
+  setTimeout(()=> $('#item-name').focus(), 120);
+}
+ $('#item-x').addEventListener('click', closeTop);
+
+/* expiry selects */
+function buildExpSelects(){
+  const now = new Date(), y0 = now.getFullYear();
+  const m = $('#exp-m'), d = $('#exp-d'), y = $('#exp-y');
+  m.innerHTML = Array.from({length:12}, (_,i)=>`<option value="${pad(i+1)}">${pad(i+1)}</option>`).join('');
+  y.innerHTML = Array.from({length:16}, (_,i)=>`<option value="${y0+i}">${y0+i}</option>`).join('');
+  m.value = pad(now.getMonth()+1); y.value = y0;
+  rebuildDays();
+  d.value = pad(now.getDate());
+}
+function rebuildDays(){
+  const dim = new Date(+$('#exp-y').value, +$('#exp-m').value, 0).getDate();
+  const keep = Math.min(+$('#exp-d').value || 1, dim);
+  $('#exp-d').innerHTML = Array.from({length:dim}, (_,i)=>`<option value="${pad(i+1)}">${pad(i+1)}</option>`).join('');
+  $('#exp-d').value = pad(keep);
+}
+ $('#exp-m').addEventListener('change', rebuildDays);
+ $('#exp-y').addEventListener('change', rebuildDays);
+
+/* category chips */
+function buildChips(selected){
+  pendingCat = CATS.includes(selected) ? selected : 'Misc';
+  $('#cat-chips').innerHTML = CATS.map(c =>
+    `<button type="button" class="chip${c === pendingCat ? ' on' : ''}" data-cat="${esc(c)}" aria-pressed="${c === pendingCat}">${esc(c)}</button>`
+  ).join('');
+}
+ $('#cat-chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  pendingCat = b.dataset.cat;
+  $$('.chip', $('#cat-chips')).forEach(c => { c.classList.toggle('on', c === b); c.setAttribute('aria-pressed', c === b); });
+});
+
+/* scrollable quantity strip */
+function buildQtyStrip(){
+  const strip = $('#qty-strip');
+  strip.innerHTML = Array.from({length:99}, (_,i)=>`<div class="qty-cell" data-q="${i+1}">${i+1}</div>`).join('');
+  const cells = $$('.qty-cell', strip);
+  qtyStep = cells[1].offsetLeft - cells[0].offsetLeft;
+  strip.addEventListener('scroll', ()=>{
+    const idx = Math.max(0, Math.min(98, Math.round(strip.scrollLeft / qtyStep)));
+    setQty(idx + 1, false);
+  }, {passive:true});
+  strip.addEventListener('wheel', e => { e.preventDefault(); strip.scrollLeft += e.deltaY; }, {passive:false});
+  strip.addEventListener('click', e => {
+    const c = e.target.closest('.qty-cell'); if(!c) return;
+    setQty(+c.dataset.q, true);
+  });
+}
+function setQty(q, scroll){
+  currentQty = Math.max(1, Math.min(99, q));
+  $('#qty-cur').textContent = currentQty;
+  const strip = $('#qty-strip');
+  $$('.qty-cell', strip).forEach(c => c.classList.toggle('on', +c.dataset.q === currentQty));
+  if(scroll) strip.scrollTo({ left: (currentQty - 1) * qtyStep, behavior:'smooth' });
+}
+ $('#qty-plus').addEventListener('click', ()=> setQty(currentQty + 1, true));
+ $('#qty-minus').addEventListener('click', ()=> setQty(currentQty - 1, true));
+
+/* save → confirmation */
+ $('#item-save').addEventListener('click', ()=>{
+  const name = $('#item-name').value.trim();
+  const price = parseFloat($('#item-price').value);
+  let ok = true;
+  if(!name){ flash($('#fld-name')); ok = false; }
+  if(isNaN(price) || price < 0){ flash($('#fld-price')); ok = false; }
+  if(!ok) return;
+  pendingItem = {
+    barcode: $('#item-barcode').textContent,
+    name, price, qty: currentQty, cat: pendingCat,
+    exp: `${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}`
+  };
+  // fill confirmation
+  $('#cf-barcode').textContent = pendingItem.barcode;
+  $('#cf-name').textContent = pendingItem.name;
+  $('#cf-cat').innerHTML = `<span class="dot" style="--c:${CAT_COLOR[pendingCat] || '#999'};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(pendingCat)}`;
+  $('#cf-line').textContent = `${pendingItem.qty} × ${money(pendingItem.price)}`;
+  $('#cf-exp').textContent = fmtDate(pendingItem.exp);
+  $('#cf-total').textContent = money(pendingItem.price * pendingItem.qty);
+  openModal('m-confirm');
+  closeFn['m-confirm'] = ()=> shut($('#m-confirm'));
+});
+function flash(f){ f.classList.add('err'); const i = $('input', f); i.classList.add('shake'); setTimeout(()=>{ i.classList.remove('shake'); f.classList.remove('err'); }, 900); i.focus(); }
+
+ $('#cf-back').addEventListener('click', ()=> shut($('#m-confirm')));
+ $('#cf-yes').addEventListener('click', ()=>{
+  if(!pendingItem || !run) return;
+  run.items.push(pendingItem);
+  lastCat = pendingItem.cat;
+  db.draft = run; save();
+  const added = pendingItem; pendingItem = null;
+  shut($('#m-confirm')); shut($('#m-item'));
+  toast(`${added.name} added — ${money(added.price * added.qty)}`, {icon:true});
+  updateScanCount();
+  openScanner();   // straight back to scanning
+});
+
+/* ================= records ================= */
+ $('#seg-session').addEventListener('click', ()=> setGroup('session'));
+ $('#seg-cat').addEventListener('click', ()=> setGroup('category'));
+function setGroup(g){
+  ui.group = g;
+  $('#seg-session').classList.toggle('on', g === 'session');
+  $('#seg-cat').classList.toggle('on', g === 'category');
+  $('#rec-sort').hidden = g !== 'session';
+  renderRecords();
+}
+ $('#rec-sort').addEventListener('change', e => { ui.sort = e.target.value; renderRecords(); });
+
+function expInfo(exp){
+  if(!exp) return { cls:'', label:'' };
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(exp + 'T00:00:00');
+  const diff = Math.round((d - today) / 864e5);
+  if(diff < 0)  return { cls:'bad',  label: diff === -1 ? 'expired yesterday' : `expired ${-diff}d ago` };
+  if(diff <= 7) return { cls:'warn', label: diff === 0 ? 'expires today' : `in ${diff}d` };
+  return { cls:'', label:'' };
+}
+function expBadge(exp){
+  if(!exp) return `<span class="exp">NO EXP</span>`;
+  const info = expInfo(exp);
+  return `<span class="exp ${info.cls}">EXP ${fmtShort(exp)}${info.label ? ' · ' + info.label : ''}</span>`;
+}
+const lineTotal = it => it.price * it.qty;
+const sessionTotal = s => s.items.reduce((a, it) => a + lineTotal(it), 0);
+
+function itemLineHTML(it, sessionId, idx, meta){
+  return `<div class="rec-line">
+    <div>
+      <div class="rl-name">${esc(it.name)}</div>
+      <div class="rl-meta"><span class="dot" style="--c:${CAT_COLOR[it.cat] || '#999'}"></span>${esc(it.cat)} · ${esc(it.barcode)} · ${expBadge(it.exp)}</div>
+    </div>
+    <div class="rl-total">${money(lineTotal(it))}</div>
+    <button class="rl-del" data-act="del-item" data-sid="${sessionId}" data-idx="${idx}" aria-label="Delete item">${ico('trash')}</button>
+    <div class="rl-mult" style="grid-column:1">${it.qty} × ${money(it.price)}${meta || ''}</div>
+  </div>`;
+}
+
+function renderRecords(){
+  const has = db.sessions.length > 0;
+  $('#rec-empty').hidden = has;
+  $('#rec-tools').style.display = has ? '' : 'none';
+  const list = $('#rec-list');
+  if(!has){ list.innerHTML = ''; return; }
+
+  if(ui.group === 'session'){
+    const sorted = [...db.sessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
+    list.innerHTML = sorted.map(s => {
+      const open = ui.open.has(s.id);
+      return `<article class="receipt${open ? ' open' : ''}${s.id === ui.freshId ? ' fresh' : ''}" data-sid="${s.id}">
+        <div class="receipt-body">
+          <button class="rec-head" data-act="toggle">
+            <div class="rec-hl">
+              <div class="rec-store">${esc(s.store)}</div>
+              <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}</div>
+            </div>
+            <div class="rec-right">
+              <span class="rec-total">${money(sessionTotal(s))}</span>
+              <span class="rec-chev ic">${ico('chev')}</span>
+              <span class="rec-del" data-act="del-session" data-sid="${s.id}" role="button" aria-label="Delete session">${ico('trash')}</span>
+            </div>
+          </button>
+          <div class="rec-items">
+            <hr class="rec-rule">
+            ${s.items.map((it,i) => itemLineHTML(it, s.id, i)).join('')}
+            <div class="rec-foot"><span>TOTAL · ${s.items.length} ITEMS</span><b>${money(sessionTotal(s))}</b></div>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+  } else {
+    // group by category
+    const byCat = {};
+    db.sessions.forEach(s => s.items.forEach((it, idx) => {
+      (byCat[it.cat] = byCat[it.cat] || []).push({ it, s, idx });
+    }));
+    const cats = Object.keys(byCat).sort((a,b) => a.localeCompare(b));
+    list.innerHTML = cats.map(cat => {
+      const rows = byCat[cat].sort((a,b) => (a.it.exp || '9999') < (b.it.exp || '9999') ? -1 : 1);
+      const sub = rows.reduce((a,r) => a + lineTotal(r.it), 0);
+      return `<section class="catgroup">
+        <div class="cg-head">
+          <span class="dot" style="--c:${CAT_COLOR[cat] || '#999'};width:10px;height:10px"></span>
+          <h3>${esc(cat)}</h3>
+          <span class="cg-sum">${rows.length} ITEM${rows.length===1?'':'S'} · ${money(sub)}</span>
+        </div>
+        ${rows.map(r => itemLineHTML(r.it, r.s.id, r.idx,
+          ` &nbsp;·&nbsp; ${esc(r.s.store)} · ${fmtTs(r.s.ts).split(' · ')[0]}`)).join('')}
+      </section>`;
+    }).join('');
+  }
+}
+
+/* records interactions (event delegation) */
+ $('#rec-list').addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if(!t) return;
+  const act = t.dataset.act;
+
+  if(act === 'toggle'){
+    const art = t.closest('.receipt');
+    art.classList.toggle('open');
+    art.classList.contains('open') ? ui.open.add(art.dataset.sid) : ui.open.delete(art.dataset.sid);
+    return;
+  }
+  if(act === 'del-session'){
+    const s = db.sessions.find(x => x.id === t.dataset.sid);
+    if(!s) return;
+    askConfirm({
+      title: 'Delete this session?',
+      body: `${s.store} · ${s.items.length} item(s) · ${money(sessionTotal(s))} — this can't be undone.`,
+      onYes(){
+        db.sessions = db.sessions.filter(x => x.id !== s.id);
+        ui.open.delete(s.id); save();
+        renderRecords(); renderHome();
+        toast('Session deleted');
+      }
+    });
+    return;
+  }
+  if(act === 'del-item'){
+    if(t.classList.contains('armed')){
+      const s = db.sessions.find(x => x.id === t.dataset.sid);
+      if(s){
+        s.items.splice(+t.dataset.idx, 1);
+        if(!s.items.length){
+          db.sessions = db.sessions.filter(x => x.id !== s.id);
+          ui.open.delete(s.id);
+          toast('Session removed — it was empty');
+        } else toast('Item removed');
+        save(); renderRecords(); renderHome();
+      }
+    } else {
+      t.classList.add('armed');
+      t.innerHTML = 'Sure?';
+      setTimeout(()=>{ if(t.isConnected){ t.classList.remove('armed'); t.innerHTML = ico('trash'); } }, 2200);
+    }
+  }
+});
+
+/* generic confirm modal */
+function askConfirm({title, body, yes='Delete', onYes}){
+  $('#cfd-title').textContent = title;
+  $('#cfd-body').textContent = body;
+  const b = $('#cfd-yes'); b.textContent = yes;
+  cfdCb = onYes;
+  openModal('m-cfd');
+  closeFn['m-cfd'] = ()=> shut($('#m-cfd'));
+}
+ $('#cfd-yes').addEventListener('click', ()=>{ shut($('#m-cfd')); cfdCb && cfdCb(); cfdCb = null; });
+ $('#cfd-no').addEventListener('click', ()=> shut($('#m-cfd')));
+
+/* ================= CSV export ================= */
+ $('#btn-export').addEventListener('click', ()=>{
+  if(!db.sessions.length){ toast('Nothing to export yet — scan something first'); return; }
+  const rows = [['session_id','date','time','store','barcode','product','category','unit_price','qty','line_total','expiry_date']];
+  [...db.sessions].sort((a,b) => a.ts - b.ts).forEach(s => {
+    const d = new Date(s.ts);
+    const date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    s.items.forEach(it => rows.push([
+      s.id, date, time, s.store, it.barcode, it.name, it.cat,
+      it.price.toFixed(2), it.qty, lineTotal(it).toFixed(2), it.exp || ''
+    ]));
+  });
+  const cell = v => { v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+  const csv = '\uFEFF' + rows.map(r => r.map(cell).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `grocery-ledger-${isoOf(new Date())}.csv`;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(a.href), 4000);
+  toast(`CSV exported — ${rows.length - 1} rows`, {icon:true});
+});
+
+/* ================= sample data ================= */
+ $('#btn-sample').addEventListener('click', ()=>{
+  const dOff = n => { const d = new Date(Date.now() + n * 864e5); return isoOf(d); };
+  const y = new Date(Date.now() - 864e5); y.setHours(16,12,0,0);
+  db.sessions.unshift({
+    id: uid(), store: 'Puregold', ts: y.getTime(),
+    items: [
+      { barcode:'4800088106048', name:'Lucky Me Pancit Canton Chili-Mansi', price:17.75, qty:4, cat:'Processed', exp:dOff(240) },
+      { barcode:'4800013512340', name:'555 Sardines in Green Sauce 155g',   price:24.00, qty:3, cat:'Canned',    exp:dOff(700) },
+      { barcode:'4800047200017', name:'Selecta Reali Ice Cream 1.3L',       price:289.00, qty:1, cat:'Frozen',   exp:dOff(5) },
+      { barcode:'4800123456789', name:'Bear Brand Swak Pack 33g',           price:17.00, qty:2, cat:'Beverages', exp:dOff(180) },
+      { barcode:'4806012300014', name:'Chicharon ni Mang Jose 90g',         price:38.50, qty:1, cat:'Snacks',    exp:dOff(-3) },
+    ]
+  });
+  save(); setTab('records'); renderHome();
+  toast('Sample session added — explore, then delete it', {icon:true});
+});
+
+/* ================= init ================= */
+buildHeroBars();
+buildQtyStrip();
+buildExpSelects();
+buildChips(lastCat);
+renderHome();
+setTab('home');
+</script>
+</body>
+</html>
