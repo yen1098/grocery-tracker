@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Barcode detection (camera). If this fails to load, the manual entry path still works. -->
+<!-- Barcode fallback library. The native BarcodeDetector engine is used first when available. -->
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
 
 <style>
@@ -21,15 +21,16 @@
     --shadow:0 1px 2px rgba(34,30,21,.06), 0 12px 32px -14px rgba(34,30,21,.22);
   }
   *{box-sizing:border-box}
+  [hidden]{display:none!important}
   html{scroll-behavior:smooth}
   body{
     margin:0; background:var(--paper); color:var(--ink);
     font:400 15px/1.55 "IBM Plex Sans",sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  /* paper grain */
+  /* paper grain — sits BELOW modals so it can never tint the camera feed */
   body::before{
-    content:""; position:fixed; inset:0; z-index:300; pointer-events:none; opacity:.05;
+    content:""; position:fixed; inset:0; z-index:35; pointer-events:none; opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
   }
   body.no-scroll{overflow:hidden}
@@ -122,7 +123,6 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E6553' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
   #rec-sort{padding:8px 30px 8px 12px;font-size:13px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);color:var(--ink)}
-  #rec-sort[hidden]{display:none}
 
   .empty{border:1.5px dashed var(--line);border-radius:16px;padding:46px 24px;text-align:center;color:var(--ink2);margin-bottom:40px}
   .empty .ic svg{width:38px;height:38px}
@@ -251,16 +251,19 @@
   .cfd-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
   .btn.danger{background:var(--red);border-color:#98311F;color:#FBF3EE}
 
-  /* ---------- scanner ---------- */
-  #m-scan{background:#171310;padding:0;place-items:stretch}
-  .scan-stage{width:min(560px,100%);margin:0 auto;height:100dvh;display:flex;flex-direction:column;transform:translateY(14px);transition:transform .22s}
-  #m-scan.open .scan-stage{transform:none}
+  /* ---------- scanner ----------
+     Fully opaque screen. No backdrop-filter, no translucent layers, no transforms
+     over the video — all of these can dim/wash out the camera on mobile WebKit. */
+  #m-scan{background:#121110;padding:0;place-items:stretch;
+    backdrop-filter:none;-webkit-backdrop-filter:none}
+  .scan-stage{width:min(560px,100%);margin:0 auto;height:100dvh;display:flex;flex-direction:column}
   .scan-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;color:#F2EDE0}
   .scan-title{font:600 11px "IBM Plex Mono";letter-spacing:.24em;color:#A79E8C}
   .scan-store{font:600 21px "Fraunces";margin-top:2px}
   .scan-actions{display:flex;gap:8px;align-items:center}
-  .cam-wrap{position:relative;flex:1;min-height:260px;background:#0D0B08;overflow:hidden}
-  #scan-video{width:100%;height:100%;object-fit:cover;display:block}
+  #torch-btn.on{background:var(--amber);border-color:var(--amber);color:#171310}
+  .cam-wrap{position:relative;flex:1;min-height:260px;background:#000;overflow:hidden}
+  #scan-video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
   .vf-band{position:absolute;left:9%;right:9%;top:50%;height:190px;transform:translateY(-50%);pointer-events:none}
   .vf-band .c{position:absolute;width:30px;height:30px;border:3px solid rgba(247,244,234,.92)}
   .c.tl{top:0;left:0;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
@@ -271,13 +274,15 @@
     box-shadow:0 0 14px 3px rgba(255,59,48,.5);animation:laserScan 2.3s ease-in-out infinite alternate}
   @keyframes laserScan{from{transform:translateY(0)}to{transform:translateY(184px)}}
   .scan-error{position:absolute;inset:0;margin:0;display:grid;place-items:center;padding:26px;text-align:center;
-    color:#F2EDE0;background:rgba(13,11,8,.92);font-size:14.5px}
+    color:#F2EDE0;background:rgba(13,11,8,.94);font-size:14.5px}
   .scan-manual{display:flex;gap:8px;padding:12px 16px;background:#1D1915}
   .scan-manual input{flex:1;min-width:0;background:#26221C;border:1px solid #3A342B;color:#F2EDE0;
     border-radius:10px;padding:11px 12px;font:500 14px "IBM Plex Mono"}
   .scan-manual input::placeholder{color:#8B8271}
   .scan-manual input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.25)}
-  .scan-hint{margin:0;padding:0 16px 14px;text-align:center;font:500 10.5px "IBM Plex Mono";letter-spacing:.16em;color:#A79E8C}
+  .scan-hint{margin:0;padding:0 16px 14px;text-align:center;font:500 10.5px "IBM Plex Mono";
+    letter-spacing:.16em;color:#A79E8C;display:flex;flex-direction:column;gap:3px}
+  #scan-engine{opacity:.75}
 
   /* toasts */
   #toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:200;display:flex;
@@ -380,7 +385,7 @@
     <label class="fld" id="new-store-wrap" hidden><span>NEW STORE NAME</span>
       <input id="new-store-input" class="in" placeholder="e.g. Landers Superstore" autocomplete="off">
     </label>
-    <button type="submit" id="store-continue" class="btn primary wide">Continue<span class="ic" data-ico="arrow"></span></button>
+    <button type="submit" id="store-continue" class="btn primary wide"><span id="store-continue-label">Continue</span><span class="ic" data-ico="arrow"></span></button>
   </form>
 </div>
 
@@ -390,6 +395,7 @@
     <div class="scan-top">
       <div><div class="scan-title">SCANNING</div><div class="scan-store" id="scan-store"></div></div>
       <div class="scan-actions">
+        <button id="torch-btn" class="btn ghost-light sm" hidden aria-label="Toggle flashlight"><span class="ic" data-ico="torch"></span>Light</button>
         <button id="scan-finish" class="btn ghost-light sm"><span class="ic" data-ico="check"></span>End run</button>
         <button id="scan-close" class="x" style="position:static" aria-label="Close scanner"><span class="ic" data-ico="x"></span></button>
       </div>
@@ -406,7 +412,7 @@
              placeholder="Type the barcode — or use a USB scanner" aria-label="Barcode number">
       <button class="btn primary" type="submit"><span class="ic" data-ico="arrow"></span>Add</button>
     </form>
-    <p class="scan-hint" id="scan-count">0 ITEMS IN THIS RUN</p>
+    <p class="scan-hint"><span id="scan-count">0 ITEMS IN THIS RUN</span><span id="scan-engine"></span></p>
   </div>
 </div>
 
@@ -524,6 +530,8 @@ const PATHS = {
   cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 3h2l2.5 12.3a1.5 1.5 0 0 0 1.5 1.2h8a1.5 1.5 0 0 0 1.5-1.2L20.5 7H6"/>',
   receipt:'<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4L10 21l-2-1.4L6 21zM9.5 8h5M9.5 12h5"/>',
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  scan:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7.5 8v8M11 8v8M14 8v8M17 8v8"/>',
+  torch:'<path d="M8 2h8v3l-2 3.5V20a2 2 0 0 1-4 0V8.5L8 5V2z"/><path d="M12 13v2"/>',
 };
 const ico = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[n]}</svg>`;
  $$('[data-ico]').forEach(n => n.innerHTML = ico(n.dataset.ico));
@@ -535,7 +543,7 @@ const CATS = ['Frozen','Produce','Toiletries','Snacks','Misc','Canned','Processe
               'Storage','Organizing','Beverages','Dairy','Bakery','Condiments','Household','Pet Care'];
 const CAT_COLOR = {Frozen:'#4C7EA8',Produce:'#4C8A46',Toiletries:'#8A6FA8',Snacks:'#B97A1E',Misc:'#7A7466',
   Canned:'#A0522D',Processed:'#8C4A3C',Cleaning:'#3E7E7E',Storage:'#6B6B6B',Organizing:'#56638A',
-  Beverages:'#3F6FA8',Dairy:'#7C8A3E',Bakery:'#A8763E',Condiments:'#96421E',Household:'#4E6E58', 'Pet Care':'#7A5230'};
+  Beverages:'#3F6FA8',Dairy:'#7C8A3E',Bakery:'#A8763E',Condiments:'#96421E',Household:'#4E6E58','Pet Care':'#7A5230'};
 
 let db;
 function load(){
@@ -548,8 +556,8 @@ function load(){
 const save = () => { try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){} };
 load();
 
-let run = db.draft;          // in-progress run (persists across reloads)
-let lastCat = 'Misc';        // remembers the last category within a run
+let run = db.draft;
+let lastCat = 'Misc';
 let pendingItem = null, cfdCb = null;
 const ui = { tab:'home', group:'session', sort:'new', open:new Set(), freshId:null };
 
@@ -565,12 +573,11 @@ function toast(msg, opts={}){
 
 /* ================= modal manager ================= */
 const stack = [];
-const closeFn = {};   // per-overlay custom close behaviour
+const closeFn = {};
 function openModal(id){ const m = $('#'+id); m.classList.add('open'); if(!stack.includes(m)) stack.push(m); document.body.classList.add('no-scroll'); }
 function shut(m){ m.classList.remove('open'); const i = stack.indexOf(m); if(i>-1) stack.splice(i,1); if(!stack.length) document.body.classList.remove('no-scroll'); }
 function closeTop(){ if(!stack.length) return; const m = stack[stack.length-1]; (closeFn[m.id] || (()=>shut(m)))(); }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTop(); });
-// backdrop click
  $$('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target === ov) closeTop(); }));
 
 /* ================= decorative barcodes ================= */
@@ -634,18 +641,16 @@ function renderHome(){
     <div class="stat"><b>${t.runs}</b><span>RUNS</span></div>
     <div class="stat"><b>${t.items}</b><span>ITEMS</span></div>
     <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>`;
-  // active run bar
   const bar = $('#active-run');
   if(run){
     bar.hidden = false;
     $('#ar-store').textContent = run.store;
     $('#ar-meta').textContent = `${run.items.length} ITEM${run.items.length===1?'':'S'} SCANNED`;
-    $('#btn-start').innerHTML = `<span class="ic">${ico('scan' in PATHS ? 'receipt' : 'cart')}</span>Resume scan`;
+    $('#btn-start').innerHTML = `<span class="ic">${ico('scan')}</span>Resume scan`;
   } else {
     bar.hidden = true;
     $('#btn-start').innerHTML = `<span class="ic">${ico('cart')}</span>Start grocery run`;
   }
-  // records badge
   const b = $('#rec-count');
   b.hidden = !db.sessions.length;
   b.textContent = db.sessions.length || '';
@@ -669,14 +674,14 @@ function openStoreModal(){
   sel.append(new Option('+ Add a new store…', '__new'));
   $('#new-store-wrap').hidden = true;
   $('#new-store-input').value = '';
-  $('#store-continue').lastChild.textContent = 'Continue';
+  $('#store-continue-label').textContent = 'Continue';
   openModal('m-store');
   closeFn['m-store'] = ()=> shut($('#m-store'));
 }
  $('#store-select').addEventListener('change', e => {
   const isNew = e.target.value === '__new';
   $('#new-store-wrap').hidden = !isNew;
-  $('#store-continue').lastChild.textContent = isNew ? 'Create & continue' : 'Continue';
+  $('#store-continue-label').textContent = isNew ? 'Create & continue' : 'Continue';
   if(isNew) $('#new-store-input').focus();
 });
  $('#store-form').addEventListener('submit', e => {
@@ -701,8 +706,13 @@ function startRun(store){
   openScanner();
 }
 
-/* ================= scanner ================= */
-let zxReader = null, scanControls = null, scanLock = false;
+/* ================= scanner =================
+   Strategy:
+   1. Native BarcodeDetector (Chrome/Edge/Android) — fast and accurate.
+   2. ZXing library fallback (iPhone Safari, Firefox).
+   3. Manual entry — always available, also accepts USB scanners. */
+let zxReader = null, scanControls = null, scanStream = null, nativeLoop = null;
+let scanLock = false, torchTrack = null, torchOn = false, wakeLock = null;
 
 function makeReader(){
   const hints = new Map();
@@ -711,52 +721,129 @@ function makeReader(){
     ZXing.BarcodeFormat.UPC_E, ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39, ZXing.BarcodeFormat.ITF
   ]);
   hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-  try { return new ZXing.BrowserMultiFormatReader(hints, {delayBetweenScanAttempts: 120}); }
+  try { return new ZXing.BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 100, delayBetweenScanSuccess: 200 }); }
   catch(e){ return new ZXing.BrowserMultiFormatReader(hints); }
 }
+function setEngine(msg){ $('#scan-engine').textContent = msg; }
+
+function setupTorch(){
+  let track = null;
+  try{
+    const src = $('#scan-video').srcObject;
+    track = src && src.getVideoTracks ? src.getVideoTracks()[0] : null;
+  }catch(e){}
+  torchTrack = track; torchOn = false;
+  let has = false;
+  try{ has = !!(track && track.getCapabilities && 'torch' in track.getCapabilities()); }catch(e){}
+  $('#torch-btn').hidden = !has;
+  $('#torch-btn').classList.remove('on');
+}
+async function toggleTorch(){
+  if(!torchTrack) return;
+  torchOn = !torchOn;
+  try{ await torchTrack.applyConstraints({ advanced:[{ torch: torchOn }] }); }
+  catch(e){ torchOn = false; }
+  $('#torch-btn').classList.toggle('on', torchOn);
+}
+ $('#torch-btn').addEventListener('click', toggleTorch);
+
 function stopScan(){
-  try { scanControls && scanControls.stop(); } catch(e){}
-  try { zxReader && zxReader.reset(); } catch(e){}
+  if(nativeLoop){ clearInterval(nativeLoop); nativeLoop = null; }
+  try{ scanControls && scanControls.stop(); }catch(e){}
+  try{ zxReader && zxReader.reset(); }catch(e){}
   scanControls = null;
+  if(scanStream){ try{ scanStream.getTracks().forEach(t => t.stop()); }catch(e){} scanStream = null; }
+  try{ $('#scan-video').srcObject = null; }catch(e){}
+  torchTrack = null; torchOn = false;
+  releaseWakeLock();
 }
 function scanError(msg){
   $('#scan-video').hidden = true;
   const e = $('#scan-error'); e.hidden = false; e.textContent = msg;
+  setEngine('CAMERA OFFLINE · USE MANUAL ENTRY');
 }
+
+/* keep the screen awake while scanning */
+async function requestWakeLock(){
+  try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
+}
+function releaseWakeLock(){ try{ wakeLock && wakeLock.release(); }catch(e){} wakeLock = null; }
+
+/* engine 1: native BarcodeDetector */
+async function startNative(video){
+  if(!('BarcodeDetector' in window)) return false;
+  let formats = [];
+  try{
+    const supported = await BarcodeDetector.getSupportedFormats();
+    formats = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','codabar','code_93']
+      .filter(f => supported.includes(f));
+  }catch(e){ formats = []; }
+  if(!formats.length) return false;
+  const detector = new BarcodeDetector({ formats });
+  scanStream = await navigator.mediaDevices.getUserMedia({
+    audio:false,
+    video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }
+  });
+  video.srcObject = scanStream;
+  await video.play();
+  setupTorch();
+  setEngine('ENGINE: NATIVE · HOLD STEADY');
+  nativeLoop = setInterval(async ()=>{
+    if(scanLock || document.hidden || !video.videoWidth) return;
+    try{
+      const found = await detector.detect(video);
+      if(found && found.length && !scanLock) onDecode(found[0].rawValue);
+    }catch(err){ /* frame not ready — ignore */ }
+  }, 120);
+  return true;
+}
+
+/* engine 2: ZXing fallback */
+async function startZXing(video){
+  if(typeof ZXing === 'undefined') return false;
+  if(!zxReader) zxReader = makeReader();
+  scanControls = await zxReader.decodeFromConstraints(
+    { audio:false, video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:720} } },
+    video,
+    result => { if(result) onDecode(result.getText()); }
+  );
+  setupTorch();
+  setEngine('ENGINE: ZXING · HOLD 10–15 CM, STEADY');
+  return true;
+}
+
 async function openScanner(){
   if(!run) return;
   $('#scan-video').hidden = false; $('#scan-error').hidden = true;
   $('#scan-code').value = '';
   $('#scan-store').textContent = run.store;
   updateScanCount();
+  setEngine('STARTING CAMERA…');
+  $('#torch-btn').hidden = true;
   openModal('m-scan');
   closeFn['m-scan'] = closeScan;
   scanLock = false;
   if(matchMedia('(hover:hover) and (pointer:fine)').matches) $('#scan-code').focus();
-  if(typeof ZXing === 'undefined'){
-    scanError('The barcode library could not load — check your connection, or just type the number below.');
-    return;
-  }
-  if(!zxReader) zxReader = makeReader();
+  requestWakeLock();
   const video = $('#scan-video');
-  try {
-    scanControls = await zxReader.decodeFromConstraints(
-      { audio:false, video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:720} } },
-      video, onDecode);
-  } catch(err){
-    try { scanControls = await zxReader.decodeFromVideoDevice(null, video, onDecode); }
-    catch(err2){ scanError('No camera available here. Type the barcode below — it works just as well.'); }
+  let ok = false;
+  try{ ok = await startNative(video); }catch(e){ ok = false; }
+  if(!ok){ try{ ok = await startZXing(video); }catch(e){ ok = false; } }
+  if(!ok){
+    scanError(typeof ZXing === 'undefined'
+      ? 'Scanner libraries could not load — check your connection, or type the barcode below.'
+      : 'No camera access. Tap the padlock icon in your address bar, allow Camera, then reopen — or type the barcode below.');
   }
 }
-function onDecode(result){
-  if(!result || scanLock) return;
-  const text = String(result.getText() || '').trim();
-  if(!text) return;
+function onDecode(text){
+  if(scanLock) return;
+  const code = String(text || '').trim();
+  if(code.length < 4) return;
   scanLock = true;
   stopScan(); beep();
   if(navigator.vibrate) navigator.vibrate(60);
   shut($('#m-scan'));
-  setTimeout(()=>{ openItemModal(text); scanLock = false; }, 180);
+  setTimeout(()=>{ openItemModal(code); scanLock = false; }, 160);
 }
 function closeScan(){ stopScan(); shut($('#m-scan')); renderHome(); }
 function updateScanCount(){
@@ -803,7 +890,7 @@ function openItemModal(barcode){
   buildChips(lastCat);
   setQty(1, false);
   openModal('m-item');
-  closeFn['m-item'] = ()=>{ shut($('#m-item')); openScanner(); };  // discard & rescan
+  closeFn['m-item'] = ()=>{ shut($('#m-item')); openScanner(); };
   setTimeout(()=> $('#item-name').focus(), 120);
 }
  $('#item-x').addEventListener('click', closeTop);
@@ -879,7 +966,6 @@ function setQty(q, scroll){
     name, price, qty: currentQty, cat: pendingCat,
     exp: `${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}`
   };
-  // fill confirmation
   $('#cf-barcode').textContent = pendingItem.barcode;
   $('#cf-name').textContent = pendingItem.name;
   $('#cf-cat').innerHTML = `<span class="dot" style="--c:${CAT_COLOR[pendingCat] || '#999'};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(pendingCat)}`;
@@ -901,7 +987,7 @@ function flash(f){ f.classList.add('err'); const i = $('input', f); i.classList.
   shut($('#m-confirm')); shut($('#m-item'));
   toast(`${added.name} added — ${money(added.price * added.qty)}`, {icon:true});
   updateScanCount();
-  openScanner();   // straight back to scanning
+  openScanner();
 });
 
 /* ================= records ================= */
@@ -978,7 +1064,6 @@ function renderRecords(){
       </article>`;
     }).join('');
   } else {
-    // group by category
     const byCat = {};
     db.sessions.forEach(s => s.items.forEach((it, idx) => {
       (byCat[it.cat] = byCat[it.cat] || []).push({ it, s, idx });
@@ -1000,7 +1085,7 @@ function renderRecords(){
   }
 }
 
-/* records interactions (event delegation) */
+/* records interactions */
  $('#rec-list').addEventListener('click', e => {
   const t = e.target.closest('[data-act]');
   if(!t) return;
