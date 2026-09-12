@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Barcode fallback library. The native BarcodeDetector engine is used first when available. -->
+<!-- ZXing = lowest-priority fallback engine. Native BarcodeDetector and ZBar (WASM, lazy-loaded) take priority when available. -->
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
 
 <style>
@@ -28,7 +28,6 @@
     font:400 15px/1.55 "IBM Plex Sans",sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  /* paper grain — sits BELOW modals so it can never tint the camera feed */
   body::before{
     content:""; position:fixed; inset:0; z-index:35; pointer-events:none; opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
@@ -40,7 +39,6 @@
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
 
-  /* ---------- header ---------- */
   header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
   .top-in{display:flex;align-items:center;justify-content:space-between;height:60px}
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
@@ -49,7 +47,6 @@
   .tabs button.on{background:var(--ink);color:var(--paper)}
   .tabs sup{font:600 10px "IBM Plex Mono";color:inherit;margin-left:3px}
 
-  /* side notes on wide screens */
   .side-note{display:none}
   @media(min-width:1080px){
     .side-note{display:block;position:fixed;bottom:26px;font:500 10px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2);opacity:.65;z-index:5}
@@ -57,7 +54,6 @@
     .side-note.r{right:26px;writing-mode:vertical-rl}
   }
 
-  /* ---------- buttons ---------- */
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ink);
     background:transparent;color:var(--ink);padding:10px 16px;border-radius:10px;font:500 14.5px "IBM Plex Sans";
     cursor:pointer;transition:transform .12s, box-shadow .12s, background .12s}
@@ -72,7 +68,6 @@
   .btn.wide{width:100%}
   .linkbtn{background:none;border:none;color:var(--green);font:600 13.5px "IBM Plex Sans";text-decoration:underline;cursor:pointer;padding:4px}
 
-  /* ---------- home ---------- */
   .kicker{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--green);margin:38px 0 10px}
   h1{font:600 clamp(2.1rem,7vw,3.1rem)/1.08 "Fraunces";letter-spacing:-.02em;margin:0}
   h1 em{color:var(--green)}
@@ -110,7 +105,6 @@
   .stat b{display:block;font:600 21px "IBM Plex Mono";letter-spacing:-.02em}
   .stat span{font:600 10px "IBM Plex Mono";letter-spacing:.18em;color:var(--ink2)}
 
-  /* ---------- records ---------- */
   .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 16px}
   .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
   .rec-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:20px}
@@ -129,7 +123,6 @@
   .empty h3{font:600 23px "Fraunces";color:var(--ink);margin:12px 0 6px}
   .empty p{margin:0 0 18px}
 
-  /* receipt cards */
   .receipt{position:relative;margin-bottom:20px;
     filter:drop-shadow(0 1px 2px rgba(34,30,21,.09)) drop-shadow(0 12px 18px rgba(34,30,21,.10))}
   .receipt.fresh{box-shadow:0 0 0 2.5px var(--green);border-radius:12px}
@@ -173,7 +166,6 @@
   .catgroup .rec-line:first-of-type{border-top:0}
   .catgroup .rec-foot{border-top:1px dashed var(--line)}
 
-  /* ---------- modals ---------- */
   .overlay{position:fixed;inset:0;z-index:50;background:rgba(30,26,17,.55);backdrop-filter:blur(3px);
     display:grid;place-items:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s, visibility .2s}
   .overlay.open{opacity:1;visibility:visible}
@@ -231,7 +223,6 @@
   .chip:hover{border-color:var(--ink)}
   .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
-  /* confirmation modal */
   .cf-list{border:1px dashed var(--line);border-radius:12px;background:var(--paper-2);padding:4px 14px;margin:14px 0 20px}
   .cf-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
   .cf-row:last-child{border-bottom:0}
@@ -247,23 +238,29 @@
   .cf-label{font:600 15px "IBM Plex Sans"}
   .cf-hint{font:400 12.5px "IBM Plex Sans";color:var(--ink2);margin:-4px 0 2px;text-align:center}
 
-  /* generic confirm (delete) */
   .cfd-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
   .btn.danger{background:var(--red);border-color:#98311F;color:#FBF3EE}
 
-  /* ---------- scanner ----------
-     Fully opaque screen. No backdrop-filter, no translucent layers, no transforms
-     over the video — all of these can dim/wash out the camera on mobile WebKit. */
+  /* ---------- scanner ---------- */
   #m-scan{background:#121110;padding:0;place-items:stretch;
     backdrop-filter:none;-webkit-backdrop-filter:none}
   .scan-stage{width:min(560px,100%);margin:0 auto;height:100dvh;display:flex;flex-direction:column}
   .scan-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;color:#F2EDE0}
   .scan-title{font:600 11px "IBM Plex Mono";letter-spacing:.24em;color:#A79E8C}
   .scan-store{font:600 21px "Fraunces";margin-top:2px}
-  .scan-actions{display:flex;gap:8px;align-items:center}
+  .scan-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
   #torch-btn.on{background:var(--amber);border-color:var(--amber);color:#171310}
+  .zoom-wrap{display:flex;align-items:center;gap:6px;color:#A79E8C;padding-right:2px}
+  .zoom-wrap .ic svg{width:14px;height:14px}
+  #zoom-slider{width:104px;accent-color:#A9700F;cursor:pointer}
   .cam-wrap{position:relative;flex:1;min-height:260px;background:#000;overflow:hidden}
   #scan-video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+  /* soft guide dim OUTSIDE the band only — the band is the analyzed region */
+  .dim{position:absolute;background:rgba(8,7,5,.38);pointer-events:none}
+  .dim.top{top:0;left:0;right:0;height:calc(50% - 95px)}
+  .dim.bot{bottom:0;left:0;right:0;height:calc(50% - 95px)}
+  .dim.l{left:0;width:9%;top:50%;transform:translateY(-50%);height:190px}
+  .dim.r{right:0;width:9%;top:50%;transform:translateY(-50%);height:190px}
   .vf-band{position:absolute;left:9%;right:9%;top:50%;height:190px;transform:translateY(-50%);pointer-events:none}
   .vf-band .c{position:absolute;width:30px;height:30px;border:3px solid rgba(247,244,234,.92)}
   .c.tl{top:0;left:0;border-right:0;border-bottom:0;border-radius:8px 0 0 0}
@@ -284,7 +281,6 @@
     letter-spacing:.16em;color:#A79E8C;display:flex;flex-direction:column;gap:3px}
   #scan-engine{opacity:.75}
 
-  /* toasts */
   #toasts{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:200;display:flex;
     flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:max-content;max-width:92vw}
   .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
@@ -335,7 +331,7 @@
 
       <ol class="steps">
         <li><span class="n">01</span><div><b>Pick your store</b><p>Puregold, SM, Robinsons — or add your own sukan spot.</p></div></li>
-        <li><span class="n">02</span><div><b>Scan the barcode</b><p>The camera reads EAN / UPC codes. No camera? Type the number in.</p></div></li>
+        <li><span class="n">02</span><div><b>Scan the barcode</b><p>Hold the code inside the frame, 10–15 cm away. Zoom in for small labels.</p></div></li>
         <li><span class="n">03</span><div><b>Confirm &amp; keep going</b><p>Price, quantity, expiry, category — then straight to the next item.</p></div></li>
       </ol>
 
@@ -395,13 +391,18 @@
     <div class="scan-top">
       <div><div class="scan-title">SCANNING</div><div class="scan-store" id="scan-store"></div></div>
       <div class="scan-actions">
+        <div class="zoom-wrap" id="zoom-wrap" hidden><span class="ic" data-ico="zoom"></span>
+          <input type="range" id="zoom-slider" aria-label="Camera zoom">
+        </div>
         <button id="torch-btn" class="btn ghost-light sm" hidden aria-label="Toggle flashlight"><span class="ic" data-ico="torch"></span>Light</button>
+        <button id="cam-btn" class="btn ghost-light sm" hidden aria-label="Switch camera"><span class="ic" data-ico="cam"></span>Cam</button>
         <button id="scan-finish" class="btn ghost-light sm"><span class="ic" data-ico="check"></span>End run</button>
         <button id="scan-close" class="x" style="position:static" aria-label="Close scanner"><span class="ic" data-ico="x"></span></button>
       </div>
     </div>
     <div class="cam-wrap">
-      <video id="scan-video" playsinline muted></video>
+      <video id="scan-video" playsinline muted autoplay></video>
+      <div class="dim top"></div><div class="dim bot"></div><div class="dim l"></div><div class="dim r"></div>
       <div class="vf-band"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
         <div class="scan-laser"></div>
       </div>
@@ -412,7 +413,11 @@
              placeholder="Type the barcode — or use a USB scanner" aria-label="Barcode number">
       <button class="btn primary" type="submit"><span class="ic" data-ico="arrow"></span>Add</button>
     </form>
-    <p class="scan-hint"><span id="scan-count">0 ITEMS IN THIS RUN</span><span id="scan-engine"></span></p>
+    <p class="scan-hint">
+      <span>FILL THE FRAME · HOLD 10–15 CM · SLIGHT TILT AVOIDS GLARE</span>
+      <span id="scan-count">0 ITEMS IN THIS RUN</span>
+      <span id="scan-engine"></span>
+    </p>
   </div>
 </div>
 
@@ -517,7 +522,6 @@ function fmtTs(ts){
   const md = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
   return d.getFullYear() === now.getFullYear() ? `${md} · ${hm}` : `${md} ${d.getFullYear()} · ${hm}`;
 }
-/* icons */
 const PATHS = {
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
   check:'<path d="M4 12.5l5 5L20 6.5"/>',
@@ -532,6 +536,8 @@ const PATHS = {
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   scan:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7.5 8v8M11 8v8M14 8v8M17 8v8"/>',
   torch:'<path d="M8 2h8v3l-2 3.5V20a2 2 0 0 1-4 0V8.5L8 5V2z"/><path d="M12 13v2"/>',
+  zoom:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6M11 8v6"/>',
+  cam:'<rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.2"/><path d="M8.5 7l1.4-2.5h4.2L15.5 7"/>',
 };
 const ico = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[n]}</svg>`;
  $$('[data-ico]').forEach(n => n.innerHTML = ico(n.dataset.ico));
@@ -657,9 +663,7 @@ function renderHome(){
 }
 
 /* ================= flow: start a run ================= */
-function tryStart(){
-  if(run) openScanner(); else openStoreModal();
-}
+function tryStart(){ if(run) openScanner(); else openStoreModal(); }
  $('#btn-start').addEventListener('click', tryStart);
  $('#hero-code').addEventListener('click', tryStart);
  $('#btn-empty-start').addEventListener('click', tryStart);
@@ -707,34 +711,208 @@ function startRun(store){
 }
 
 /* ================= scanner =================
-   Strategy:
-   1. Native BarcodeDetector (Chrome/Edge/Android) — fast and accurate.
-   2. ZXing library fallback (iPhone Safari, Firefox).
-   3. Manual entry — always available, also accepts USB scanners. */
-let zxReader = null, scanControls = null, scanStream = null, nativeLoop = null;
-let scanLock = false, torchTrack = null, torchOn = false, wakeLock = null;
+   Own pipeline: one getUserMedia stream → <video> preview → frame pump (~9fps).
+   Each tick crops to the viewfinder band (more pixels on the code) or uses the
+   full frame, then runs the best available engine:
+     1. ZBar WASM  — retail-grade 1D decoding, lazy-loaded from CDN
+     2. BarcodeDetector — native, ONLY when it truly supports 1D formats
+     3. ZXing low-level MultiFormatReader — universal fallback, with inverted passes */
+const S = {
+  stream:null, track:null, running:false, busy:false, tick:0, pump:null,
+  crop:document.createElement('canvas'), full:document.createElement('canvas'),
+  detector:null, nativeFormats:[],
+  zbar:null, zbarState:'none',     // 'none' | 'loading' | 'ready'
+  devices:[], devIdx:-1,
+};
+let scanLock=false, torchTrack=null, torchOn=false, wakeLock=null;
 
-function makeReader(){
+/* ---------- engine 1: ZBar (WASM) ---------- */
+function ensureZbar(){
+  if(S.zbarState === 'ready') return;
+  if(S.zbarState !== 'none') return;      // already loading
+  S.zbarState = 'loading';
+  const urls = [
+    'https://cdn.jsdelivr.net/npm/zbar-wasm@1.2.1/dist/index.js',
+    'https://unpkg.com/zbar-wasm@1.2.1/dist/index.js'
+  ];
+  (async()=>{
+    for(const u of urls){
+      try{
+        const m = await import(u);
+        if(m && typeof m.locate === 'function'){
+          S.zbar = m; S.zbarState = 'ready';
+          setEngineLine('ZBAR LOADED');
+          return;
+        }
+      }catch(e){ /* try next mirror */ }
+    }
+    S.zbarState = 'none';
+    setEngineLine();
+  })();
+}
+async function zbarText(canvas){
+  if(S.zbarState !== 'ready' || !S.zbar) return null;
+  const syms = await S.zbar.locate(canvas);
+  for(const s of (syms || [])){
+    let text = null;
+    try{
+      let d = null;
+      if(typeof s.decode === 'function') d = s.decode();
+      else if(typeof s.getDecode === 'function') d = s.getDecode();
+      if(typeof d === 'string') text = d;
+      else if(d) text = (d.text != null ? d.text : (d.data != null ? d.data : null));
+      if(text == null && typeof s.text === 'string') text = s.text;
+      if(text == null && typeof s.data === 'string') text = s.data;
+    }catch(e){}
+    if(text && String(text).length >= 5) return String(text);
+  }
+  return null;
+}
+
+/* ---------- engine 2: native BarcodeDetector ---------- */
+async function setupNative(){
+  if(S.detector || !('BarcodeDetector' in window)) return;
+  try{
+    const sup = await window.BarcodeDetector.getSupportedFormats();
+    const want = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','codabar'];
+    S.nativeFormats = want.filter(f => sup.includes(f));
+    // only take over if this build genuinely handles retail 1D codes
+    if(S.nativeFormats.length) S.detector = new window.BarcodeDetector({ formats: S.nativeFormats });
+  }catch(e){}
+}
+async function nativeText(canvas){
+  if(!S.detector) return null;
+  try{
+    const found = await S.detector.detect(canvas);
+    if(found && found.length){
+      const v = found[0].rawValue;
+      if(v && v.length >= 5) return v;
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ---------- engine 3: ZXing (low-level) ---------- */
+let zxReader = null;
+function ensureZx(){
+  if(zxReader) return true;
+  if(typeof ZXing === 'undefined') return false;
   const hints = new Map();
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
     ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8, ZXing.BarcodeFormat.UPC_A,
-    ZXing.BarcodeFormat.UPC_E, ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39, ZXing.BarcodeFormat.ITF
+    ZXing.BarcodeFormat.UPC_E, ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+    ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.CODABAR
   ]);
   hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-  try { return new ZXing.BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 100, delayBetweenScanSuccess: 200 }); }
-  catch(e){ return new ZXing.BrowserMultiFormatReader(hints); }
+  zxReader = new ZXing.MultiFormatReader();
+  zxReader.setHints(hints);
+  return true;
 }
-function setEngine(msg){ $('#scan-engine').textContent = msg; }
-
-function setupTorch(){
-  let track = null;
+function zxText(canvas, alsoInvert){
+  if(!ensureZx()) return null;
   try{
-    const src = $('#scan-video').srcObject;
-    track = src && src.getVideoTracks ? src.getVideoTracks()[0] : null;
+    let r = null;
+    try{
+      const src  = new ZXing.HTMLCanvasElementLuminanceSource(canvas);
+      const bmp  = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(src));
+      r = zxReader.decode(bmp);
+    }catch(e){ r = null; }
+    finally{ zxReader.reset(); }
+    if(!r && alsoInvert){
+      try{
+        const isrc = new ZXing.InvertedLuminanceSource(new ZXing.HTMLCanvasElementLuminanceSource(canvas));
+        const bmp2 = new ZXing.BinaryBitmap(new ZXing.HybridBinarizer(isrc));
+        r = zxReader.decode(bmp2);
+      }catch(e){ r = null; }
+      finally{ zxReader.reset(); }
+    }
+    if(r){ const t = r.getText(); return (t && t.length >= 5) ? t : null; }
   }catch(e){}
-  torchTrack = track; torchOn = false;
+  return null;
+}
+
+/* ---------- frame pump ---------- */
+function bandRect(video){
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if(!vw || !vh) return null;
+  const dw = video.clientWidth, dh = video.clientHeight;
+  if(!dw || !dh) return null;
+  // map the on-screen band into video pixels (object-fit: cover math)
+  const scale = Math.max(dw / vw, dh / vh);
+  const offX = (vw * scale - dw) / 2, offY = (vh * scale - dh) / 2;
+  const bh = Math.min(190, dh * 0.55), by = (dh - bh) / 2;
+  const bx = dw * 0.09, bw = dw * 0.82;
+  const sx = (bx + offX) / scale, sy = (by + offY) / scale;
+  const sw = bw / scale, sh = bh / scale;
+  if(sw < 60 || sh < 40) return null;      // degenerate — fall back to full frame
+  return { sx, sy, sw, sh };
+}
+function drawTo(canvas, video, rect){
+  let sx, sy, sw, sh;
+  if(rect){ ({sx, sy, sw, sh} = rect); }
+  else { sx = 0; sy = 0; sw = video.videoWidth; sh = video.videoHeight; }
+  const k = Math.min(1, 1280 / sw);
+  canvas.width  = Math.max(2, Math.round(sw * k));
+  canvas.height = Math.max(2, Math.round(sh * k));
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+  return canvas;
+}
+async function pumpTick(){
+  const video = $('#scan-video');
+  if(!video.videoWidth || scanLock || !S.running || document.hidden) return;
+  S.tick++;
+  const rect = bandRect(video);
+  const useCrop = rect && (S.tick % 2 === 1);   // odd ticks: band crop; even ticks: full frame
+  const target = drawTo(useCrop ? S.crop : S.full, video, useCrop ? rect : null);
+  let text = null;
+  if(S.zbarState === 'ready') text = await zbarText(target);
+  if(!text && (S.tick % 2 === 0 || !S.detector)) text = zxText(target, S.tick % 4 === 0);
+  if(!text && S.detector && S.tick % 2 === 1) text = await nativeText(target);
+  if(text && S.running && !scanLock) onDecode(text);
+}
+function startPump(){
+  stopPump();
+  S.pump = setInterval(async ()=>{
+    if(S.busy) return;
+    S.busy = true;
+    try{ await pumpTick(); }catch(e){}
+    S.busy = false;
+  }, 110);
+}
+function stopPump(){ if(S.pump){ clearInterval(S.pump); S.pump = null; } }
+
+/* ---------- camera ---------- */
+async function openStream(deviceId){
+  try{ S.stream && S.stream.getTracks().forEach(t => t.stop()); }catch(e){}
+  const video = { width:{ideal:1920}, height:{ideal:1080} };
+  if(deviceId) video.deviceId = { exact: deviceId };
+  else video.facingMode = { ideal:'environment' };
+  S.stream = await navigator.mediaDevices.getUserMedia({ audio:false, video });
+  const v = $('#scan-video');
+  v.srcObject = S.stream;
+  try{ await v.play(); }catch(e){}
+  S.track = S.stream.getVideoTracks()[0];
+  torchTrack = S.track; torchOn = false;
+  setupTorch(); setupZoom();
+  setTimeout(setEngineLine, 400);   // once dimensions are known
+}
+async function listCameras(){
+  try{
+    const all = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+    const back = all.filter(d => /back|rear|environment|world/i.test(d.label));
+    S.devices = back.length > 1 ? back : (all.length > 1 ? all : []);
+    $('#cam-btn').hidden = S.devices.length < 2;
+  }catch(e){ S.devices = []; $('#cam-btn').hidden = true; }
+}
+ $('#cam-btn').addEventListener('click', async ()=>{
+  if(!S.devices.length) return;
+  S.devIdx = (S.devIdx + 1) % S.devices.length;
+  try{ await openStream(S.devices[S.devIdx].deviceId); }catch(e){}
+});
+function setupTorch(){
   let has = false;
-  try{ has = !!(track && track.getCapabilities && 'torch' in track.getCapabilities()); }catch(e){}
+  try{ has = !!(torchTrack && torchTrack.getCapabilities && 'torch' in torchTrack.getCapabilities()); }catch(e){}
   $('#torch-btn').hidden = !has;
   $('#torch-btn').classList.remove('on');
 }
@@ -746,13 +924,40 @@ async function toggleTorch(){
   $('#torch-btn').classList.toggle('on', torchOn);
 }
  $('#torch-btn').addEventListener('click', toggleTorch);
+function setupZoom(){
+  const wrap = $('#zoom-wrap'), slider = $('#zoom-slider');
+  wrap.hidden = true;
+  try{
+    const caps = S.track && S.track.getCapabilities ? S.track.getCapabilities() : null;
+    if(caps && caps.zoom && caps.zoom.max > caps.zoom.min){
+      slider.min = caps.zoom.min;
+      slider.max = caps.zoom.max;
+      slider.step = caps.zoom.step || (caps.zoom.max - caps.zoom.min) / 50;
+      slider.value = (S.track.getSettings() && S.track.getSettings().zoom) || caps.zoom.min;
+      wrap.hidden = false;
+    }
+  }catch(e){}
+}
+ $('#zoom-slider').addEventListener('input', e => {
+  try{ S.track && S.track.applyConstraints({ advanced:[{ zoom: +e.target.value }] }); }catch(err){}
+});
+
+function setEngineLine(extra){
+  const v = $('#scan-video');
+  const res = (v && v.videoWidth) ? `${v.videoWidth}×${v.videoHeight}` : '';
+  let eng;
+  if(S.zbarState === 'ready') eng = 'ZBAR';
+  else if(S.zbarState === 'loading') eng = (S.detector ? 'NATIVE+ZXING' : 'ZXING') + '+ZBAR…';
+  else if(S.detector) eng = 'NATIVE+ZXING';
+  else eng = (typeof ZXing !== 'undefined') ? 'ZXING' : 'NO ENGINE';
+  $('#scan-engine').textContent = [res, eng, extra].filter(Boolean).join(' · ').toUpperCase();
+}
 
 function stopScan(){
-  if(nativeLoop){ clearInterval(nativeLoop); nativeLoop = null; }
-  try{ scanControls && scanControls.stop(); }catch(e){}
-  try{ zxReader && zxReader.reset(); }catch(e){}
-  scanControls = null;
-  if(scanStream){ try{ scanStream.getTracks().forEach(t => t.stop()); }catch(e){} scanStream = null; }
+  stopPump();
+  S.running = false; S.tick = 0; S.busy = false;
+  try{ S.stream && S.stream.getTracks().forEach(t => t.stop()); }catch(e){}
+  S.stream = null; S.track = null;
   try{ $('#scan-video').srcObject = null; }catch(e){}
   torchTrack = null; torchOn = false;
   releaseWakeLock();
@@ -760,85 +965,46 @@ function stopScan(){
 function scanError(msg){
   $('#scan-video').hidden = true;
   const e = $('#scan-error'); e.hidden = false; e.textContent = msg;
-  setEngine('CAMERA OFFLINE · USE MANUAL ENTRY');
+  $('#scan-engine').textContent = 'CAMERA OFFLINE · USE MANUAL ENTRY';
 }
 
-/* keep the screen awake while scanning */
 async function requestWakeLock(){
   try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
 }
 function releaseWakeLock(){ try{ wakeLock && wakeLock.release(); }catch(e){} wakeLock = null; }
 
-/* engine 1: native BarcodeDetector */
-async function startNative(video){
-  if(!('BarcodeDetector' in window)) return false;
-  let formats = [];
-  try{
-    const supported = await BarcodeDetector.getSupportedFormats();
-    formats = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','itf','codabar','code_93']
-      .filter(f => supported.includes(f));
-  }catch(e){ formats = []; }
-  if(!formats.length) return false;
-  const detector = new BarcodeDetector({ formats });
-  scanStream = await navigator.mediaDevices.getUserMedia({
-    audio:false,
-    video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }
-  });
-  video.srcObject = scanStream;
-  await video.play();
-  setupTorch();
-  setEngine('ENGINE: NATIVE · HOLD STEADY');
-  nativeLoop = setInterval(async ()=>{
-    if(scanLock || document.hidden || !video.videoWidth) return;
-    try{
-      const found = await detector.detect(video);
-      if(found && found.length && !scanLock) onDecode(found[0].rawValue);
-    }catch(err){ /* frame not ready — ignore */ }
-  }, 120);
-  return true;
-}
-
-/* engine 2: ZXing fallback */
-async function startZXing(video){
-  if(typeof ZXing === 'undefined') return false;
-  if(!zxReader) zxReader = makeReader();
-  scanControls = await zxReader.decodeFromConstraints(
-    { audio:false, video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:720} } },
-    video,
-    result => { if(result) onDecode(result.getText()); }
-  );
-  setupTorch();
-  setEngine('ENGINE: ZXING · HOLD 10–15 CM, STEADY');
-  return true;
-}
-
 async function openScanner(){
   if(!run) return;
   $('#scan-video').hidden = false; $('#scan-error').hidden = true;
   $('#scan-code').value = '';
+  $('#torch-btn').hidden = true; $('#zoom-wrap').hidden = true; $('#cam-btn').hidden = true;
   $('#scan-store').textContent = run.store;
   updateScanCount();
-  setEngine('STARTING CAMERA…');
-  $('#torch-btn').hidden = true;
+  $('#scan-engine').textContent = 'STARTING CAMERA…';
   openModal('m-scan');
   closeFn['m-scan'] = closeScan;
-  scanLock = false;
+  scanLock = false; S.tick = 0; S.running = true;
   if(matchMedia('(hover:hover) and (pointer:fine)').matches) $('#scan-code').focus();
   requestWakeLock();
-  const video = $('#scan-video');
-  let ok = false;
-  try{ ok = await startNative(video); }catch(e){ ok = false; }
-  if(!ok){ try{ ok = await startZXing(video); }catch(e){ ok = false; } }
-  if(!ok){
-    scanError(typeof ZXing === 'undefined'
-      ? 'Scanner libraries could not load — check your connection, or type the barcode below.'
-      : 'No camera access. Tap the padlock icon in your address bar, allow Camera, then reopen — or type the barcode below.');
+  ensureZbar();          // upgrade to the retail-grade engine in the background
+  await setupNative();
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    scanError("This browser can't expose the camera here (an HTTPS page is required). Type the barcode below instead.");
+    return;
+  }
+  try{
+    await openStream();
+    await listCameras();
+    startPump();
+    setEngineLine();
+  }catch(err){
+    scanError('Camera refused. Tap the padlock icon in the address bar → allow Camera → reopen. Or type the barcode below.');
   }
 }
 function onDecode(text){
-  if(scanLock) return;
+  if(scanLock || !S.running) return;
   const code = String(text || '').trim();
-  if(code.length < 4) return;
+  if(code.length < 5) return;
   scanLock = true;
   stopScan(); beep();
   if(navigator.vibrate) navigator.vibrate(60);
@@ -895,7 +1061,6 @@ function openItemModal(barcode){
 }
  $('#item-x').addEventListener('click', closeTop);
 
-/* expiry selects */
 function buildExpSelects(){
   const now = new Date(), y0 = now.getFullYear();
   const m = $('#exp-m'), d = $('#exp-d'), y = $('#exp-y');
@@ -914,7 +1079,6 @@ function rebuildDays(){
  $('#exp-m').addEventListener('change', rebuildDays);
  $('#exp-y').addEventListener('change', rebuildDays);
 
-/* category chips */
 function buildChips(selected){
   pendingCat = CATS.includes(selected) ? selected : 'Misc';
   $('#cat-chips').innerHTML = CATS.map(c =>
@@ -927,7 +1091,6 @@ function buildChips(selected){
   $$('.chip', $('#cat-chips')).forEach(c => { c.classList.toggle('on', c === b); c.setAttribute('aria-pressed', c === b); });
 });
 
-/* scrollable quantity strip */
 function buildQtyStrip(){
   const strip = $('#qty-strip');
   strip.innerHTML = Array.from({length:99}, (_,i)=>`<div class="qty-cell" data-q="${i+1}">${i+1}</div>`).join('');
@@ -953,7 +1116,6 @@ function setQty(q, scroll){
  $('#qty-plus').addEventListener('click', ()=> setQty(currentQty + 1, true));
  $('#qty-minus').addEventListener('click', ()=> setQty(currentQty - 1, true));
 
-/* save → confirmation */
  $('#item-save').addEventListener('click', ()=>{
   const name = $('#item-name').value.trim();
   const price = parseFloat($('#item-price').value);
@@ -1085,7 +1247,6 @@ function renderRecords(){
   }
 }
 
-/* records interactions */
  $('#rec-list').addEventListener('click', e => {
   const t = e.target.closest('[data-act]');
   if(!t) return;
@@ -1132,7 +1293,6 @@ function renderRecords(){
   }
 });
 
-/* generic confirm modal */
 function askConfirm({title, body, yes='Delete', onYes}){
   $('#cfd-title').textContent = title;
   $('#cfd-body').textContent = body;
