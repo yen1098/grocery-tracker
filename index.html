@@ -36,30 +36,31 @@
   }
   body::before{
     content:""; position:fixed; inset:0; z-index:35; pointer-events:none; opacity:.05;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http group' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
   }
   body.no-scroll{overflow:hidden}
   ::selection{background:rgba(46,107,69,.25)}
   button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
-  #view-home .wrap,#view-records .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 108px)}
+  #view-home .wrap,#view-records .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 96px)}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
   .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
   header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);
     border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
-  .top-in{display:flex;align-items:center;justify-content:center;height:58px}
+  .top-in{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 0 9px}
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
+  .tagline{font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);opacity:.85;text-transform:uppercase}
 
-  /* bottom navigation */
+  /* bottom navigation — flush to the home-indicator zone */
   .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:4px;
     background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
-    padding:8px 12px calc(env(safe-area-inset-bottom) + 8px)}
-  .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    padding:7px 0 5px;border:none;background:transparent;border-radius:14px;color:var(--ink2);cursor:pointer;transition:.15s}
-  .bn-btn .ic svg{width:21px;height:21px}
-  .bn-btn>span:last-child{font:600 12px "IBM Plex Sans"}
+    padding:6px 10px max(8px, env(safe-area-inset-bottom))}
+  .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    padding:5px 0 3px;border:none;background:transparent;border-radius:12px;color:var(--ink2);cursor:pointer;transition:.15s}
+  .bn-btn .ic svg{width:20px;height:20px}
+  .bn-btn>span:last-child{font:600 11.5px "IBM Plex Sans"}
   .bn-btn.on{color:var(--ink)}
   .bn-btn.on .ic{color:var(--green)}
   .bn-btn sup{font:600 9.5px "IBM Plex Mono";background:var(--ink);color:var(--paper);
@@ -89,10 +90,7 @@
   .danger-link{background:none;border:none;color:var(--red);font:600 12.5px "IBM Plex Sans";
     text-decoration:underline;cursor:pointer;padding:4px 2px}
 
-  h1{font:600 clamp(2rem,6.5vw,2.8rem)/1.1 "Fraunces";letter-spacing:-.02em;margin:34px 0 0}
-  h1 em{color:var(--green)}
-
-  .active-run{display:flex;align-items:center;gap:12px;margin-top:24px;padding:11px 13px;background:var(--card);
+  .active-run{display:flex;align-items:center;gap:12px;margin-top:22px;padding:11px 13px;background:var(--card);
     border:1px solid var(--line);border-left:3px solid var(--green);border-radius:12px;flex-wrap:wrap}
   .ar-dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
   @keyframes pulse{50%{opacity:.35}}
@@ -110,14 +108,23 @@
     color:var(--ink);cursor:pointer;text-align:left}
   .stat-btn:active{background:var(--paper-2)}
 
-  /* records */
+  .sec-title{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2)}
+  .mini-budget{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:10px;cursor:pointer}
+  .mini-budget:active{transform:scale(.99)}
+  .mb-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:7px}
+  .mb-name{font:600 16px "Fraunces"}
+  .mb-val{font:600 12.5px "IBM Plex Mono";color:var(--green)}
+  .mb-val.neg{color:var(--red)}
+
   .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 14px}
   .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
-  .sec-title{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2)}
   .rec-tools{display:flex;gap:6px;align-items:center;margin-bottom:14px}
   .seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
   .seg button{border:none;background:transparent;padding:6px 11px;border-radius:999px;font:600 12px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
   .seg button.on{background:var(--ink);color:var(--paper)}
+  .seg.grow{display:flex;width:100%}
+  .seg.grow button{flex:1;padding:11px 0;font-size:14px}
   .rec-tools-right{display:flex;gap:6px;align-items:center;margin-left:auto}
 
   select.in{appearance:none;-webkit-appearance:none;
@@ -129,21 +136,20 @@
   .empty .ic svg{width:38px;height:38px}
   .empty h3{font:600 23px "Fraunces";color:var(--ink);margin:12px 0 14px}
 
-  /* unified card look — receipts and period cards share this */
   .period-card,.receipt{background:var(--card);border:1px solid var(--line);border-radius:14px;
     margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
   .receipt.fresh{box-shadow:0 0 0 2.5px var(--green)}
   .receipt-body{padding:4px 14px 14px}
 
-  /* period cards */
-  .pc-head{display:flex;align-items:center;gap:4px;padding:12px 8px 9px 14px}
+  .pc-head{display:flex;align-items:center;gap:4px;padding:12px 6px 9px 14px}
   .pc-toggle{flex:1;min-width:0;display:flex;align-items:center;background:none;border:none;text-align:left;cursor:pointer;padding:0}
   .pc-hl{flex:1;min-width:0}
   .pc-name{font:600 18px "Fraunces";letter-spacing:-.01em}
   .pc-range{font:500 11px "IBM Plex Mono";color:var(--ink2);margin-top:2px;text-transform:uppercase}
+  /* carets: no hover background — iOS keeps :hover stuck after tap on touch screens */
   .pc-chev-btn,.rec-chev-btn{flex:none;border:none;background:none;color:var(--ink2);cursor:pointer;
-    padding:8px;display:grid;place-items:center;border-radius:8px}
-  .pc-chev-btn svg,.rec-chev-btn svg{width:16px;height:16px;transition:transform .25s}
+    padding:10px 8px 10px 14px;min-width:48px;min-height:48px;display:grid;place-items:center;border-radius:12px}
+  .pc-chev-btn svg,.rec-chev-btn svg{width:17px;height:17px;transition:transform .25s}
   .period-card.open .pc-chev-btn svg,.receipt.open .rec-chev-btn svg{transform:rotate(180deg)}
   .pc-budget{padding:0 14px 12px}
   .bb-top{display:flex;justify-content:space-between;gap:10px;font:500 11px "IBM Plex Mono";
@@ -157,8 +163,7 @@
   .pc-sessions .receipt{margin-bottom:8px}
   .pc-foot{padding:4px 6px 8px}
 
-  /* receipt cards */
-  .rec-headrow{display:flex;align-items:center;gap:2px;padding-left:2px}
+  .rec-headrow{display:flex;align-items:center;gap:0;padding-left:2px;cursor:pointer}
   .rec-head{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;
     padding:13px 0 11px;text-align:left;cursor:pointer}
   .rec-hl{flex:1;min-width:0}
@@ -167,9 +172,7 @@
     margin-left:7px;animation:pulse 1.6s infinite;vertical-align:middle}
   .rec-meta{font:500 11px "IBM Plex Mono";letter-spacing:.08em;color:var(--ink2);margin-top:3px;text-transform:uppercase}
   .p-chip{color:var(--amber)}
-  .rec-total{font:600 15px "IBM Plex Mono";flex:none}
-  .rec-del{flex:none;border:none;background:none;color:#B9AE97;cursor:pointer;padding:8px;border-radius:8px;display:grid;place-items:center}
-  .rec-del:hover{color:var(--red);background:rgba(196,64,42,.08)}
+  .rec-total{font:600 15px "IBM Plex Mono";flex:none;padding-right:2px}
   .rec-rule{border:0;border-top:1px dashed var(--line);margin:0}
   .rec-items{display:none}
   .receipt.open .rec-items{display:block;animation:fadeIn .25s}
@@ -196,16 +199,23 @@
   .catgroup .swipe-wrap{margin-inline:14px}
   .catgroup .rec-foot{margin-inline:14px;padding-inline:0;border-top:1px dashed var(--line)}
 
-  /* swipe-to-delete */
   .swipe-wrap{position:relative}
   .swipe-del{position:absolute;inset:0;background:var(--red);color:#FBF3EE;display:flex;
     align-items:center;justify-content:flex-end;padding-right:20px;border-radius:14px}
   .swipe-del svg{width:20px;height:20px;display:block}
-  .swipe-content{position:relative;background:var(--card);touch-action:pan-y;will-change:transform}
+  .swipe-content{position:relative;background:var(--card);border-radius:14px;touch-action:pan-y;will-change:transform;
+    -webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+
+  .drag-clone{position:fixed;z-index:300;pointer-events:none;opacity:.95;margin:0;
+    box-shadow:0 18px 44px rgba(0,0,0,.35);transform:rotate(1.5deg) scale(1.02)}
+  .drag-src{opacity:.35}
+  body.dragging{user-select:none;-webkit-user-select:none}
+  .drop-hint{outline:2.5px dashed var(--green);outline-offset:3px}
 
   .overlay{position:fixed;inset:0;z-index:80;background:rgba(30,26,17,.55);backdrop-filter:blur(3px);
     display:grid;place-items:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s, visibility .2s}
   .overlay.open{opacity:1;visibility:visible}
+  #m-fx{z-index:95}
   .modal{position:relative;width:min(480px,100%);background:var(--card);border-radius:16px;padding:24px 22px 20px;
     box-shadow:0 24px 60px -18px rgba(0,0,0,.45);max-height:min(88dvh,780px);overflow:auto;
     transform:translateY(12px) scale(.98);transition:transform .22s cubic-bezier(.2,.8,.3,1.1)}
@@ -241,6 +251,7 @@
   .price-wrap .in{padding-left:30px;font-family:"IBM Plex Mono"}
   .fx-hint{margin-top:6px;font:500 11.5px "IBM Plex Mono";color:var(--green);letter-spacing:.02em}
   .fx-hint.keep{color:var(--ink2)}
+  .fx-hint .linkbtn{font-size:11.5px;padding:2px 4px}
 
   .cur-seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:2px}
   .cur-seg button{border:none;background:transparent;padding:4px 11px;border-radius:999px;
@@ -296,7 +307,6 @@
   .cfd-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
   .btn.danger{background:var(--red);border-color:#98311F;color:#FBF3EE}
 
-  /* ---------- scanner ---------- */
   #m-scan{background:#121110;padding:0;place-items:stretch;
     backdrop-filter:none;-webkit-backdrop-filter:none}
   .scan-stage{width:min(560px,100%);margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column}
@@ -341,7 +351,7 @@
   #scan-count{color:#F2EDE0;font-weight:600}
   #scan-engine{opacity:.75}
 
-  #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translateX(-50%);
+  #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%);
     z-index:200;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
     width:max-content;max-width:92vw}
   .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
@@ -361,6 +371,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
+    <span class="tagline">A quiet ledger for everything you buy</span>
   </div>
 </header>
 
@@ -375,13 +386,13 @@
         <button id="ar-finish" class="btn sm accent"><span class="ic" data-ico="check"></span>Finish</button>
       </div>
 
-      <h1>Groceries,<br><em>on the record.</em></h1>
-
       <div class="cta-row">
         <button id="btn-start" class="btn primary big"><span class="ic" data-ico="cart"></span>Start grocery run</button>
       </div>
 
+      <div id="home-budgets"></div>
       <div class="stats" id="stats"></div>
+      <p id="last-run" class="mut" hidden style="margin:14px 2px 0"></p>
     </div>
   </section>
 
@@ -413,16 +424,15 @@
   </section>
 </main>
 
-<!-- bottom navigation -->
 <nav class="bottom-nav" aria-label="Sections">
   <button id="tab-home" class="bn-btn on"><span class="ic" data-ico="cart"></span><span>Run</span></button>
   <button id="tab-recs" class="bn-btn"><span class="ic" data-ico="receipt"></span><span>Records<sup id="rec-count" hidden></sup></span></button>
 </nav>
 
 <span class="side-note l">LOCAL-FIRST — YOUR DATA NEVER LEAVES THIS DEVICE</span>
-<span class="side-note r">SWIPE LEFT ON ANY ROW TO DELETE</span>
+<span class="side-note r">HOLD A RUN TO DRAG IT INTO A BUDGET</span>
 
-<!-- ============ MODAL: start a run (store + budget) ============ -->
+<!-- ============ MODAL: start a run ============ -->
 <div class="overlay" id="m-start">
   <form class="modal" id="start-form" role="dialog" aria-modal="true" aria-labelledby="start-title" style="width:min(420px,100%)">
     <button type="button" class="x" id="start-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
@@ -431,7 +441,12 @@
     <label class="fld" id="new-store-wrap" hidden><span>NEW STORE</span>
       <input id="new-store-input" class="in" placeholder="e.g. Landers" autocomplete="off">
     </label>
-    <label class="fld"><span>BUDGET</span><select id="run-budget" class="in"></select></label>
+    <div class="fld"><span>BUDGET</span>
+      <div class="seg grow" role="group" aria-label="Use a budget">
+        <button type="button" id="bg-on" class="">Budget</button>
+        <button type="button" id="bg-off" class="on">No budget</button>
+      </div>
+    </div>
     <div id="new-budget-wrap" hidden>
       <label class="fld" id="fld-budget"><span>LIMIT (₱)</span>
         <input id="budget-input" class="in" type="number" min="1" step="0.01" inputmode="decimal" placeholder="3000">
@@ -679,7 +694,7 @@ const rate = () => db.rate;
 
 let run = db.draft;
 let lastCat = 'Misc';
-let pendingItem = null, cfdCb = null;
+let pendingItem = null, cfdCb = null, bgOn = false;
 const ui = { tab:'home', group:'session', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null };
 
 /* ---- totals ---- */
@@ -711,7 +726,7 @@ function findKnownProduct(barcode){
   return null;
 }
 
-/* ---- period naming: auto-updates once the window has passed ---- */
+/* ---- period naming ---- */
 function periodName(p){
   const now = d0(Date.now());
   if(d0(p.start) <= now && now <= d0(p.end)){
@@ -743,7 +758,7 @@ function closeTop(){ if(!stack.length) return; const m = stack[stack.length-1]; 
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTop(); });
  $$('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target === ov) closeTop(); }));
 
-/* ================= decorative barcodes (item blocks) ================= */
+/* ================= decorative barcodes ================= */
 function barsHTML(seed, max=34){
   const s = String(seed); const w = [];
   for(let i=0; i<s.length && w.length<max; i++){
@@ -778,7 +793,7 @@ function beep(){
   }catch(e){}
 }
 
-/* ================= tabs (bottom nav) ================= */
+/* ================= tabs ================= */
 function setTab(t){
   ui.tab = t;
   $('#tab-home').classList.toggle('on', t === 'home');
@@ -805,6 +820,29 @@ function renderHome(){
     <div class="stat"><b>${t.items}</b><span>ITEMS</span></div>
     <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>
     <button class="stat stat-btn" type="button" data-act="fx" aria-label="Exchange rate settings"><b>₱${(+rate()).toFixed(0)}</b><span>1 USD</span></button>`;
+
+  const box = $('#home-budgets');
+  const act = activePeriods();
+  box.innerHTML = act.length
+    ? `<div class="sec-title" style="margin:26px 2px 10px">ACTIVE BUDGETS</div>` + act.map(p => {
+        const spent = periodSpent(p), rem = p.budget - spent;
+        const pct = p.budget > 0 ? Math.min(100, spent / p.budget * 100) : 100;
+        const cls = rem < 0 ? 'over' : (pct >= 75 ? 'warn' : '');
+        return `<button class="mini-budget" type="button" data-act="go-records">
+          <span class="mb-row"><span class="mb-name">${esc(periodName(p))}</span>
+          <span class="mb-val ${rem<0?'neg':''}">${rem>=0 ? money(rem)+' left' : money(-rem)+' over'}</span></span>
+          <span class="bbar"><i class="${cls}" style="width:${pct}%"></i></span>
+        </button>`;
+      }).join('')
+    : '';
+
+  const lr = $('#last-run');
+  if(db.sessions.length){
+    const s = [...db.sessions].sort((a,b)=>b.ts-a.ts)[0];
+    lr.hidden = false;
+    lr.textContent = `LAST RUN · ${s.store.toUpperCase()} · ${money(sessionTotal(s))} · ${fmtTs(s.ts).toUpperCase()}`;
+  } else lr.hidden = true;
+
   const bar = $('#active-run');
   if(run){
     const rt = runTotals();
@@ -813,7 +851,7 @@ function renderHome(){
     $('#ar-store').textContent = run.store;
     let meta = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} SO FAR`;
     if(p){
-      const rem = p.budget - periodSpent(p) - rt.sum;
+      const rem = p.budget- periodSpent(p) - rt.sum;
       meta += rem >= 0 ? ` · ${money(rem)} LEFT` : ` · ${money(-rem)} OVER`;
     }
     $('#ar-meta').textContent = meta;
@@ -827,33 +865,28 @@ function renderHome(){
   b.textContent = db.sessions.length || '';
 }
 
-/* ================= start-run modal (store + budget) ================= */
+/* ================= start-run modal (budget toggle) ================= */
 function tryStart(){ if(run) openScanner(); else openStartModal(); }
  $('#btn-start').addEventListener('click', tryStart);
  $('#btn-empty-start').addEventListener('click', tryStart);
  $('#ar-resume').addEventListener('click', openScanner);
  $('#ar-finish').addEventListener('click', finishRun);
 
-function openStartModal(prePid){
+function orderedStores(){
+  const lastUse = {};
+  db.sessions.forEach(s => { if(!(s.store in lastUse) || s.ts > lastUse[s.store]) lastUse[s.store] = s.ts; });
+  return [...db.stores].sort((a,b) => (lastUse[b]||0) - (lastUse[a]||0));
+}
+function openStartModal(){
   const sel = $('#store-select');
   sel.innerHTML = '';
-  db.stores.forEach(s => sel.append(new Option(s, s)));
+  orderedStores().forEach(s => sel.append(new Option(s, s)));
   sel.append(new Option('+ Add a new store…', '__new'));
   $('#new-store-wrap').hidden = true;
   $('#new-store-input').value = '';
-  const b = $('#run-budget');
-  b.innerHTML = '';
-  b.append(new Option('No budget', '__none'));
+  // budget toggle: default ON if an active period exists
   const act = activePeriods();
-  act.forEach(p => {
-    const rem = p.budget - periodSpent(p);
-    b.append(new Option(`${periodName(p)} · ${rem >= 0 ? money(rem) + ' left' : money(-rem) + ' over'}`, p.id));
-  });
-  b.append(new Option('+ New budget period…', '__new'));
-  let pre = prePid || (act.length === 1 ? act[0].id : '__none');
-  if(![...b.options].some(o => o.value === pre)) pre = '__none';
-  b.value = pre;
-  $('#new-budget-wrap').hidden = b.value !== '__new';
+  setBudgetToggle(act.length > 0);
   $('#budget-input').value = '';
   $('#period-type').value = 'month';
   $('#custom-range').hidden = true;
@@ -861,15 +894,19 @@ function openStartModal(prePid){
   openModal('m-start');
   closeFn['m-start'] = ()=> shut($('#m-start'));
 }
- $('#start-x').addEventListener('click', ()=> shut($('#m-start')));
+function setBudgetToggle(on){
+  bgOn = on;
+  $('#bg-on').classList.toggle('on', on);
+  $('#bg-off').classList.toggle('on', !on);
+  $('#new-budget-wrap').hidden = !on;
+  if(on) setTimeout(()=> $('#budget-input').focus(), 120);
+}
+ $('#bg-on').addEventListener('click', ()=> setBudgetToggle(true));
+ $('#bg-off').addEventListener('click', ()=> setBudgetToggle(false));
  $('#store-select').addEventListener('change', e => {
   const isNew = e.target.value === '__new';
   $('#new-store-wrap').hidden = !isNew;
   if(isNew) $('#new-store-input').focus();
-});
- $('#run-budget').addEventListener('change', e => {
-  $('#new-budget-wrap').hidden = e.target.value !== '__new';
-  if(e.target.value === '__new') setTimeout(()=> $('#budget-input').focus(), 80);
 });
  $('#period-type').addEventListener('change', e => {
   $('#custom-range').hidden = e.target.value !== 'custom';
@@ -890,8 +927,7 @@ function openStartModal(prePid){
   } else store = sel.value;
 
   let periodId = null;
-  const bv = $('#run-budget').value;
-  if(bv === '__new'){
+  if(bgOn){
     const budget = parseFloat($('#budget-input').value);
     if(isNaN(budget) || budget <= 0){
       const f = $('#fld-budget'); f.classList.remove('err'); void f.offsetWidth; f.classList.add('err');
@@ -921,8 +957,6 @@ function openStartModal(prePid){
     const p = { id: uid(), type, budget: Math.round(budget*100)/100, start: start.getTime(), end: end.getTime() };
     db.periods.push(p);
     periodId = p.id;
-  } else if(bv !== '__none'){
-    periodId = bv;
   }
   save();
   shut($('#m-start'));
@@ -956,6 +990,7 @@ function openFx(){
   save();
   shut($('#m-fx'));
   renderHome();
+  updateFxHint();
   toast(`Rate saved — 1 USD = ₱${db.rate.toFixed(2)}`, {icon:true});
 });
 
@@ -1338,13 +1373,15 @@ function setCurrency(c){
 }
 function updateFxHint(){
   const hint = $('#fx-hint');
+  const editLink = ` <button type="button" class="linkbtn" data-act="fx">edit</button>`;
   if(curEntry === 'USD'){
     const v = parseFloat($('#item-price').value);
-    if(!(isNaN(v) || v < 0)){
-      hint.hidden = false; hint.className = 'fx-hint';
-      hint.textContent = `≈ ${money(v * rate())} at 1 USD = ₱${(+rate()).toFixed(2)}`;
-      return;
-    }
+    const rt = `1 USD = ₱${(+rate()).toFixed(2)}`;
+    hint.hidden = false; hint.className = 'fx-hint';
+    hint.innerHTML = (isNaN(v) || v < 0)
+      ? `${rt} · enter amount in $${editLink}`
+      : `≈ ${money(v * rate())} at ${rt}${editLink}`;
+    return;
   }
   if(knownItem){
     hint.hidden = false; hint.className = 'fx-hint keep';
@@ -1515,47 +1552,44 @@ function itemRowHTML(it, sid, idx, meta){
   return swipeWrap(inner, kind, ` data-sid="${sid}" data-idx="${idx}"`);
 }
 
-function receiptHTML(s, withChip){
-  const p = s.periodId ? db.periods.find(x => x.id === s.periodId) : null;
-  const chip = withChip && p ? ` · <span class="p-chip">${esc(periodName(p))}</span>` : '';
+function receiptHTML(s){
   return `<article class="receipt${ui.open.has(s.id) ? ' open' : ''}${s.id === ui.freshId ? ' fresh' : ''}" data-sid="${s.id}">
     <div class="receipt-body">
-      <div class="rec-headrow">
-        <button class="rec-head" data-act="toggle" data-sid="${s.id}">
+      <div class="rec-headrow" data-act="toggle" data-sid="${s.id}">
+        <button type="button" class="rec-head">
           <div class="rec-hl">
             <div class="rec-store">${esc(s.store)}</div>
-            <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}${chip}</div>
+            <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}</div>
           </div>
           <span class="rec-total">${money(sessionTotal(s))}</span>
         </button>
-        <button class="rec-del" data-act="del-session" data-sid="${s.id}" aria-label="Delete run">${ico('trash')}</button>
-        <button class="rec-chev-btn" data-act="toggle" data-sid="${s.id}" aria-label="Expand">${ico('chev')}</button>
+        <button type="button" class="rec-chev-btn" data-act="toggle" data-sid="${s.id}" aria-label="Expand">${ico('chev')}</button>
       </div>
       <div class="rec-items">
         <hr class="rec-rule">
         ${s.items.map((it,i) => itemRowHTML(it, s.id, i)).join('')}
         <div class="rec-foot"><span>TOTAL · ${s.items.length} ITEMS</span><b>${money(sessionTotal(s))}</b></div>
+        <div class="rec-actions"><button class="danger-link" data-act="del-session" data-sid="${s.id}">Delete run</button></div>
       </div>
     </div>
   </article>`;
 }
-const swipeReceipt = (s, withChip=true) =>
-  swipeWrap(receiptHTML(s, withChip), 'session', ` data-sid="${s.id}"`);
+const swipeReceipt = s => swipeWrap(receiptHTML(s), 'session', ` data-sid="${s.id}"`);
 
 function activeCardHTML(){
   const rt = runTotals();
   const p = run.periodId ? db.periods.find(x => x.id === run.periodId) : null;
   return `<article class="receipt${ui.openRun ? ' open' : ''}" id="active-card">
     <div class="receipt-body">
-      <div class="rec-headrow">
-        <button class="rec-head" data-act="toggle-run">
+      <div class="rec-headrow" data-act="toggle-run">
+        <button type="button" class="rec-head">
           <div class="rec-hl">
             <div class="rec-store">${esc(run.store)}<span class="live-dot"></span></div>
             <div class="rec-meta">IN PROGRESS · ${fmtTs(run.ts)}${p ? ` · <span class="p-chip">${esc(periodName(p))}</span>` : ''}</div>
           </div>
           <span class="rec-total">${money(rt.sum)}</span>
         </button>
-        <button class="rec-chev-btn" data-act="toggle-run" aria-label="Expand">${ico('chev')}</button>
+        <button type="button" class="rec-chev-btn" data-act="toggle-run" aria-label="Expand">${ico('chev')}</button>
       </div>
       <div class="rec-items">
         <hr class="rec-rule">
@@ -1583,25 +1617,25 @@ function budgetsHTML(){
     const open  = ui.openP.has(p.id);
     return `<article class="period-card${open ? ' open' : ''}" data-pid="${p.id}">
       ${swipeWrap(`<div class="pc-head">
-          <button class="pc-toggle" data-act="p-toggle" data-pid="${p.id}">
+          <button type="button" class="pc-toggle" data-act="p-toggle" data-pid="${p.id}">
             <div class="pc-hl">
               <div class="pc-name">${esc(periodName(p))}</div>
               <div class="pc-range">${periodRangeText(p)} · ${runs.length} run${runs.length===1?'':'s'}</div>
             </div>
           </button>
           <button class="btn sm accent" data-act="p-start" data-pid="${p.id}">Scan</button>
-          <button class="pc-chev-btn" data-act="p-toggle" data-pid="${p.id}" aria-label="Expand">${ico('chev')}</button>
+          <button type="button" class="pc-chev-btn" data-act="p-toggle" data-pid="${p.id}" aria-label="Expand">${ico('chev')}</button>
         </div>
-        <div class="pc-budget">
+        <div class="pc-budget" data-act="p-toggle" data-pid="${p.id}">
           <div class="bb-top">
             <span>SPENT <b>${money(spent)}</b></span>
             <span>${rem >= 0 ? `LEFT <b>${money(rem)}</b>` : `OVER <b>${money(-rem)}</b>`} · ${money(p.budget)}</span>
           </div>
           <div class="bbar"><i class="${cls}" style="width:${pct}%"></i></div>
-        </div>`, 'period', ` data-pid="${p.id}"`)}
+        </div>`, 'period', ` data-pid="${p.id}" data-act="p-toggle"`)}
       <div class="pc-sessions">
         ${runs.length
-          ? [...runs].sort((a,b)=>b.ts-a.ts).map(s => swipeReceipt(s, false)).join('')
+          ? [...runs].sort((a,b)=>b.ts-a.ts).map(s => swipeReceipt(s)).join('')
           : '<p class="mut" style="margin:4px 6px 10px">No runs yet.</p>'}
         <div class="pc-foot"><button class="danger-link" data-act="del-period" data-pid="${p.id}">Delete period</button></div>
       </div>
@@ -1610,7 +1644,7 @@ function budgetsHTML(){
 }
 
 function renderRecords(){
-  const freeSessions = db.sessions.filter(s => !s.periodId);   // period runs live inside their budget card
+  const freeSessions = db.sessions.filter(s => !s.periodId);
   const showEmpty = !db.sessions.length && !run && !db.periods.length;
   $('#rec-empty').hidden = !showEmpty;
   $('#rec-tools').style.display = showEmpty ? 'none' : '';
@@ -1622,7 +1656,7 @@ function renderRecords(){
   if(freeSessions.length){
     if(ui.group === 'session'){
       const sorted = [...freeSessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
-      html += sorted.map(s => swipeReceipt(s, false)).join('');
+      html += sorted.map(s => swipeReceipt(s)).join('');
     } else {
       const byCat = {};
       db.sessions.forEach(s => s.items.forEach((it, idx) => {
@@ -1748,12 +1782,14 @@ function askConfirm({title, body, yes='Delete', onYes}){
  $('#cfd-no').addEventListener('click', ()=> shut($('#m-cfd')));
 
 /* ================= tap actions (delegated) ================= */
+let suppressClickUntil = 0;
 document.addEventListener('click', e => {
   if(Date.now() < suppressClickUntil){ e.stopPropagation(); e.preventDefault(); return; }
   const t = e.target.closest('[data-act]');
   if(!t) return;
   switch(t.dataset.act){
     case 'fx': openFx(); break;
+    case 'go-records': setTab('records'); break;
     case 'toggle': {
       const art = t.closest('.receipt');
       art.classList.toggle('open');
@@ -1779,7 +1815,7 @@ document.addEventListener('click', e => {
     }
     case 'p-start': {
       if(run){ toast('Finish your current run first'); break; }
-      openStartModal(t.dataset.pid);
+      openStartModal();
       break;
     }
     case 'del-period':
@@ -1788,17 +1824,18 @@ document.addEventListener('click', e => {
 });
 
 /* ================= swipe-to-delete ================= */
-let suppressClickUntil = 0;
+let suppressSwipe = false;
 function bindSwipe(container){
   if(!container) return;
   let sw = null;
   container.addEventListener('touchstart', e => {
+    if(dragState || suppressSwipe) return;
     const c = e.target.closest('.swipe-content');
     if(!c) return;
     sw = { c, x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, horiz: null };
   }, {passive:true});
   container.addEventListener('touchmove', e => {
-    if(!sw) return;
+    if(dragState || suppressSwipe || !sw) return;
     const dx = e.touches[0].clientX - sw.x, dy = e.touches[0].clientY - sw.y;
     if(sw.horiz === null){
       if(Math.abs(dx) > 10 || Math.abs(dy) > 10) sw.horiz = Math.abs(dx) > Math.abs(dy);
@@ -1812,6 +1849,7 @@ function bindSwipe(container){
   }, {passive:false});
   const end = () => {
     if(!sw) return;
+    if(dragState || suppressSwipe){ sw = null; return; }
     const { c, dx, horiz } = sw; sw = null;
     c.style.transition = ''; c.style.transform = '';
     if(horiz && Math.abs(dx) > 12) suppressClickUntil = Date.now() + 350;
@@ -1827,6 +1865,124 @@ function requestSwipeDelete(el){
   else if(kind === 'run-item')confirmDeleteRunItem(+el.dataset.idx);
   else if(kind === 'period')  confirmDeletePeriod(el.dataset.pid);
 }
+
+/* ================= drag a run into a budget ================= */
+let dragState = null, holdPending = null, holdTimer = null, mouseDown = null;
+
+function startVisualDrag(c, x, y){
+  const rect = c.getBoundingClientRect();
+  const src = c.querySelector('.receipt') || c;
+  const clone = src.cloneNode(true);
+  clone.classList.add('drag-clone');
+  clone.style.width = rect.width + 'px';
+  clone.style.left = rect.left + 'px';
+  clone.style.top = rect.top + 'px';
+  document.body.appendChild(clone);
+  c.classList.add('drag-src');
+  document.body.classList.add('dragging');
+  if(navigator.vibrate) navigator.vibrate(30);
+  const s = db.sessions.find(v => v.id === c.dataset.sid);
+  dragState = { c, clone, sid: c.dataset.sid, curPid: s ? s.periodId : null,
+                offX: x - rect.left, offY: y - rect.top, over: null };
+  suppressSwipe = true;
+}
+function moveDrag(x, y){
+  if(!dragState) return;
+  dragState.clone.style.left = (x - dragState.offX) + 'px';
+  dragState.clone.style.top  = (y - dragState.offY) + 'px';
+  const el = document.elementFromPoint(x, y);
+  const pc = el ? el.closest('.period-card') : null;
+  if(dragState.over && dragState.over !== pc) dragState.over.classList.remove('drop-hint');
+  if(pc && pc.dataset.pid !== dragState.curPid) pc.classList.add('drop-hint');
+  dragState.over = (pc && pc.dataset.pid !== dragState.curPid) ? pc : null;
+}
+function endDrag(commit){
+  if(!dragState) return;
+  const d = dragState; dragState = null;
+  d.clone.remove();
+  d.c.classList.remove('drag-src');
+  document.body.classList.remove('dragging');
+  if(d.over) d.over.classList.remove('drop-hint');
+  suppressClickUntil = Date.now() + 350;
+  setTimeout(()=>{ suppressSwipe = false; }, 80);
+  if(commit && d.over && d.over.dataset.pid) confirmMoveToPeriod(d.sid, d.over.dataset.pid);
+}
+function confirmMoveToPeriod(sid, pid){
+  const s = db.sessions.find(x => x.id === sid);
+  const p = db.periods.find(x => x.id === pid);
+  if(!s || !p) return;
+  if(s.periodId === pid){ toast('Already in ' + periodName(p)); return; }
+  const left = p.budget - periodSpent(p) - sessionTotal(s);
+  askConfirm({
+    title: 'Move to budget?',
+    body: `${s.store} · ${money(sessionTotal(s))} → ${periodName(p)}. Would leave ${left >= 0 ? money(left) : 'it ' + money(-left) + ' over'}.`,
+    yes: 'Move',
+    onYes(){
+      s.periodId = pid;
+      ui.openP.add(pid);
+      save(); renderRecords(); renderHome();
+      toast(`Moved to ${periodName(p)}`, {icon:true});
+    }
+  });
+}
+/* touch: long-press to lift */
+document.addEventListener('touchstart', e => {
+  if(dragState || suppressSwipe || e.touches.length !== 1) return;
+  if(e.target.closest('button, a, input, select, textarea')) return;
+  const c = e.target.closest('.swipe-content[data-del="session"]');
+  if(!c) return;
+  const t = e.touches[0];
+  holdPending = { c, x: t.clientX, y: t.clientY };
+  holdTimer = setTimeout(()=>{
+    if(!holdPending) return;
+    startVisualDrag(holdPending.c, holdPending.x, holdPending.y);
+    holdPending = null;
+  }, 300);
+}, {passive:true});
+document.addEventListener('touchmove', e => {
+  if(holdPending){
+    const t = e.touches[0];
+    if(Math.hypot(t.clientX - holdPending.x, t.clientY - holdPending.y) > 12){
+      clearTimeout(holdTimer); holdPending = null;
+    }
+    return;
+  }
+  if(!dragState) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  moveDrag(t.clientX, t.clientY);
+}, {passive:false});
+document.addEventListener('touchend', e => {
+  if(holdPending){ clearTimeout(holdTimer); holdPending = null; }
+  if(dragState){ e.preventDefault(); endDrag(true); }
+}, {passive:false});
+document.addEventListener('touchcancel', () => {
+  if(holdPending){ clearTimeout(holdTimer); holdPending = null; }
+  if(dragState) endDrag(false);
+});
+/* mouse: drag directly */
+document.addEventListener('mousedown', e => {
+  if(dragState || e.button !== 0) return;
+  if(e.target.closest('button, a, input, select, textarea')) return;
+  const c = e.target.closest('.swipe-content[data-del="session"]');
+  if(!c) return;
+  mouseDown = { c, x: e.clientX, y: e.clientY };
+});
+document.addEventListener('mousemove', e => {
+  if(!mouseDown) return;
+  if(!dragState){
+    if(Math.hypot(e.clientX - mouseDown.x, e.clientY - mouseDown.y) > 8){
+      startVisualDrag(mouseDown.c, mouseDown.x, mouseDown.y);
+    }
+    return;
+  }
+  e.preventDefault();
+  moveDrag(e.clientX, e.clientY);
+});
+document.addEventListener('mouseup', () => {
+  mouseDown = null;
+  if(dragState) endDrag(true);
+});
 
 /* ================= CSV export ================= */
  $('#btn-export').addEventListener('click', ()=>{
