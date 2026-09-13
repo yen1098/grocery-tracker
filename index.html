@@ -43,22 +43,31 @@
   button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
-  #view-home .wrap,#view-records .wrap{padding-bottom:56px}
+  #view-home .wrap,#view-records .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 108px)}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
   .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
   header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);
     border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
-  .top-in{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .top-in{display:flex;align-items:center;justify-content:center;height:58px}
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
-  .tabs{display:flex;gap:4px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:4px}
-  .tabs button{border:none;background:transparent;padding:7px 15px;border-radius:999px;font:600 13.5px "IBM Plex Sans";color:var(--ink2);cursor:pointer;transition:.15s}
-  .tabs button.on{background:var(--ink);color:var(--paper)}
-  .tabs sup{font:600 10px "IBM Plex Mono";color:inherit;margin-left:3px}
+
+  /* bottom navigation */
+  .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:4px;
+    background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
+    padding:8px 12px calc(env(safe-area-inset-bottom) + 8px)}
+  .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    padding:7px 0 5px;border:none;background:transparent;border-radius:14px;color:var(--ink2);cursor:pointer;transition:.15s}
+  .bn-btn .ic svg{width:21px;height:21px}
+  .bn-btn>span:last-child{font:600 12px "IBM Plex Sans"}
+  .bn-btn.on{color:var(--ink)}
+  .bn-btn.on .ic{color:var(--green)}
+  .bn-btn sup{font:600 9.5px "IBM Plex Mono";background:var(--ink);color:var(--paper);
+    border-radius:999px;padding:1px 5px;margin-left:4px;vertical-align:2px}
 
   .side-note{display:none}
   @media(min-width:1080px){
-    .side-note{display:block;position:fixed;bottom:26px;font:500 10px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2);opacity:.65;z-index:5}
+    .side-note{display:block;position:fixed;bottom:110px;font:500 10px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2);opacity:.65;z-index:5}
     .side-note.l{left:26px;transform:rotate(180deg);writing-mode:vertical-rl}
     .side-note.r{right:26px;writing-mode:vertical-rl}
   }
@@ -72,10 +81,13 @@
   .btn.accent{background:var(--green);border-color:var(--green-deep);color:#F5F1E4}
   .btn.big{width:100%;padding:15px 24px;font-size:16px}
   .btn.sm{padding:7px 13px;font-size:13px}
+  .btn.compact{padding:9px 12px;font-size:13px;gap:6px}
   .btn.ghost-light{border-color:rgba(245,241,228,.4);color:#F2EDE0;background:transparent}
   .btn.ghost-light:hover{border-color:#F2EDE0}
   .btn.wide{width:100%}
   .linkbtn{background:none;border:none;color:var(--green);font:600 13.5px "IBM Plex Sans";text-decoration:underline;cursor:pointer;padding:4px}
+  .danger-link{background:none;border:none;color:var(--red);font:600 12.5px "IBM Plex Sans";
+    text-decoration:underline;cursor:pointer;padding:4px 2px}
 
   h1{font:600 clamp(2rem,6.5vw,2.8rem)/1.1 "Fraunces";letter-spacing:-.02em;margin:34px 0 0}
   h1 em{color:var(--green)}
@@ -99,33 +111,40 @@
   .stat-btn:active{background:var(--paper-2)}
 
   /* records */
-  .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 16px}
+  .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 14px}
   .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
   .sec-title{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2)}
-  .rec-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:18px}
-  .seg{display:flex;gap:3px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
-  .seg button{border:none;background:transparent;padding:6px 13px;border-radius:999px;font:600 12.5px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
+  .rec-tools{display:flex;gap:6px;align-items:center;margin-bottom:14px}
+  .seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .seg button{border:none;background:transparent;padding:6px 11px;border-radius:999px;font:600 12px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
   .seg button.on{background:var(--ink);color:var(--paper)}
-  .rec-tools-right{display:flex;gap:8px;align-items:center;margin-left:auto}
+  .rec-tools-right{display:flex;gap:6px;align-items:center;margin-left:auto}
 
   select.in{appearance:none;-webkit-appearance:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E6553' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
-  #rec-sort{padding:8px 30px 8px 12px;font-size:13px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);color:var(--ink)}
+    background-repeat:no-repeat;background-position:right 8px center;padding-right:26px}
+  #rec-sort{padding:8px 26px 8px 10px;font-size:12.5px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);color:var(--ink)}
 
   .empty{border:1.5px dashed var(--line);border-radius:16px;padding:44px 24px;text-align:center;color:var(--ink2);margin-bottom:40px}
   .empty .ic svg{width:38px;height:38px}
   .empty h3{font:600 23px "Fraunces";color:var(--ink);margin:12px 0 14px}
 
-  /* budget cards (records tab) */
-  .period-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;
-    box-shadow:var(--shadow);overflow:hidden}
-  .pc-head{display:flex;align-items:center;gap:6px;padding:12px 10px 9px 14px}
-  .pc-toggle{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:none;text-align:left;cursor:pointer;padding:0}
+  /* unified card look — receipts and period cards share this */
+  .period-card,.receipt{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+  .receipt.fresh{box-shadow:0 0 0 2.5px var(--green)}
+  .receipt-body{padding:4px 14px 14px}
+
+  /* period cards */
+  .pc-head{display:flex;align-items:center;gap:4px;padding:12px 8px 9px 14px}
+  .pc-toggle{flex:1;min-width:0;display:flex;align-items:center;background:none;border:none;text-align:left;cursor:pointer;padding:0}
+  .pc-hl{flex:1;min-width:0}
   .pc-name{font:600 18px "Fraunces";letter-spacing:-.01em}
   .pc-range{font:500 11px "IBM Plex Mono";color:var(--ink2);margin-top:2px;text-transform:uppercase}
-  .pc-chev{color:var(--ink2);transition:transform .25s;flex:none}
-  .period-card.open .pc-chev{transform:rotate(180deg)}
+  .pc-chev-btn,.rec-chev-btn{flex:none;border:none;background:none;color:var(--ink2);cursor:pointer;
+    padding:8px;display:grid;place-items:center;border-radius:8px}
+  .pc-chev-btn svg,.rec-chev-btn svg{width:16px;height:16px;transition:transform .25s}
+  .period-card.open .pc-chev-btn svg,.receipt.open .rec-chev-btn svg{transform:rotate(180deg)}
   .pc-budget{padding:0 14px 12px}
   .bb-top{display:flex;justify-content:space-between;gap:10px;font:500 11px "IBM Plex Mono";
     letter-spacing:.06em;color:var(--ink2);margin-bottom:6px;text-transform:uppercase}
@@ -133,27 +152,22 @@
   .bbar{height:6px;background:var(--paper-2);border-radius:999px;overflow:hidden}
   .bbar i{display:block;height:100%;border-radius:999px;background:var(--green);transition:width .3s}
   .bbar i.warn{background:var(--amber)} .bbar i.over{background:var(--red)}
-  .pc-sessions{display:none;border-top:1px dashed var(--line);padding:10px 10px 4px}
+  .pc-sessions{display:none;border-top:1px dashed var(--line);padding:10px 10px 6px}
   .period-card.open .pc-sessions{display:block;animation:fadeIn .25s}
+  .pc-sessions .receipt{margin-bottom:8px}
+  .pc-foot{padding:4px 6px 8px}
 
-  .receipt{position:relative;margin-bottom:12px;
-    filter:drop-shadow(0 1px 2px rgba(34,30,21,.09)) drop-shadow(0 12px 18px rgba(34,30,21,.10))}
-  .receipt.fresh{box-shadow:0 0 0 2.5px var(--green);border-radius:12px}
-  .receipt-body{background:var(--card);border-radius:12px 12px 0 0;padding:4px 18px 14px}
-  .receipt::after{content:"";position:absolute;top:100%;left:0;width:100%;height:8px;
-    background:conic-gradient(from 135deg at 50% 0,var(--card) 90deg,transparent 90deg) 0 0/12px 8px repeat-x}
+  /* receipt cards */
   .rec-headrow{display:flex;align-items:center;gap:2px;padding-left:2px}
   .rec-head{flex:1;min-width:0;display:flex;align-items:center;gap:12px;background:none;border:none;
-    padding:15px 0 12px;text-align:left;cursor:pointer}
+    padding:13px 0 11px;text-align:left;cursor:pointer}
   .rec-hl{flex:1;min-width:0}
-  .rec-store{font:600 19px "Fraunces";letter-spacing:-.01em}
+  .rec-store{font:600 18px "Fraunces";letter-spacing:-.01em}
   .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);
     margin-left:7px;animation:pulse 1.6s infinite;vertical-align:middle}
   .rec-meta{font:500 11px "IBM Plex Mono";letter-spacing:.08em;color:var(--ink2);margin-top:3px;text-transform:uppercase}
   .p-chip{color:var(--amber)}
-  .rec-total{font:600 16px "IBM Plex Mono";flex:none}
-  .rec-chev{color:var(--ink2);transition:transform .25s;flex:none}
-  .receipt.open .rec-chev{transform:rotate(180deg)}
+  .rec-total{font:600 15px "IBM Plex Mono";flex:none}
   .rec-del{flex:none;border:none;background:none;color:#B9AE97;cursor:pointer;padding:8px;border-radius:8px;display:grid;place-items:center}
   .rec-del:hover{color:var(--red);background:rgba(196,64,42,.08)}
   .rec-rule{border:0;border-top:1px dashed var(--line);margin:0}
@@ -175,21 +189,21 @@
     border-top:1px dashed var(--line);margin-top:2px;font:600 12.5px "IBM Plex Mono";letter-spacing:.14em}
   .rec-foot b{font-size:16.5px;letter-spacing:0}
 
-  .catgroup{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
+  .catgroup{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
   .cg-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px dashed var(--line)}
   .cg-head h3{font:600 17px "Fraunces";margin:0;flex:1}
   .cg-sum{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
-  .catgroup .swipe-wrap{margin-inline:16px}
-  .catgroup .rec-foot{margin-inline:16px;padding-inline:0;border-top:1px dashed var(--line)}
+  .catgroup .swipe-wrap{margin-inline:14px}
+  .catgroup .rec-foot{margin-inline:14px;padding-inline:0;border-top:1px dashed var(--line)}
 
   /* swipe-to-delete */
   .swipe-wrap{position:relative}
   .swipe-del{position:absolute;inset:0;background:var(--red);color:#FBF3EE;display:flex;
-    align-items:center;justify-content:flex-end;padding-right:20px;border-radius:10px}
+    align-items:center;justify-content:flex-end;padding-right:20px;border-radius:14px}
   .swipe-del svg{width:20px;height:20px;display:block}
   .swipe-content{position:relative;background:var(--card);touch-action:pan-y;will-change:transform}
 
-  .overlay{position:fixed;inset:0;z-index:50;background:rgba(30,26,17,.55);backdrop-filter:blur(3px);
+  .overlay{position:fixed;inset:0;z-index:80;background:rgba(30,26,17,.55);backdrop-filter:blur(3px);
     display:grid;place-items:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s, visibility .2s}
   .overlay.open{opacity:1;visibility:visible}
   .modal{position:relative;width:min(480px,100%);background:var(--card);border-radius:16px;padding:24px 22px 20px;
@@ -327,7 +341,7 @@
   #scan-count{color:#F2EDE0;font-weight:600}
   #scan-engine{opacity:.75}
 
-  #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);transform:translateX(-50%);
+  #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translateX(-50%);
     z-index:200;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
     width:max-content;max-width:92vw}
   .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
@@ -347,10 +361,6 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <nav class="tabs" aria-label="Sections">
-      <button id="tab-home" class="on">Run</button>
-      <button id="tab-recs">Records<sup id="rec-count" hidden></sup></button>
-    </nav>
   </div>
 </header>
 
@@ -381,15 +391,15 @@
       <div class="rec-top"><h2>Ledger</h2></div>
       <div class="rec-tools" id="rec-tools">
         <div class="seg" role="tablist" aria-label="Group records">
-          <button id="seg-session" class="on">By session</button>
-          <button id="seg-cat">By category</button>
+          <button id="seg-session" class="on">Session</button>
+          <button id="seg-cat">Category</button>
         </div>
         <div class="rec-tools-right">
           <select id="rec-sort" class="in" aria-label="Sort sessions">
-            <option value="new">Newest first</option>
-            <option value="old">Oldest first</option>
+            <option value="new">Newest</option>
+            <option value="old">Oldest</option>
           </select>
-          <button id="btn-export" class="btn primary"><span class="ic" data-ico="download"></span>Export CSV</button>
+          <button id="btn-export" class="btn primary compact"><span class="ic" data-ico="download"></span>CSV</button>
         </div>
       </div>
       <div id="rec-empty" class="empty" hidden>
@@ -402,6 +412,12 @@
     </div>
   </section>
 </main>
+
+<!-- bottom navigation -->
+<nav class="bottom-nav" aria-label="Sections">
+  <button id="tab-home" class="bn-btn on"><span class="ic" data-ico="cart"></span><span>Run</span></button>
+  <button id="tab-recs" class="bn-btn"><span class="ic" data-ico="receipt"></span><span>Records<sup id="rec-count" hidden></sup></span></button>
+</nav>
 
 <span class="side-note l">LOCAL-FIRST — YOUR DATA NEVER LEAVES THIS DEVICE</span>
 <span class="side-note r">SWIPE LEFT ON ANY ROW TO DELETE</span>
@@ -435,7 +451,7 @@
         </div>
       </div>
     </div>
-    <button type="submit" class="btn primary wide"><span id="start-go-label">Start scanning</span><span class="ic" data-ico="arrow"></span></button>
+    <button type="submit" class="btn primary wide">Start scanning<span class="ic" data-ico="arrow"></span></button>
   </form>
 </div>
 
@@ -762,7 +778,7 @@ function beep(){
   }catch(e){}
 }
 
-/* ================= tabs ================= */
+/* ================= tabs (bottom nav) ================= */
 function setTab(t){
   ui.tab = t;
   $('#tab-home').classList.toggle('on', t === 'home');
@@ -1511,9 +1527,9 @@ function receiptHTML(s, withChip){
             <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}${chip}</div>
           </div>
           <span class="rec-total">${money(sessionTotal(s))}</span>
-          <span class="rec-chev ic">${ico('chev')}</span>
         </button>
-        <button class="rec-del" data-act="del-session" data-sid="${s.id}" aria-label="Delete session">${ico('trash')}</button>
+        <button class="rec-del" data-act="del-session" data-sid="${s.id}" aria-label="Delete run">${ico('trash')}</button>
+        <button class="rec-chev-btn" data-act="toggle" data-sid="${s.id}" aria-label="Expand">${ico('chev')}</button>
       </div>
       <div class="rec-items">
         <hr class="rec-rule">
@@ -1538,9 +1554,8 @@ function activeCardHTML(){
             <div class="rec-meta">IN PROGRESS · ${fmtTs(run.ts)}${p ? ` · <span class="p-chip">${esc(periodName(p))}</span>` : ''}</div>
           </div>
           <span class="rec-total">${money(rt.sum)}</span>
-          <span class="rec-chev ic">${ico('chev')}</span>
         </button>
-        <button class="rec-del" data-act="discard-run" aria-label="Discard run">${ico('x')}</button>
+        <button class="rec-chev-btn" data-act="toggle-run" aria-label="Expand">${ico('chev')}</button>
       </div>
       <div class="rec-items">
         <hr class="rec-rule">
@@ -1573,10 +1588,9 @@ function budgetsHTML(){
               <div class="pc-name">${esc(periodName(p))}</div>
               <div class="pc-range">${periodRangeText(p)} · ${runs.length} run${runs.length===1?'':'s'}</div>
             </div>
-            <span class="pc-chev ic">${ico('chev')}</span>
           </button>
-          <button class="btn sm accent" data-act="p-start" data-pid="${p.id}">Run</button>
-          <button class="rec-del" data-act="del-period" data-pid="${p.id}" aria-label="Delete period">${ico('trash')}</button>
+          <button class="btn sm accent" data-act="p-start" data-pid="${p.id}">Scan</button>
+          <button class="pc-chev-btn" data-act="p-toggle" data-pid="${p.id}" aria-label="Expand">${ico('chev')}</button>
         </div>
         <div class="pc-budget">
           <div class="bb-top">
@@ -1589,14 +1603,15 @@ function budgetsHTML(){
         ${runs.length
           ? [...runs].sort((a,b)=>b.ts-a.ts).map(s => swipeReceipt(s, false)).join('')
           : '<p class="mut" style="margin:4px 6px 10px">No runs yet.</p>'}
+        <div class="pc-foot"><button class="danger-link" data-act="del-period" data-pid="${p.id}">Delete period</button></div>
       </div>
     </article>`;
   }).join('');
 }
 
 function renderRecords(){
-  const hasSessions = db.sessions.length > 0;
-  const showEmpty = !hasSessions && !run && !db.periods.length;
+  const freeSessions = db.sessions.filter(s => !s.periodId);   // period runs live inside their budget card
+  const showEmpty = !db.sessions.length && !run && !db.periods.length;
   $('#rec-empty').hidden = !showEmpty;
   $('#rec-tools').style.display = showEmpty ? 'none' : '';
   const list = $('#rec-list');
@@ -1604,10 +1619,10 @@ function renderRecords(){
 
   let html = budgetsHTML();
   if(run) html += activeCardHTML();
-  if(hasSessions){
+  if(freeSessions.length){
     if(ui.group === 'session'){
-      const sorted = [...db.sessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
-      html += sorted.map(s => swipeReceipt(s, true)).join('');
+      const sorted = [...freeSessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
+      html += sorted.map(s => swipeReceipt(s, false)).join('');
     } else {
       const byCat = {};
       db.sessions.forEach(s => s.items.forEach((it, idx) => {
@@ -1628,6 +1643,8 @@ function renderRecords(){
         </section>`;
       }).join('');
     }
+  } else if(ui.group === 'session' && db.periods.length){
+    html += `<p class="mut" style="margin:14px 2px">All runs are inside budget periods.</p>`;
   }
   list.innerHTML = html;
 }
@@ -1841,6 +1858,7 @@ function requestSwipeDelete(el){
  $('#btn-sample').addEventListener('click', ()=>{
   const dOff = n => { const d = new Date(Date.now() + n * 864e5); return isoOf(d); };
   const y = new Date(Date.now() - 864e5); y.setHours(16,12,0,0);
+  const y2 = new Date(Date.now() - 2 * 864e5); y2.setHours(10,42,0,0);
   const now = new Date();
   const period = { id: uid(), type:'month', budget:3000,
     start: new Date(now.getFullYear(), now.getMonth(), 1).getTime(),
@@ -1857,8 +1875,15 @@ function requestSwipeDelete(el){
       { barcode:'0012345678905', name:'Imported Granola Bars (4-pack)',     price:639.62, qty:1, cat:'Snacks',   exp:dOff(150), cur:'USD', orig:11.99 },
     ]
   });
+  db.sessions.unshift({
+    id: uid(), store: 'Shopwise', ts: y2.getTime(), periodId: null,
+    items: [
+      { barcode:'4809012345001', name:'Palmolive Dishwashing 450ml', price:109.50, qty:2, cat:'Cleaning', exp:dOff(900) },
+      { barcode:'4809012345002', name:'Ziploc Storage Bags 35s',     price:132.75, qty:1, cat:'Storage',  exp:dOff(1200) },
+    ]
+  });
   save(); setTab('records'); renderHome();
-  toast('Sample run + budget added', {icon:true});
+  toast('Sample budget + runs added', {icon:true});
 });
 
 /* ================= init ================= */
