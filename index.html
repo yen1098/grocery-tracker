@@ -43,7 +43,9 @@
   button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
+  #view-home .wrap,#view-records .wrap{padding-bottom:56px}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
+  .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
   header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);
     border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
@@ -68,17 +70,15 @@
   .btn:active{transform:translateY(0);box-shadow:none}
   .btn.primary{background:var(--ink);color:var(--paper)}
   .btn.accent{background:var(--green);border-color:var(--green-deep);color:#F5F1E4}
-  .btn.big{width:100%;padding:14px 24px;font-size:16px}
+  .btn.big{width:100%;padding:15px 24px;font-size:16px}
   .btn.sm{padding:7px 13px;font-size:13px}
   .btn.ghost-light{border-color:rgba(245,241,228,.4);color:#F2EDE0;background:transparent}
   .btn.ghost-light:hover{border-color:#F2EDE0}
   .btn.wide{width:100%}
   .linkbtn{background:none;border:none;color:var(--green);font:600 13.5px "IBM Plex Sans";text-decoration:underline;cursor:pointer;padding:4px}
 
-  .kicker{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--green);margin:38px 0 10px}
-  h1{font:600 clamp(2.1rem,7vw,3.1rem)/1.08 "Fraunces";letter-spacing:-.02em;margin:0}
+  h1{font:600 clamp(2rem,6.5vw,2.8rem)/1.1 "Fraunces";letter-spacing:-.02em;margin:34px 0 0}
   h1 em{color:var(--green)}
-  .sub{color:var(--ink2);margin:14px 0 0;max-width:44ch}
 
   .active-run{display:flex;align-items:center;gap:12px;margin-top:24px;padding:11px 13px;background:var(--card);
     border:1px solid var(--line);border-left:3px solid var(--green);border-radius:12px;flex-wrap:wrap}
@@ -88,34 +88,21 @@
   .ar-txt b{font:600 15px "Fraunces";display:block}
   .ar-txt span{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
 
-  .hero-code{position:relative;display:flex;align-items:center;justify-content:space-between;gap:2px;width:100%;
-    height:112px;margin-top:32px;padding:12px 16px;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;cursor:pointer;overflow:hidden;box-shadow:var(--shadow);transition:transform .14s}
-  .hero-code:active{transform:scale(.985)}
-  .hero-code i{background:var(--ink);height:76%;border-radius:1px}
-  .hero-code i.g{height:100%}
-  .laser{position:absolute;left:0;right:0;top:-3px;height:3px;background:var(--laser);
-    box-shadow:0 0 12px 2px rgba(255,59,48,.5);opacity:.9;animation:laser 3.2s ease-in-out infinite alternate}
-  .hero-code:hover .laser{animation-duration:1s}
-  @keyframes laser{from{transform:translateY(0)}to{transform:translateY(112px)}}
-  .hero-cap{text-align:center;font:600 10.5px "IBM Plex Mono";letter-spacing:.2em;color:var(--ink2);margin:12px 0 0}
-
-  .cta-row{margin-top:24px}
-  .steps{list-style:none;margin:36px 0 0;padding:0;border-top:1px solid var(--line)}
-  .steps li{display:flex;gap:16px;padding:14px 2px;border-bottom:1px solid var(--line)}
-  .steps .n{font:600 12px "IBM Plex Mono";color:var(--green);letter-spacing:.08em;padding-top:2px}
-  .steps b{font-weight:600}
-  .steps p{margin:2px 0 0;color:var(--ink2);font-size:14px}
-  .stats{display:flex;margin:30px 0 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .stat{flex:1;padding:14px 16px;border-left:1px solid var(--line)}
+  .cta-row{margin-top:22px}
+  .stats{display:flex;margin:20px 0 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .stat{flex:1;padding:13px 14px;border-left:1px solid var(--line)}
   .stat:first-child{border-left:0}
-  .stat b{display:block;font:600 21px "IBM Plex Mono";letter-spacing:-.02em}
+  .stat b{display:block;font:600 20px "IBM Plex Mono";letter-spacing:-.02em}
   .stat span{font:600 10px "IBM Plex Mono";letter-spacing:.18em;color:var(--ink2)}
-  .fx-line{display:flex;justify-content:center;margin:12px 0 46px}
+  .stat-btn{appearance:none;border:0;border-left:1px solid var(--line);background:transparent;
+    color:var(--ink);cursor:pointer;text-align:left}
+  .stat-btn:active{background:var(--paper-2)}
 
+  /* records */
   .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:30px 0 16px}
   .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
-  .rec-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .sec-title{font:600 10.5px "IBM Plex Mono";letter-spacing:.22em;color:var(--ink2)}
+  .rec-tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:18px}
   .seg{display:flex;gap:3px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
   .seg button{border:none;background:transparent;padding:6px 13px;border-radius:999px;font:600 12.5px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
   .seg button.on{background:var(--ink);color:var(--paper)}
@@ -126,12 +113,30 @@
     background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
   #rec-sort{padding:8px 30px 8px 12px;font-size:13px;border:1px solid var(--line);border-radius:10px;background-color:var(--card);color:var(--ink)}
 
-  .empty{border:1.5px dashed var(--line);border-radius:16px;padding:46px 24px;text-align:center;color:var(--ink2);margin-bottom:40px}
+  .empty{border:1.5px dashed var(--line);border-radius:16px;padding:44px 24px;text-align:center;color:var(--ink2);margin-bottom:40px}
   .empty .ic svg{width:38px;height:38px}
-  .empty h3{font:600 23px "Fraunces";color:var(--ink);margin:12px 0 6px}
-  .empty p{margin:0 0 18px}
+  .empty h3{font:600 23px "Fraunces";color:var(--ink);margin:12px 0 14px}
 
-  .receipt{position:relative;margin-bottom:20px;
+  /* budget cards (records tab) */
+  .period-card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .pc-head{display:flex;align-items:center;gap:6px;padding:12px 10px 9px 14px}
+  .pc-toggle{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:none;text-align:left;cursor:pointer;padding:0}
+  .pc-name{font:600 18px "Fraunces";letter-spacing:-.01em}
+  .pc-range{font:500 11px "IBM Plex Mono";color:var(--ink2);margin-top:2px;text-transform:uppercase}
+  .pc-chev{color:var(--ink2);transition:transform .25s;flex:none}
+  .period-card.open .pc-chev{transform:rotate(180deg)}
+  .pc-budget{padding:0 14px 12px}
+  .bb-top{display:flex;justify-content:space-between;gap:10px;font:500 11px "IBM Plex Mono";
+    letter-spacing:.06em;color:var(--ink2);margin-bottom:6px;text-transform:uppercase}
+  .bb-top b{color:var(--ink);font-weight:600}
+  .bbar{height:6px;background:var(--paper-2);border-radius:999px;overflow:hidden}
+  .bbar i{display:block;height:100%;border-radius:999px;background:var(--green);transition:width .3s}
+  .bbar i.warn{background:var(--amber)} .bbar i.over{background:var(--red)}
+  .pc-sessions{display:none;border-top:1px dashed var(--line);padding:10px 10px 4px}
+  .period-card.open .pc-sessions{display:block;animation:fadeIn .25s}
+
+  .receipt{position:relative;margin-bottom:12px;
     filter:drop-shadow(0 1px 2px rgba(34,30,21,.09)) drop-shadow(0 12px 18px rgba(34,30,21,.10))}
   .receipt.fresh{box-shadow:0 0 0 2.5px var(--green);border-radius:12px}
   .receipt-body{background:var(--card);border-radius:12px 12px 0 0;padding:4px 18px 14px}
@@ -142,7 +147,10 @@
     padding:15px 0 12px;text-align:left;cursor:pointer}
   .rec-hl{flex:1;min-width:0}
   .rec-store{font:600 19px "Fraunces";letter-spacing:-.01em}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);
+    margin-left:7px;animation:pulse 1.6s infinite;vertical-align:middle}
   .rec-meta{font:500 11px "IBM Plex Mono";letter-spacing:.08em;color:var(--ink2);margin-top:3px;text-transform:uppercase}
+  .p-chip{color:var(--amber)}
   .rec-total{font:600 16px "IBM Plex Mono";flex:none}
   .rec-chev{color:var(--ink2);transition:transform .25s;flex:none}
   .receipt.open .rec-chev{transform:rotate(180deg)}
@@ -152,8 +160,8 @@
   .rec-items{display:none}
   .receipt.open .rec-items{display:block;animation:fadeIn .25s}
   @keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1}}
+  .rec-actions{display:flex;justify-content:flex-end;gap:8px;padding:12px 0 4px}
   .rec-line{display:grid;grid-template-columns:1fr auto auto;gap:3px 12px;align-items:center;padding:11px 0;border-bottom:1px dashed var(--line)}
-  .rec-line:last-of-type{border-bottom:0}
   .rl-name{font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
   .rl-mult{font:500 12px "IBM Plex Mono";color:var(--ink2)}
   .rl-total{font:600 13.5px "IBM Plex Mono";grid-row:span 2}
@@ -163,18 +171,23 @@
   .exp.warn{color:var(--amber)} .exp.bad{color:var(--red)}
   .rl-del{border:none;background:none;color:#C4BAA4;cursor:pointer;padding:6px;border-radius:8px;grid-column:3;justify-self:end}
   .rl-del:hover{color:var(--red);background:rgba(196,64,42,.08)}
-  .rl-del.armed{background:var(--red);color:#fff;font:600 11px "IBM Plex Sans";padding:6px 10px}
   .rec-foot{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0 3px;
     border-top:1px dashed var(--line);margin-top:2px;font:600 12.5px "IBM Plex Mono";letter-spacing:.14em}
   .rec-foot b{font-size:16.5px;letter-spacing:0}
 
-  .catgroup{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow)}
-  .cg-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px dashed var(--line)}
-  .cg-head h3{font:600 17.5px "Fraunces";margin:0;flex:1}
+  .catgroup{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
+  .cg-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px dashed var(--line)}
+  .cg-head h3{font:600 17px "Fraunces";margin:0;flex:1}
   .cg-sum{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
-  .catgroup .rec-line,.catgroup .rec-foot{margin-inline:16px;padding-inline:0}
-  .catgroup .rec-line:first-of-type{border-top:0}
-  .catgroup .rec-foot{border-top:1px dashed var(--line)}
+  .catgroup .swipe-wrap{margin-inline:16px}
+  .catgroup .rec-foot{margin-inline:16px;padding-inline:0;border-top:1px dashed var(--line)}
+
+  /* swipe-to-delete */
+  .swipe-wrap{position:relative}
+  .swipe-del{position:absolute;inset:0;background:var(--red);color:#FBF3EE;display:flex;
+    align-items:center;justify-content:flex-end;padding-right:20px;border-radius:10px}
+  .swipe-del svg{width:20px;height:20px;display:block}
+  .swipe-content{position:relative;background:var(--card);touch-action:pan-y;will-change:transform}
 
   .overlay{position:fixed;inset:0;z-index:50;background:rgba(30,26,17,.55);backdrop-filter:blur(3px);
     display:grid;place-items:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s, visibility .2s}
@@ -183,7 +196,7 @@
     box-shadow:0 24px 60px -18px rgba(0,0,0,.45);max-height:min(88dvh,780px);overflow:auto;
     transform:translateY(12px) scale(.98);transition:transform .22s cubic-bezier(.2,.8,.3,1.1)}
   .overlay.open .modal{transform:none}
-  .modal-title{font:600 24px "Fraunces";margin:0 0 4px;letter-spacing:-.01em}
+  .modal-title{font:600 24px "Fraunces";margin:0 0 14px;letter-spacing:-.01em}
   .modal-sub{color:var(--ink2);font-size:13.5px;margin:0 0 18px}
   .x{position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;border-radius:50%;
     background:var(--paper-2);color:var(--ink2);cursor:pointer;display:grid;place-items:center;transition:.12s}
@@ -200,14 +213,21 @@
   .fld.err .in{border-color:var(--red);box-shadow:0 0 0 3px rgba(196,64,42,.12)}
   .shake{animation:shake .3s}
   @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .price-row{display:flex;gap:8px}
+  .price-row .price-wrap{flex:1}
+  .prev-price{flex:none;display:flex;flex-direction:column;justify-content:center;gap:2px;
+    background:var(--paper-2);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;min-width:96px}
+  .prev-price span{font:600 9px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2)}
+  .prev-price b{font:600 14px "IBM Plex Mono"}
+  .prev-price small{font:500 10px "IBM Plex Mono";color:var(--amber)}
   .price-wrap{position:relative}
   .price-wrap::before{content:"₱";position:absolute;left:12px;top:50%;transform:translateY(-50%);
     font:600 14px "IBM Plex Mono";color:var(--ink2);pointer-events:none}
   .price-wrap.usd::before{content:"$"}
   .price-wrap .in{padding-left:30px;font-family:"IBM Plex Mono"}
   .fx-hint{margin-top:6px;font:500 11.5px "IBM Plex Mono";color:var(--green);letter-spacing:.02em}
+  .fx-hint.keep{color:var(--ink2)}
 
-  /* currency mini-toggle */
   .cur-seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:2px}
   .cur-seg button{border:none;background:transparent;padding:4px 11px;border-radius:999px;
     font:600 12.5px "IBM Plex Mono";color:var(--ink2);cursor:pointer}
@@ -234,7 +254,9 @@
   #qty-select{flex:1;text-align:center;font-family:"IBM Plex Mono";font-weight:600}
 
   .exp-row{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px}
+  .exp-row.two{grid-template-columns:1fr 1fr}
   .exp-row .in{padding:10px 26px 10px 10px;font-family:"IBM Plex Mono";font-size:14px}
+  .exp-row .date-in{padding:10px}
 
   .chips{display:flex;flex-wrap:wrap;gap:7px}
   .chip{border:1px solid var(--line);background:#FFFDF6;color:var(--ink);border-radius:999px;
@@ -242,21 +264,20 @@
   .chip:hover{border-color:var(--ink)}
   .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 
-  .cf-list{border:1px dashed var(--line);border-radius:12px;background:var(--paper-2);padding:4px 14px;margin:14px 0 20px}
+  .cf-list{border:1px dashed var(--line);border-radius:12px;background:var(--paper-2);padding:4px 14px;margin:0 0 18px}
   .cf-row{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
   .cf-row:last-child{border-bottom:0}
   .cf-row .k{font:600 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);padding-top:3px;flex:none}
   .cf-row .v{font:500 13.5px "IBM Plex Sans";text-align:right;overflow-wrap:anywhere}
   .cf-row .v.mono{font-family:"IBM Plex Mono"}
   .cf-row .v .usd-note{color:var(--amber)}
-  .cf-actions{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .cf-actions{display:flex;flex-direction:column;align-items:center;gap:8px}
   .bigcheck{width:64px;height:64px;border-radius:50%;border:none;background:var(--green);color:#F5F1E4;
     display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 0 var(--green-deep);transition:.1s}
   .bigcheck:hover{background:#357A4F}
   .bigcheck:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-deep)}
   .bigcheck svg{width:28px;height:28px}
   .cf-label{font:600 15px "IBM Plex Sans"}
-  .cf-hint{font:400 12.5px "IBM Plex Sans";color:var(--ink2);margin:-4px 0 2px;text-align:center}
 
   .cfd-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
   .btn.danger{background:var(--red);border-color:#98311F;color:#FBF3EE}
@@ -300,6 +321,9 @@
   .scan-hint{margin:0;padding:0 16px 14px;padding-bottom:calc(env(safe-area-inset-bottom) + 14px);
     text-align:center;font:500 10.5px "IBM Plex Mono";letter-spacing:.16em;color:#A79E8C;
     display:flex;flex-direction:column;gap:3px}
+  #scan-budget{font-weight:600}
+  #scan-budget.ok{color:#8FCDA4}
+  #scan-budget.over{color:#FF8A7A}
   #scan-count{color:#F2EDE0;font-weight:600}
   #scan-engine{opacity:.75}
 
@@ -331,42 +355,30 @@
 </header>
 
 <main>
-  <!-- ============ HOME / RUN ============ -->
+  <!-- ============ HOME ============ -->
   <section id="view-home">
     <div class="wrap">
-      <p class="kicker">GROCERY LEDGER · LOCAL-FIRST</p>
-      <h1>Groceries,<br><em>on the record.</em></h1>
-      <p class="sub">Scan barcodes in the aisle, log price and expiry in seconds, and keep a tidy receipt for every run — exportable as CSV anytime.</p>
-
       <div id="active-run" class="active-run" hidden>
         <span class="ar-dot"></span>
         <div class="ar-txt"><b id="ar-store"></b><span id="ar-meta"></span></div>
-        <button id="ar-resume" class="btn sm">Resume scan</button>
+        <button id="ar-resume" class="btn sm">Resume</button>
         <button id="ar-finish" class="btn sm accent"><span class="ic" data-ico="check"></span>Finish</button>
       </div>
 
-      <button id="hero-code" class="hero-code" aria-label="Start a grocery run"><span class="laser"></span></button>
-      <p class="hero-cap">TAP THE CODE TO START A RUN</p>
+      <h1>Groceries,<br><em>on the record.</em></h1>
 
       <div class="cta-row">
         <button id="btn-start" class="btn primary big"><span class="ic" data-ico="cart"></span>Start grocery run</button>
       </div>
 
-      <ol class="steps">
-        <li><span class="n">01</span><div><b>Pick your store</b><p>Puregold, SM, Robinsons — or add your own sukan spot.</p></div></li>
-        <li><span class="n">02</span><div><b>Scan the barcode</b><p>Hold the code inside the frame, 10–15 cm away. Known products fill in automatically.</p></div></li>
-        <li><span class="n">03</span><div><b>Confirm &amp; keep going</b><p>Price in ₱ or $, quantity, expiry, category — then the next item.</p></div></li>
-      </ol>
-
       <div class="stats" id="stats"></div>
-      <div class="fx-line"><button id="fx-open" class="linkbtn"></button></div>
     </div>
   </section>
 
   <!-- ============ RECORDS ============ -->
   <section id="view-records" hidden>
     <div class="wrap">
-      <div class="rec-top"><h2>The ledger</h2></div>
+      <div class="rec-top"><h2>Ledger</h2></div>
       <div class="rec-tools" id="rec-tools">
         <div class="seg" role="tablist" aria-label="Group records">
           <button id="seg-session" class="on">By session</button>
@@ -383,9 +395,8 @@
       <div id="rec-empty" class="empty" hidden>
         <span class="ic" data-ico="receipt"></span>
         <h3>No receipts yet.</h3>
-        <p>Your finished runs land here — grouped, totalled, and ready to export.</p>
         <button id="btn-empty-start" class="btn primary"><span class="ic" data-ico="cart"></span>Start grocery run</button>
-        <div style="margin-top:10px"><button id="btn-sample" class="linkbtn">or preview with sample data</button></div>
+        <div style="margin-top:10px"><button id="btn-sample" class="linkbtn">preview with sample data</button></div>
       </div>
       <div id="rec-list"></div>
     </div>
@@ -393,28 +404,47 @@
 </main>
 
 <span class="side-note l">LOCAL-FIRST — YOUR DATA NEVER LEAVES THIS DEVICE</span>
-<span class="side-note r">EXPORT READY · CSV · GITHUB PAGES FRIENDLY</span>
+<span class="side-note r">SWIPE LEFT ON ANY ROW TO DELETE</span>
 
-<!-- ============ MODAL: store picker ============ -->
-<div class="overlay" id="m-store">
-  <form class="modal" id="store-form" role="dialog" aria-modal="true" aria-labelledby="store-title">
-    <button type="button" class="x" id="store-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
-    <h2 class="modal-title" id="store-title">Where are you shopping?</h2>
-    <p class="modal-sub">Each run is tagged with one store.</p>
+<!-- ============ MODAL: start a run (store + budget) ============ -->
+<div class="overlay" id="m-start">
+  <form class="modal" id="start-form" role="dialog" aria-modal="true" aria-labelledby="start-title" style="width:min(420px,100%)">
+    <button type="button" class="x" id="start-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
+    <h2 class="modal-title" id="start-title">New run</h2>
     <label class="fld"><span>STORE</span><select id="store-select" class="in"></select></label>
-    <label class="fld" id="new-store-wrap" hidden><span>NEW STORE NAME</span>
-      <input id="new-store-input" class="in" placeholder="e.g. Landers Superstore" autocomplete="off">
+    <label class="fld" id="new-store-wrap" hidden><span>NEW STORE</span>
+      <input id="new-store-input" class="in" placeholder="e.g. Landers" autocomplete="off">
     </label>
-    <button type="submit" id="store-continue" class="btn primary wide"><span id="store-continue-label">Continue</span><span class="ic" data-ico="arrow"></span></button>
+    <label class="fld"><span>BUDGET</span><select id="run-budget" class="in"></select></label>
+    <div id="new-budget-wrap" hidden>
+      <label class="fld" id="fld-budget"><span>LIMIT (₱)</span>
+        <input id="budget-input" class="in" type="number" min="1" step="0.01" inputmode="decimal" placeholder="3000">
+      </label>
+      <label class="fld"><span>PERIOD</span>
+        <select id="period-type" class="in">
+          <option value="week">This week</option>
+          <option value="month" selected>This month</option>
+          <option value="quarter">This quarter</option>
+          <option value="custom">Custom range</option>
+        </select>
+      </label>
+      <div class="fld" id="custom-range" hidden><span>START – END</span>
+        <div class="exp-row two">
+          <input type="date" id="p-from" class="in date-in" aria-label="Start date">
+          <input type="date" id="p-to" class="in date-in" aria-label="End date">
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn primary wide"><span id="start-go-label">Start scanning</span><span class="ic" data-ico="arrow"></span></button>
   </form>
 </div>
 
-<!-- ============ MODAL: exchange-rate settings ============ -->
+<!-- ============ MODAL: exchange rate ============ -->
 <div class="overlay" id="m-fx">
   <form class="modal" id="fx-form" role="dialog" aria-modal="true" aria-labelledby="fx-title" style="width:min(400px,100%)">
     <button type="button" class="x" id="fx-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
     <h2 class="modal-title" id="fx-title">Exchange rate</h2>
-    <p class="modal-sub">Used when you enter a price in dollars. Changing it only affects <b>future</b> entries — past records keep the rate they were saved with.</p>
+    <p class="modal-sub">Applies to future dollar entries. Saved records keep their original rate.</p>
     <label class="fld" id="fld-rate"><span>1 USD = ? PHP</span>
       <input id="rate-input" class="in" type="number" min="0.0001" step="0.0001" inputmode="decimal" placeholder="58.00">
     </label>
@@ -451,7 +481,8 @@
       <button class="btn primary" type="submit"><span class="ic" data-ico="arrow"></span>Add</button>
     </form>
     <p class="scan-hint">
-      <span>FILL THE FRAME · HOLD 10–15 CM · SLIGHT TILT AVOIDS GLARE</span>
+      <span id="scan-budget" hidden></span>
+      <span>HOLD STEADY · 10–15 CM</span>
       <span id="scan-count">0 ITEMS · ₱0.00 THIS RUN</span>
       <span id="scan-engine"></span>
     </p>
@@ -463,9 +494,8 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="item-title">
     <button type="button" class="x" id="item-x" aria-label="Discard and rescan"><span class="ic" data-ico="x"></span></button>
     <h2 class="modal-title" id="item-title">Item details</h2>
-    <p class="modal-sub">Everything is editable except the code — saved products fill their name in automatically.</p>
 
-    <span class="bc-label">BARCODE · READ ONLY</span>
+    <span class="bc-label">BARCODE</span>
     <div class="bc-block">
       <div class="bc-bars" id="item-bars" aria-hidden="true"></div>
       <div class="bc-num" id="item-barcode"></div>
@@ -483,13 +513,20 @@
 
     <div class="fld" id="fld-price">
       <div class="fld-head">
-        <span>PRICE · TOTALS IN PESO</span>
+        <span>PRICE</span>
         <div class="cur-seg" role="group" aria-label="Price currency">
           <button type="button" id="cur-php" class="on">₱</button>
           <button type="button" id="cur-usd">$</button>
         </div>
       </div>
-      <div class="price-wrap" id="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+      <div class="price-row">
+        <div class="prev-price" id="prev-price" hidden>
+          <span>PREV</span>
+          <b id="prev-price-val"></b>
+          <small id="prev-price-note" hidden></small>
+        </div>
+        <div class="price-wrap" id="price-wrap"><input id="item-price" class="in" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+      </div>
       <div class="fx-hint" id="fx-hint" hidden></div>
     </div>
 
@@ -501,7 +538,7 @@
       </div>
     </div>
 
-    <div class="fld"><span>EXPIRY DATE · DEFAULTS TO TODAY</span>
+    <div class="fld"><span>EXPIRY</span>
       <div class="exp-row">
         <select id="exp-m" class="in" aria-label="Month"></select>
         <select id="exp-d" class="in" aria-label="Day"></select>
@@ -517,28 +554,25 @@
 
 <!-- ============ MODAL: confirm item ============ -->
 <div class="overlay" id="m-confirm">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cf-title">
-    <h2 class="modal-title" id="cf-title">One last look</h2>
-    <p class="modal-sub">Check the details, then stamp it in.</p>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cf-title" style="width:min(420px,100%)">
+    <h2 class="modal-title" id="cf-title">Confirm</h2>
     <div class="cf-list">
-      <div class="cf-row"><span class="k">BARCODE</span><span class="v mono" id="cf-barcode"></span></div>
       <div class="cf-row"><span class="k">PRODUCT</span><span class="v" id="cf-name"></span></div>
       <div class="cf-row"><span class="k">CATEGORY</span><span class="v" id="cf-cat"></span></div>
       <div class="cf-row"><span class="k">QTY × PRICE</span><span class="v mono" id="cf-line"></span></div>
-      <div class="cf-row" id="cf-entered-row" hidden><span class="k">ENTERED</span><span class="v mono" id="cf-entered"></span></div>
+      <div class="cf-row" id="cf-entered-row" hidden><span class="k">PRICE SOURCE</span><span class="v mono" id="cf-entered"></span></div>
       <div class="cf-row"><span class="k">EXPIRY</span><span class="v mono" id="cf-exp"></span></div>
       <div class="cf-row"><span class="k">LINE TOTAL</span><span class="v mono" id="cf-total" style="font-weight:600;font-size:15px"></span></div>
     </div>
     <div class="cf-actions">
       <button id="cf-yes" class="bigcheck" aria-label="Confirm and add"><span class="ic" data-ico="check"></span></button>
-      <span class="cf-label">Confirm &amp; add to run</span>
-      <span class="cf-hint">You'll go straight back to the scanner.</span>
+      <span class="cf-label">Add to run</span>
       <button id="cf-back" class="btn sm">Edit details</button>
     </div>
   </div>
 </div>
 
-<!-- ============ MODAL: generic confirm (delete) ============ -->
+<!-- ============ MODAL: delete confirmation ============ -->
 <div class="overlay" id="m-cfd">
   <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="cfd-title" style="width:min(400px,100%)">
     <h2 class="modal-title" id="cfd-title">Delete?</h2>
@@ -565,6 +599,7 @@ const money = n => PHP.format(n);
 const usd = n => '$' + (+n).toFixed(2);
 const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 function fmtDate(iso){ if(!iso) return '—'; const [y,m,d] = iso.split('-').map(Number); return `${pad(d)} ${MONTHS[m-1]} ${y}`; }
 function fmtShort(iso){ const [,m,d] = iso.split('-'); return `${d} ${MONTHS[+m-1]} ${iso.slice(2,4)}`; }
 function fmtTs(ts){
@@ -572,6 +607,15 @@ function fmtTs(ts){
   const hm = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   const md = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
   return d.getFullYear() === now.getFullYear() ? `${md} · ${hm}` : `${md} ${d.getFullYear()} · ${hm}`;
+}
+function d0(ts){ const d = new Date(ts); d.setHours(0,0,0,0); return d; }
+function fmtRange(s, e){
+  const sameM = s.getMonth()===e.getMonth() && s.getFullYear()===e.getFullYear();
+  const sameY = s.getFullYear()===e.getFullYear();
+  const mon = d => MONTHS[d.getMonth()];
+  if(sameM) return `${mon(s)} ${s.getDate()}–${e.getDate()}, ${e.getFullYear()}`;
+  if(sameY) return `${mon(s)} ${s.getDate()} – ${mon(e)} ${e.getDate()}, ${e.getFullYear()}`;
+  return `${mon(s)} ${s.getDate()}, ${s.getFullYear()} – ${mon(e)} ${e.getDate()}, ${e.getFullYear()}`;
 }
 const PATHS = {
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
@@ -607,10 +651,11 @@ let db;
 function load(){
   try { db = JSON.parse(localStorage.getItem(DB_KEY)); } catch(e){ db = null; }
   if(!db || !Array.isArray(db.stores) || !Array.isArray(db.sessions)){
-    db = { stores:[...DEFAULT_STORES], sessions:[], draft:null, rate:DEFAULT_RATE };
+    db = { stores:[...DEFAULT_STORES], sessions:[], draft:null, rate:DEFAULT_RATE, periods:[] };
   }
   if(!('draft' in db)) db.draft = null;
   if(typeof db.rate !== 'number' || !(db.rate > 0)) db.rate = DEFAULT_RATE;
+  if(!Array.isArray(db.periods)) db.periods = [];
 }
 const save = () => { try{ localStorage.setItem(DB_KEY, JSON.stringify(db)); }catch(e){} };
 load();
@@ -619,18 +664,23 @@ const rate = () => db.rate;
 let run = db.draft;
 let lastCat = 'Misc';
 let pendingItem = null, cfdCb = null;
-const ui = { tab:'home', group:'session', sort:'new', open:new Set(), freshId:null };
+const ui = { tab:'home', group:'session', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null };
 
-/* ---- totals helpers ---- */
-const lineTotal = it => it.price * it.qty;      // price is ALWAYS stored in PHP
+/* ---- totals ---- */
+const lineTotal = it => it.price * it.qty;
 const sessionTotal = s => s.items.reduce((a, it) => a + lineTotal(it), 0);
 function runTotals(){
   let n = 0, sum = 0;
   if(run) run.items.forEach(it => { n += 1; sum += lineTotal(it); });
   return { n, sum };
 }
+function periodSpent(p){ return db.sessions.filter(s => s.periodId === p.id).reduce((a, s) => a + sessionTotal(s), 0); }
+function activePeriods(){
+  const t = d0(Date.now());
+  return db.periods.filter(p => d0(p.start) <= t && t <= d0(p.end));
+}
 
-/* ---- product memory: most recent name recorded for a barcode ---- */
+/* ---- product memory ---- */
 function findKnownProduct(barcode){
   if(run){
     for(let i = run.items.length - 1; i >= 0; i--){
@@ -644,6 +694,19 @@ function findKnownProduct(barcode){
   }
   return null;
 }
+
+/* ---- period naming: auto-updates once the window has passed ---- */
+function periodName(p){
+  const now = d0(Date.now());
+  if(d0(p.start) <= now && now <= d0(p.end)){
+    return { week:'This Week', month:'This Month', quarter:'This Quarter', custom:'Current period' }[p.type] || 'Current period';
+  }
+  const s = new Date(p.start), e = new Date(p.end);
+  if(p.type === 'month')   return `${MONTHS_FULL[s.getMonth()]} ${s.getFullYear()}`;
+  if(p.type === 'quarter') return `Q${Math.floor(s.getMonth()/3)+1} ${s.getFullYear()}`;
+  return fmtRange(s, e);
+}
+function periodRangeText(p){ return fmtRange(new Date(p.start), new Date(p.end)); }
 
 /* ================= toasts ================= */
 function toast(msg, opts={}){
@@ -664,7 +727,7 @@ function closeTop(){ if(!stack.length) return; const m = stack[stack.length-1]; 
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTop(); });
  $$('.overlay').forEach(ov => ov.addEventListener('click', e => { if(e.target === ov) closeTop(); }));
 
-/* ================= decorative barcodes ================= */
+/* ================= decorative barcodes (item blocks) ================= */
 function barsHTML(seed, max=34){
   const s = String(seed); const w = [];
   for(let i=0; i<s.length && w.length<max; i++){
@@ -673,14 +736,6 @@ function barsHTML(seed, max=34){
     if(i % 2) w.push(((c >> 2) % 3) + 1);
   }
   return w.map(x => `<i style="width:${x * 1.6}px"></i>`).join('');
-}
-function buildHeroBars(){
-  const W = [3,1,2,1,1,4,1,2,3,1,1,2,1,5,1,2,1,1,3,2,1,1,4,1,2,1,3,1,1,2,4,1,1,2,1,3,2,1,1,2];
-  const c = $('#hero-code');
-  c.innerHTML = '<span class="laser"></span>' +
-    '<i class="g" style="width:3px"></i><i class="g" style="width:3px"></i>' +
-    W.map(w => `<i style="width:${w*2.4}px"></i>`).join('') +
-    '<i class="g" style="width:3px"></i><i class="g" style="width:3px"></i>';
 }
 
 /* ================= beeps (iOS-safe) ================= */
@@ -721,7 +776,7 @@ function setTab(t){
  $('#tab-recs').addEventListener('click', ()=> setTab('records'));
  $('#wordmark').addEventListener('click', e => { e.preventDefault(); setTab('home'); });
 
-/* ================= home render ================= */
+/* ================= home ================= */
 function totals(){
   let items = 0, spent = 0;
   db.sessions.forEach(s => s.items.forEach(it => { items += it.qty; spent += it.price * it.qty; }));
@@ -732,14 +787,20 @@ function renderHome(){
   $('#stats').innerHTML = `
     <div class="stat"><b>${t.runs}</b><span>RUNS</span></div>
     <div class="stat"><b>${t.items}</b><span>ITEMS</span></div>
-    <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>`;
-  $('#fx-open').textContent = `1 USD = ₱${(+rate()).toFixed(2)} · change`;
+    <div class="stat"><b>${money(t.spent)}</b><span>SPENT</span></div>
+    <button class="stat stat-btn" type="button" data-act="fx" aria-label="Exchange rate settings"><b>₱${(+rate()).toFixed(0)}</b><span>1 USD</span></button>`;
   const bar = $('#active-run');
   if(run){
     const rt = runTotals();
+    const p = run.periodId ? db.periods.find(x => x.id === run.periodId) : null;
     bar.hidden = false;
     $('#ar-store').textContent = run.store;
-    $('#ar-meta').textContent = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} SO FAR`;
+    let meta = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} SO FAR`;
+    if(p){
+      const rem = p.budget - periodSpent(p) - rt.sum;
+      meta += rem >= 0 ? ` · ${money(rem)} LEFT` : ` · ${money(-rem)} OVER`;
+    }
+    $('#ar-meta').textContent = meta;
     $('#btn-start').innerHTML = `<span class="ic">${ico('scan')}</span>Resume scan`;
   } else {
     bar.hidden = true;
@@ -750,33 +811,58 @@ function renderHome(){
   b.textContent = db.sessions.length || '';
 }
 
-/* ================= flow: start a run ================= */
-function tryStart(){ if(run) openScanner(); else openStoreModal(); }
+/* ================= start-run modal (store + budget) ================= */
+function tryStart(){ if(run) openScanner(); else openStartModal(); }
  $('#btn-start').addEventListener('click', tryStart);
- $('#hero-code').addEventListener('click', tryStart);
  $('#btn-empty-start').addEventListener('click', tryStart);
  $('#ar-resume').addEventListener('click', openScanner);
  $('#ar-finish').addEventListener('click', finishRun);
 
-/* ---- store modal ---- */
-function openStoreModal(){
+function openStartModal(prePid){
   const sel = $('#store-select');
   sel.innerHTML = '';
   db.stores.forEach(s => sel.append(new Option(s, s)));
   sel.append(new Option('+ Add a new store…', '__new'));
   $('#new-store-wrap').hidden = true;
   $('#new-store-input').value = '';
-  $('#store-continue-label').textContent = 'Continue';
-  openModal('m-store');
-  closeFn['m-store'] = ()=> shut($('#m-store'));
+  const b = $('#run-budget');
+  b.innerHTML = '';
+  b.append(new Option('No budget', '__none'));
+  const act = activePeriods();
+  act.forEach(p => {
+    const rem = p.budget - periodSpent(p);
+    b.append(new Option(`${periodName(p)} · ${rem >= 0 ? money(rem) + ' left' : money(-rem) + ' over'}`, p.id));
+  });
+  b.append(new Option('+ New budget period…', '__new'));
+  let pre = prePid || (act.length === 1 ? act[0].id : '__none');
+  if(![...b.options].some(o => o.value === pre)) pre = '__none';
+  b.value = pre;
+  $('#new-budget-wrap').hidden = b.value !== '__new';
+  $('#budget-input').value = '';
+  $('#period-type').value = 'month';
+  $('#custom-range').hidden = true;
+  $('#fld-budget').classList.remove('err');
+  openModal('m-start');
+  closeFn['m-start'] = ()=> shut($('#m-start'));
 }
+ $('#start-x').addEventListener('click', ()=> shut($('#m-start')));
  $('#store-select').addEventListener('change', e => {
   const isNew = e.target.value === '__new';
   $('#new-store-wrap').hidden = !isNew;
-  $('#store-continue-label').textContent = isNew ? 'Create & continue' : 'Continue';
   if(isNew) $('#new-store-input').focus();
 });
- $('#store-form').addEventListener('submit', e => {
+ $('#run-budget').addEventListener('change', e => {
+  $('#new-budget-wrap').hidden = e.target.value !== '__new';
+  if(e.target.value === '__new') setTimeout(()=> $('#budget-input').focus(), 80);
+});
+ $('#period-type').addEventListener('change', e => {
+  $('#custom-range').hidden = e.target.value !== 'custom';
+  if(e.target.value === 'custom'){
+    const t = isoOf(new Date());
+    $('#p-from').value = t; $('#p-to').value = t;
+  }
+});
+ $('#start-form').addEventListener('submit', e => {
   e.preventDefault();
   const sel = $('#store-select');
   let store;
@@ -786,25 +872,60 @@ function openStoreModal(){
     if(!db.stores.some(s => s.toLowerCase() === store.toLowerCase())){ db.stores.push(store); }
     else store = db.stores.find(s => s.toLowerCase() === store.toLowerCase());
   } else store = sel.value;
-  save();
-  shut($('#m-store'));
-  startRun(store);
-});
- $('#store-x').addEventListener('click', ()=> shut($('#m-store')));
 
-function startRun(store){
-  run = { id: uid(), store, ts: Date.now(), items: [] };
+  let periodId = null;
+  const bv = $('#run-budget').value;
+  if(bv === '__new'){
+    const budget = parseFloat($('#budget-input').value);
+    if(isNaN(budget) || budget <= 0){
+      const f = $('#fld-budget'); f.classList.remove('err'); void f.offsetWidth; f.classList.add('err');
+      $('#budget-input').focus(); return;
+    }
+    const type = $('#period-type').value;
+    const now = new Date();
+    let start, end;
+    if(type === 'week'){
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      start = new Date(today); start.setDate(today.getDate() - ((today.getDay()+6)%7));
+      end = new Date(start); end.setDate(start.getDate()+6);
+    } else if(type === 'month'){
+      start = new Date(now.getFullYear(), now.getMonth(), 1);
+      end   = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    } else if(type === 'quarter'){
+      const qm = Math.floor(now.getMonth()/3)*3;
+      start = new Date(now.getFullYear(), qm, 1);
+      end   = new Date(now.getFullYear(), qm+3, 0);
+    } else {
+      const fv = $('#p-from').value, tv = $('#p-to').value;
+      if(!fv || !tv){ toast('Pick both dates'); return; }
+      start = new Date(fv + 'T00:00:00');
+      end   = new Date(tv + 'T23:59:59.999');
+      if(start > end){ toast('Start must come before end'); return; }
+    }
+    const p = { id: uid(), type, budget: Math.round(budget*100)/100, start: start.getTime(), end: end.getTime() };
+    db.periods.push(p);
+    periodId = p.id;
+  } else if(bv !== '__none'){
+    periodId = bv;
+  }
+  save();
+  shut($('#m-start'));
+  startRun(store, periodId);
+});
+
+function startRun(store, periodId){
+  run = { id: uid(), store, ts: Date.now(), items: [], periodId: periodId || null };
   db.draft = run; save();
   openScanner();
 }
 
-/* ================= exchange-rate settings ================= */
- $('#fx-open').addEventListener('click', ()=>{
+/* ================= exchange rate ================= */
+function openFx(){
   $('#rate-input').value = +rate();
   $('#fld-rate').classList.remove('err');
   openModal('m-fx');
   closeFn['m-fx'] = ()=> shut($('#m-fx'));
-});
+}
  $('#fx-x').addEventListener('click', ()=> shut($('#m-fx')));
  $('#fx-form').addEventListener('submit', e => {
   e.preventDefault();
@@ -819,7 +940,7 @@ function startRun(store){
   save();
   shut($('#m-fx'));
   renderHome();
-  toast(`Rate saved — 1 USD = ₱${db.rate.toFixed(2)} (future entries)`, {icon:true});
+  toast(`Rate saved — 1 USD = ₱${db.rate.toFixed(2)}`, {icon:true});
 });
 
 /* ================= scanner ================= */
@@ -873,7 +994,6 @@ async function zbarText(canvas){
   }
   return null;
 }
-
 async function setupNative(){
   if(S.detector || !('BarcodeDetector' in window)) return;
   try{
@@ -894,7 +1014,6 @@ async function nativeText(canvas){
   }catch(e){}
   return null;
 }
-
 let zxReader = null;
 function ensureZx(){
   if(zxReader) return true;
@@ -932,7 +1051,6 @@ function zxText(canvas, alsoInvert){
   }catch(e){}
   return null;
 }
-
 function bandRect(video){
   const vw = video.videoWidth, vh = video.videoHeight;
   if(!vw || !vh) return null;
@@ -1042,7 +1160,6 @@ function setupZoom(){
  $('#zoom-slider').addEventListener('input', e => {
   try{ S.track && S.track.applyConstraints({ advanced:[{ zoom: +e.target.value }] }); }catch(err){}
 });
-
 function setEngineLine(extra){
   const v = $('#scan-video');
   const res = (v && v.videoWidth) ? `${v.videoWidth}×${v.videoHeight}` : '';
@@ -1053,7 +1170,6 @@ function setEngineLine(extra){
   else eng = (typeof ZXing !== 'undefined') ? 'ZXING' : 'NO ENGINE';
   $('#scan-engine').textContent = [res, eng, extra].filter(Boolean).join(' · ').toUpperCase();
 }
-
 function stopScan(){
   stopPump();
   S.running = false; S.tick = 0; S.busy = false;
@@ -1068,7 +1184,6 @@ function scanError(msg){
   const e = $('#scan-error'); e.hidden = false; e.textContent = msg;
   $('#scan-engine').textContent = 'CAMERA OFFLINE · USE MANUAL ENTRY';
 }
-
 async function requestWakeLock(){
   try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
 }
@@ -1100,7 +1215,7 @@ async function openScanner(){
     startPump();
     setEngineLine();
   }catch(err){
-    scanError('Camera refused. Open Settings → Apps → Safari → Camera → Allow (or tap the AA/padlock in the address bar), then reopen. Or type the barcode below.');
+    scanError('Camera refused. Settings → Safari → Camera → Allow, then reopen. Or type the barcode below.');
   }
 }
 function onDecode(text){
@@ -1117,6 +1232,18 @@ function closeScan(){ stopScan(); shut($('#m-scan')); renderHome(); }
 function updateScanCount(){
   const rt = runTotals();
   $('#scan-count').textContent = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} THIS RUN`;
+  const b = $('#scan-budget');
+  const p = run && run.periodId ? db.periods.find(x => x.id === run.periodId) : null;
+  if(!p){ b.hidden = true; return; }
+  const rem = p.budget - periodSpent(p) - rt.sum;
+  b.hidden = false;
+  if(rem >= 0){
+    b.className = 'ok';
+    b.textContent = `BUDGET: ${money(rem)} LEFT OF ${money(p.budget)}`;
+  } else {
+    b.className = 'over';
+    b.textContent = `BUDGET: ${money(-rem)} OVER LIMIT`;
+  }
 }
  $('#scan-close').addEventListener('click', closeScan);
  $('#scan-finish').addEventListener('click', finishRun);
@@ -1132,24 +1259,30 @@ function finishRun(){
   if(!run){ return; }
   if(!run.items.length){
     db.draft = null; run = null; save();
-    shut($('#m-scan')); toast('No items scanned — run discarded'); renderHome();
+    shut($('#m-scan')); toast('Run discarded — no items'); renderHome(); renderRecords();
     return;
   }
-  db.sessions.unshift({ id: run.id, store: run.store, ts: run.ts, items: run.items });
-  const newId = run.id;
+  db.sessions.unshift({ id: run.id, store: run.store, ts: run.ts, items: run.items, periodId: run.periodId || null });
+  const saved = db.sessions[0];
   db.draft = null; run = null; save();
   shut($('#m-scan'));
-  ui.freshId = newId; ui.open.add(newId);
-  setTimeout(()=>{ ui.freshId = null; $$('.receipt.fresh').forEach(r => r.classList.remove('fresh')); }, 2000);
+  ui.openRun = false;
+  const p = saved.periodId ? db.periods.find(x => x.id === saved.periodId) : null;
+  let msg = `Run saved — ${money(sessionTotal(saved))} at ${saved.store}`;
+  if(p){
+    const rem = p.budget - periodSpent(p);
+    msg += ` · ${periodName(p)} ${rem >= 0 ? money(rem) + ' left' : money(-rem) + ' over'}`;
+  }
+  toast(msg, {icon:true});
   setTab('records');
-  toast(`Run saved — ${db.sessions[0].items.length} item(s) at ${db.sessions[0].store}`, {icon:true});
   renderHome();
 }
 
 /* ================= item modal ================= */
-let currentQty = 1, pendingCat = 'Misc', curEntry = 'PHP';   // 'PHP' | 'USD'
+let currentQty = 1, pendingCat = 'Misc', curEntry = 'PHP', knownItem = null;
 
-function applyKnownName(known){
+function applyKnownProduct(known){
+  knownItem = known;
   const lbl = $('#fld-name-label');
   if(known){
     $('#item-name').value = known.name;
@@ -1157,11 +1290,20 @@ function applyKnownName(known){
     lbl.textContent = 'PRODUCT NAME · SAVED';
     $('#name-known').hidden = false;
     $('#item-name').hidden = true;
+    $('#prev-price').hidden = false;
+    $('#prev-price-val').textContent = money(known.price);
+    const note = $('#prev-price-note');
+    if(known.cur === 'USD' && known.orig != null){ note.hidden = false; note.textContent = `was ${usd(known.orig)}`; }
+    else note.hidden = true;
+    const hint = $('#fx-hint');
+    hint.hidden = false; hint.className = 'fx-hint keep';
+    hint.textContent = 'Leave blank to keep previous price.';
   } else {
-    $('#item-name').value = '';
     lbl.textContent = 'PRODUCT NAME';
     $('#name-known').hidden = true;
     $('#item-name').hidden = false;
+    $('#prev-price').hidden = true;
+    $('#fx-hint').hidden = true;
   }
 }
  $('#name-known-edit').addEventListener('click', ()=>{
@@ -1171,22 +1313,29 @@ function applyKnownName(known){
   setTimeout(()=> $('#item-name').focus(), 60);
 });
 
-/* currency toggle + live conversion hint */
 function setCurrency(c){
   curEntry = c;
   $('#cur-php').classList.toggle('on', c === 'PHP');
   $('#cur-usd').classList.toggle('on', c === 'USD');
   $('#price-wrap').classList.toggle('usd', c === 'USD');
-  $('#item-price').placeholder = '0.00';
   updateFxHint();
 }
 function updateFxHint(){
   const hint = $('#fx-hint');
-  if(curEntry !== 'USD'){ hint.hidden = true; return; }
-  const v = parseFloat($('#item-price').value);
-  if(isNaN(v) || v < 0){ hint.hidden = true; return; }
-  hint.hidden = false;
-  hint.textContent = `≈ ${money(v * rate())} at 1 USD = ₱${(+rate()).toFixed(2)}`;
+  if(curEntry === 'USD'){
+    const v = parseFloat($('#item-price').value);
+    if(!(isNaN(v) || v < 0)){
+      hint.hidden = false; hint.className = 'fx-hint';
+      hint.textContent = `≈ ${money(v * rate())} at 1 USD = ₱${(+rate()).toFixed(2)}`;
+      return;
+    }
+  }
+  if(knownItem){
+    hint.hidden = false; hint.className = 'fx-hint keep';
+    hint.textContent = 'Leave blank to keep previous price.';
+  } else {
+    hint.hidden = true;
+  }
 }
  $('#cur-php').addEventListener('click', ()=> setCurrency('PHP'));
  $('#cur-usd').addEventListener('click', ()=> setCurrency('USD'));
@@ -1197,9 +1346,9 @@ function openItemModal(barcode){
   $('#item-bars').innerHTML = barsHTML(barcode, 30);
   $('#item-price').value = '';
   $('#fld-name').classList.remove('err'); $('#fld-price').classList.remove('err');
-  setCurrency('PHP');                       // each scan starts in peso
+  setCurrency('PHP');
   const known = findKnownProduct(barcode);
-  applyKnownName(known);
+  applyKnownProduct(known);
   buildExpSelects();
   buildChips(known ? known.cat : lastCat);
   setQty(1);
@@ -1252,35 +1401,44 @@ function setQty(q){
 
  $('#item-save').addEventListener('click', ()=>{
   const name = $('#item-name').value.trim();
-  const entered = parseFloat($('#item-price').value);
+  const raw  = $('#item-price').value.trim();
   let ok = true;
   if(!name){ flash($('#fld-name')); ok = false; }
-  if(isNaN(entered) || entered < 0){ flash($('#fld-price')); ok = false; }
+
+  let price, cur, orig;
+  const typed = raw !== '' ? parseFloat(raw) : NaN;
+  if(raw === ''){
+    if(knownItem){ price = knownItem.price; cur = knownItem.cur; orig = knownItem.orig; }
+    else { flash($('#fld-price')); ok = false; }
+  } else if(isNaN(typed) || typed < 0){
+    flash($('#fld-price')); ok = false;
+  } else if(curEntry === 'USD'){
+    price = Math.round(typed * rate() * 100) / 100; cur = 'USD'; orig = typed;
+  } else {
+    price = typed;
+  }
   if(!ok) return;
 
-  // canonical price is always PHP — USD is converted at today's rate on save
-  let item;
-  if(curEntry === 'USD'){
-    const php = Math.round(entered * rate() * 100) / 100;
-    item = { barcode:$('#item-barcode').textContent, name, price:php, qty:currentQty,
-             cat:pendingCat, cur:'USD', orig:entered,
-             exp:`${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}` };
-  } else {
-    item = { barcode:$('#item-barcode').textContent, name, price:entered, qty:currentQty,
-             cat:pendingCat,
-             exp:`${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}` };
-  }
-  pendingItem = item;
+  pendingItem = {
+    barcode: $('#item-barcode').textContent,
+    name, price, qty: currentQty, cat: pendingCat,
+    exp: `${$('#exp-y').value}-${$('#exp-m').value}-${$('#exp-d').value}`
+  };
+  if(cur === 'USD'){ pendingItem.cur = 'USD'; pendingItem.orig = orig; }
+  const usedPrev = raw === '';
 
-  $('#cf-barcode').textContent = pendingItem.barcode;
   $('#cf-name').textContent = pendingItem.name;
   $('#cf-cat').innerHTML = `<span class="dot" style="--c:${CAT_COLOR[pendingCat] || '#999'};display:inline-block;vertical-align:middle;margin-right:6px"></span>${esc(pendingCat)}`;
   $('#cf-line').textContent = `${pendingItem.qty} × ${money(pendingItem.price)}`;
-  if(pendingItem.cur === 'USD'){
-    $('#cf-entered-row').hidden = false;
-    $('#cf-entered').innerHTML = `<span class="usd-note">${usd(pendingItem.orig)}</span> @ ₱${(+rate()).toFixed(2)}`;
+  const cer = $('#cf-entered-row');
+  if(cur === 'USD' && !usedPrev){
+    cer.hidden = false;
+    $('#cf-entered').innerHTML = `<span class="usd-note">${usd(orig)}</span> @ ₱${(+rate()).toFixed(2)}`;
+  } else if(usedPrev){
+    cer.hidden = false;
+    $('#cf-entered').textContent = `previous · ${money(price)}`;
   } else {
-    $('#cf-entered-row').hidden = true;
+    cer.hidden = true;
   }
   $('#cf-exp').textContent = fmtDate(pendingItem.exp);
   $('#cf-total').textContent = money(pendingItem.price * pendingItem.qty);
@@ -1292,7 +1450,6 @@ function flash(f){
   const i = $('input', f);
   if(i){ i.classList.add('shake'); setTimeout(()=> i.classList.remove('shake'), 400); i.focus(); }
 }
-
  $('#cf-back').addEventListener('click', ()=> shut($('#m-confirm')));
  $('#cf-yes').addEventListener('click', ()=>{
   if(!pendingItem || !run) return;
@@ -1301,12 +1458,180 @@ function flash(f){
   db.draft = run; save();
   const added = pendingItem; pendingItem = null;
   shut($('#m-confirm')); shut($('#m-item'));
-  toast(`${added.name} added — ${money(added.price * added.qty)}${added.cur === 'USD' ? ` (${usd(added.orig)})` : ''}`, {icon:true});
+  toast(`${added.name} — ${money(added.price * added.qty)}`, {icon:true});
   updateScanCount();
   openScanner();
 });
 
-/* ================= records ================= */
+/* ================= records rendering ================= */
+const expInfo = exp => {
+  if(!exp) return { cls:'', label:'' };
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(exp + 'T00:00:00');
+  const diff = Math.round((d - today) / 864e5);
+  if(diff < 0)  return { cls:'bad',  label: diff === -1 ? 'expired yesterday' : `expired ${-diff}d ago` };
+  if(diff <= 7) return { cls:'warn', label: diff === 0 ? 'expires today' : `in ${diff}d` };
+  return { cls:'', label:'' };
+};
+function expBadge(exp){
+  if(!exp) return `<span class="exp">NO EXP</span>`;
+  const info = expInfo(exp);
+  return `<span class="exp ${info.cls}">EXP ${fmtShort(exp)}${info.label ? ' · ' + info.label : ''}</span>`;
+}
+
+function swipeWrap(inner, kind, attrs){
+  return `<div class="swipe-wrap"><div class="swipe-del">${ico('trash')}</div>
+    <div class="swipe-content" data-del="${kind}"${attrs}>${inner}</div></div>`;
+}
+
+function itemRowHTML(it, sid, idx, meta){
+  const kind = sid === 'run' ? 'run-item' : 'item';
+  const usdNote = it.cur === 'USD' && it.orig != null ? ` <span class="rl-usd">· ${usd(it.orig)}</span>` : '';
+  const inner = `<div class="rec-line">
+    <div>
+      <div class="rl-name">${esc(it.name)}</div>
+      <div class="rl-meta"><span class="dot" style="--c:${CAT_COLOR[it.cat] || '#999'}"></span>${esc(it.cat)} · ${esc(it.barcode)} · ${expBadge(it.exp)}${usdNote}</div>
+    </div>
+    <div class="rl-total">${money(lineTotal(it))}</div>
+    <button class="rl-del" data-act="del-${kind}" data-sid="${sid}" data-idx="${idx}" aria-label="Delete item">${ico('trash')}</button>
+    <div class="rl-mult" style="grid-column:1">${it.qty} × ${money(it.price)}${meta || ''}</div>
+  </div>`;
+  return swipeWrap(inner, kind, ` data-sid="${sid}" data-idx="${idx}"`);
+}
+
+function receiptHTML(s, withChip){
+  const p = s.periodId ? db.periods.find(x => x.id === s.periodId) : null;
+  const chip = withChip && p ? ` · <span class="p-chip">${esc(periodName(p))}</span>` : '';
+  return `<article class="receipt${ui.open.has(s.id) ? ' open' : ''}${s.id === ui.freshId ? ' fresh' : ''}" data-sid="${s.id}">
+    <div class="receipt-body">
+      <div class="rec-headrow">
+        <button class="rec-head" data-act="toggle" data-sid="${s.id}">
+          <div class="rec-hl">
+            <div class="rec-store">${esc(s.store)}</div>
+            <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}${chip}</div>
+          </div>
+          <span class="rec-total">${money(sessionTotal(s))}</span>
+          <span class="rec-chev ic">${ico('chev')}</span>
+        </button>
+        <button class="rec-del" data-act="del-session" data-sid="${s.id}" aria-label="Delete session">${ico('trash')}</button>
+      </div>
+      <div class="rec-items">
+        <hr class="rec-rule">
+        ${s.items.map((it,i) => itemRowHTML(it, s.id, i)).join('')}
+        <div class="rec-foot"><span>TOTAL · ${s.items.length} ITEMS</span><b>${money(sessionTotal(s))}</b></div>
+      </div>
+    </div>
+  </article>`;
+}
+const swipeReceipt = (s, withChip=true) =>
+  swipeWrap(receiptHTML(s, withChip), 'session', ` data-sid="${s.id}"`);
+
+function activeCardHTML(){
+  const rt = runTotals();
+  const p = run.periodId ? db.periods.find(x => x.id === run.periodId) : null;
+  return `<article class="receipt${ui.openRun ? ' open' : ''}" id="active-card">
+    <div class="receipt-body">
+      <div class="rec-headrow">
+        <button class="rec-head" data-act="toggle-run">
+          <div class="rec-hl">
+            <div class="rec-store">${esc(run.store)}<span class="live-dot"></span></div>
+            <div class="rec-meta">IN PROGRESS · ${fmtTs(run.ts)}${p ? ` · <span class="p-chip">${esc(periodName(p))}</span>` : ''}</div>
+          </div>
+          <span class="rec-total">${money(rt.sum)}</span>
+          <span class="rec-chev ic">${ico('chev')}</span>
+        </button>
+        <button class="rec-del" data-act="discard-run" aria-label="Discard run">${ico('x')}</button>
+      </div>
+      <div class="rec-items">
+        <hr class="rec-rule">
+        ${run.items.length
+          ? run.items.map((it,i) => itemRowHTML(it, 'run', i)).join('')
+          : '<p class="mut" style="margin:6px 2px">No items yet.</p>'}
+        <div class="rec-actions">
+          <button class="btn sm danger" data-act="discard-run">Discard</button>
+          <button class="btn sm accent" data-act="finish-run"><span class="ic">${ico('check')}</span>Finish</button>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+function budgetsHTML(){
+  if(!db.periods.length) return '';
+  const sorted = [...db.periods].sort((a,b) => b.end - a.end);
+  return `<div class="sec-title" style="margin:4px 2px 10px">BUDGETS</div>` + sorted.map(p => {
+    const spent = periodSpent(p);
+    const runs  = db.sessions.filter(s => s.periodId === p.id);
+    const pct   = p.budget > 0 ? Math.min(100, spent / p.budget * 100) : 100;
+    const rem   = p.budget - spent;
+    const cls   = rem < 0 ? 'over' : (pct >= 75 ? 'warn' : '');
+    const open  = ui.openP.has(p.id);
+    return `<article class="period-card${open ? ' open' : ''}" data-pid="${p.id}">
+      ${swipeWrap(`<div class="pc-head">
+          <button class="pc-toggle" data-act="p-toggle" data-pid="${p.id}">
+            <div class="pc-hl">
+              <div class="pc-name">${esc(periodName(p))}</div>
+              <div class="pc-range">${periodRangeText(p)} · ${runs.length} run${runs.length===1?'':'s'}</div>
+            </div>
+            <span class="pc-chev ic">${ico('chev')}</span>
+          </button>
+          <button class="btn sm accent" data-act="p-start" data-pid="${p.id}">Run</button>
+          <button class="rec-del" data-act="del-period" data-pid="${p.id}" aria-label="Delete period">${ico('trash')}</button>
+        </div>
+        <div class="pc-budget">
+          <div class="bb-top">
+            <span>SPENT <b>${money(spent)}</b></span>
+            <span>${rem >= 0 ? `LEFT <b>${money(rem)}</b>` : `OVER <b>${money(-rem)}</b>`} · ${money(p.budget)}</span>
+          </div>
+          <div class="bbar"><i class="${cls}" style="width:${pct}%"></i></div>
+        </div>`, 'period', ` data-pid="${p.id}"`)}
+      <div class="pc-sessions">
+        ${runs.length
+          ? [...runs].sort((a,b)=>b.ts-a.ts).map(s => swipeReceipt(s, false)).join('')
+          : '<p class="mut" style="margin:4px 6px 10px">No runs yet.</p>'}
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function renderRecords(){
+  const hasSessions = db.sessions.length > 0;
+  const showEmpty = !hasSessions && !run && !db.periods.length;
+  $('#rec-empty').hidden = !showEmpty;
+  $('#rec-tools').style.display = showEmpty ? 'none' : '';
+  const list = $('#rec-list');
+  if(showEmpty){ list.innerHTML = ''; return; }
+
+  let html = budgetsHTML();
+  if(run) html += activeCardHTML();
+  if(hasSessions){
+    if(ui.group === 'session'){
+      const sorted = [...db.sessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
+      html += sorted.map(s => swipeReceipt(s, true)).join('');
+    } else {
+      const byCat = {};
+      db.sessions.forEach(s => s.items.forEach((it, idx) => {
+        (byCat[it.cat] = byCat[it.cat] || []).push({ it, s, idx });
+      }));
+      const cats = Object.keys(byCat).sort((a,b) => a.localeCompare(b));
+      html += cats.map(cat => {
+        const rows = byCat[cat].sort((a,b) => (a.it.exp || '9999') < (b.it.exp || '9999') ? -1 : 1);
+        const sub = rows.reduce((a,r) => a + lineTotal(r.it), 0);
+        return `<section class="catgroup">
+          <div class="cg-head">
+            <span class="dot" style="--c:${CAT_COLOR[cat] || '#999'};width:10px;height:10px"></span>
+            <h3>${esc(cat)}</h3>
+            <span class="cg-sum">${rows.length} ITEM${rows.length===1?'':'S'} · ${money(sub)}</span>
+          </div>
+          ${rows.map(r => itemRowHTML(r.it, r.s.id, r.idx,
+            ` &nbsp;·&nbsp; ${esc(r.s.store)} · ${fmtTs(r.s.ts).split(' · ')[0]}`)).join('')}
+        </section>`;
+      }).join('');
+    }
+  }
+  list.innerHTML = html;
+}
+
  $('#seg-session').addEventListener('click', ()=> setGroup('session'));
  $('#seg-cat').addEventListener('click', ()=> setGroup('category'));
 function setGroup(g){
@@ -1318,138 +1643,86 @@ function setGroup(g){
 }
  $('#rec-sort').addEventListener('change', e => { ui.sort = e.target.value; renderRecords(); });
 
-function expInfo(exp){
-  if(!exp) return { cls:'', label:'' };
-  const today = new Date(); today.setHours(0,0,0,0);
-  const d = new Date(exp + 'T00:00:00');
-  const diff = Math.round((d - today) / 864e5);
-  if(diff < 0)  return { cls:'bad',  label: diff === -1 ? 'expired yesterday' : `expired ${-diff}d ago` };
-  if(diff <= 7) return { cls:'warn', label: diff === 0 ? 'expires today' : `in ${diff}d` };
-  return { cls:'', label:'' };
-}
-function expBadge(exp){
-  if(!exp) return `<span class="exp">NO EXP</span>`;
-  const info = expInfo(exp);
-  return `<span class="exp ${info.cls}">EXP ${fmtShort(exp)}${info.label ? ' · ' + info.label : ''}</span>`;
-}
-
-function itemLineHTML(it, sessionId, idx, meta){
-  const usdNote = it.cur === 'USD' && it.orig != null ? ` <span class="rl-usd">· ${usd(it.orig)}</span>` : '';
-  return `<div class="rec-line">
-    <div>
-      <div class="rl-name">${esc(it.name)}</div>
-      <div class="rl-meta"><span class="dot" style="--c:${CAT_COLOR[it.cat] || '#999'}"></span>${esc(it.cat)} · ${esc(it.barcode)} · ${expBadge(it.exp)}${usdNote}</div>
-    </div>
-    <div class="rl-total">${money(lineTotal(it))}</div>
-    <button class="rl-del" data-act="del-item" data-sid="${sessionId}" data-idx="${idx}" aria-label="Delete item">${ico('trash')}</button>
-    <div class="rl-mult" style="grid-column:1">${it.qty} × ${money(it.price)}${meta || ''}</div>
-  </div>`;
-}
-
-function renderRecords(){
-  const has = db.sessions.length > 0;
-  $('#rec-empty').hidden = has;
-  $('#rec-tools').style.display = has ? '' : 'none';
-  const list = $('#rec-list');
-  if(!has){ list.innerHTML = ''; return; }
-
-  if(ui.group === 'session'){
-    const sorted = [...db.sessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
-    list.innerHTML = sorted.map(s => {
-      const open = ui.open.has(s.id);
-      return `<article class="receipt${open ? ' open' : ''}${s.id === ui.freshId ? ' fresh' : ''}" data-sid="${s.id}">
-        <div class="receipt-body">
-          <div class="rec-headrow">
-            <button class="rec-head" data-act="toggle">
-              <div class="rec-hl">
-                <div class="rec-store">${esc(s.store)}</div>
-                <div class="rec-meta">${fmtTs(s.ts)} · ${s.items.length} item${s.items.length===1?'':'s'}</div>
-              </div>
-              <span class="rec-total">${money(sessionTotal(s))}</span>
-              <span class="rec-chev ic">${ico('chev')}</span>
-            </button>
-            <button class="rec-del" data-act="del-session" data-sid="${s.id}" aria-label="Delete session">${ico('trash')}</button>
-          </div>
-          <div class="rec-items">
-            <hr class="rec-rule">
-            ${s.items.map((it,i) => itemLineHTML(it, s.id, i)).join('')}
-            <div class="rec-foot"><span>TOTAL · ${s.items.length} ITEMS</span><b>${money(sessionTotal(s))}</b></div>
-          </div>
-        </div>
-      </article>`;
-    }).join('');
-  } else {
-    const byCat = {};
-    db.sessions.forEach(s => s.items.forEach((it, idx) => {
-      (byCat[it.cat] = byCat[it.cat] || []).push({ it, s, idx });
-    }));
-    const cats = Object.keys(byCat).sort((a,b) => a.localeCompare(b));
-    list.innerHTML = cats.map(cat => {
-      const rows = byCat[cat].sort((a,b) => (a.it.exp || '9999') < (b.it.exp || '9999') ? -1 : 1);
-      const sub = rows.reduce((a,r) => a + lineTotal(r.it), 0);
-      return `<section class="catgroup">
-        <div class="cg-head">
-          <span class="dot" style="--c:${CAT_COLOR[cat] || '#999'};width:10px;height:10px"></span>
-          <h3>${esc(cat)}</h3>
-          <span class="cg-sum">${rows.length} ITEM${rows.length===1?'':'S'} · ${money(sub)}</span>
-        </div>
-        ${rows.map(r => itemLineHTML(r.it, r.s.id, r.idx,
-          ` &nbsp;·&nbsp; ${esc(r.s.store)} · ${fmtTs(r.s.ts).split(' · ')[0]}`)).join('')}
-      </section>`;
-    }).join('');
-  }
-}
-
- $('#rec-list').addEventListener('click', e => {
-  const t = e.target.closest('[data-act]');
-  if(!t) return;
-  const act = t.dataset.act;
-
-  if(act === 'toggle'){
-    const art = t.closest('.receipt');
-    art.classList.toggle('open');
-    art.classList.contains('open') ? ui.open.add(art.dataset.sid) : ui.open.delete(art.dataset.sid);
-    return;
-  }
-  if(act === 'del-session'){
-    const s = db.sessions.find(x => x.id === t.dataset.sid);
-    if(!s) return;
-    askConfirm({
-      title: 'Delete this session?',
-      body: `${s.store} · ${s.items.length} item(s) · ${money(sessionTotal(s))} — this can't be undone.`,
-      onYes(){
-        db.sessions = db.sessions.filter(x => x.id !== s.id);
-        ui.open.delete(s.id); save();
-        renderRecords(); renderHome();
-        toast('Session deleted');
-      }
-    });
-    return;
-  }
-  if(act === 'del-item'){
-    if(t.classList.contains('armed')){
-      const s = db.sessions.find(x => x.id === t.dataset.sid);
-      if(s){
-        s.items.splice(+t.dataset.idx, 1);
-        if(!s.items.length){
-          db.sessions = db.sessions.filter(x => x.id !== s.id);
-          ui.open.delete(s.id);
-          toast('Session removed — it was empty');
-        } else toast('Item removed');
-        save(); renderRecords(); renderHome();
-      }
-    } else {
-      t.classList.add('armed');
-      t.innerHTML = 'Sure?';
-      setTimeout(()=>{ if(t.isConnected){ t.classList.remove('armed'); t.innerHTML = ico('trash'); } }, 2200);
+/* ================= delete flows (all confirmed) ================= */
+function confirmDeleteItem(sid, idx){
+  if(sid === 'run'){ confirmDeleteRunItem(idx); return; }
+  const s = db.sessions.find(x => x.id === sid); if(!s) return;
+  const it = s.items[idx]; if(!it) return;
+  askConfirm({
+    title: 'Delete item?',
+    body: `${it.name} · ${money(lineTotal(it))} — can't be undone.`,
+    onYes(){
+      s.items.splice(idx, 1);
+      if(!s.items.length){
+        db.sessions = db.sessions.filter(x => x.id !== sid);
+        ui.open.delete(sid);
+        toast('Run removed — it was empty');
+      } else toast('Item deleted');
+      save(); renderRecords(); renderHome();
     }
-  }
-});
-
+  });
+}
+function confirmDeleteRunItem(idx){
+  if(!run || !run.items[idx]) return;
+  const it = run.items[idx];
+  askConfirm({
+    title: 'Remove item?',
+    body: `${it.name} · ${money(lineTotal(it))} — can't be undone.`,
+    onYes(){
+      run.items.splice(idx, 1);
+      db.draft = run; save();
+      renderRecords(); renderHome();
+      toast('Removed from run');
+    }
+  });
+}
+function confirmDeleteSession(sid){
+  const s = db.sessions.find(x => x.id === sid);
+  if(!s) return;
+  askConfirm({
+    title: 'Delete run?',
+    body: `${s.store} · ${s.items.length} item(s) · ${money(sessionTotal(s))} — can't be undone.`,
+    onYes(){
+      db.sessions = db.sessions.filter(x => x.id !== sid);
+      ui.open.delete(sid); save();
+      renderRecords(); renderHome();
+      toast('Run deleted');
+    }
+  });
+}
+function confirmDiscardRun(){
+  if(!run) return;
+  askConfirm({
+    title: 'Discard run?',
+    body: `${run.store} · ${run.items.length} item(s) scanned so far will be thrown away.`,
+    yes: 'Discard',
+    onYes(){
+      run = null; db.draft = null; ui.openRun = false; save();
+      renderRecords(); renderHome();
+      toast('Run discarded');
+    }
+  });
+}
+function confirmDeletePeriod(pid){
+  const p = db.periods.find(x => x.id === pid);
+  if(!p) return;
+  const runs = db.sessions.filter(s => s.periodId === pid).length;
+  askConfirm({
+    title: 'Delete period?',
+    body: `${periodName(p)} · budget ${money(p.budget)} · ${runs} run(s). Its runs stay as individual runs.`,
+    onYes(){
+      db.sessions.forEach(s => { if(s.periodId === pid) delete s.periodId; });
+      db.periods = db.periods.filter(x => x.id !== pid);
+      ui.openP.delete(pid); save();
+      renderRecords(); renderHome();
+      toast('Period deleted — runs kept');
+    }
+  });
+}
 function askConfirm({title, body, yes='Delete', onYes}){
   $('#cfd-title').textContent = title;
   $('#cfd-body').textContent = body;
-  const b = $('#cfd-yes'); b.textContent = yes;
+  $('#cfd-yes').textContent = yes;
   cfdCb = onYes;
   openModal('m-cfd');
   closeFn['m-cfd'] = ()=> shut($('#m-cfd'));
@@ -1457,16 +1730,98 @@ function askConfirm({title, body, yes='Delete', onYes}){
  $('#cfd-yes').addEventListener('click', ()=>{ shut($('#m-cfd')); cfdCb && cfdCb(); cfdCb = null; });
  $('#cfd-no').addEventListener('click', ()=> shut($('#m-cfd')));
 
+/* ================= tap actions (delegated) ================= */
+document.addEventListener('click', e => {
+  if(Date.now() < suppressClickUntil){ e.stopPropagation(); e.preventDefault(); return; }
+  const t = e.target.closest('[data-act]');
+  if(!t) return;
+  switch(t.dataset.act){
+    case 'fx': openFx(); break;
+    case 'toggle': {
+      const art = t.closest('.receipt');
+      art.classList.toggle('open');
+      art.classList.contains('open') ? ui.open.add(t.dataset.sid) : ui.open.delete(t.dataset.sid);
+      break;
+    }
+    case 'toggle-run':
+      ui.openRun = !ui.openRun; renderRecords(); break;
+    case 'finish-run':
+      finishRun(); break;
+    case 'discard-run':
+      confirmDiscardRun(); break;
+    case 'del-session':
+      confirmDeleteSession(t.dataset.sid); break;
+    case 'del-item':
+      confirmDeleteItem(t.dataset.sid, +t.dataset.idx); break;
+    case 'del-run-item':
+      confirmDeleteRunItem(+t.dataset.idx); break;
+    case 'p-toggle': {
+      const pid = t.dataset.pid;
+      ui.openP.has(pid) ? ui.openP.delete(pid) : ui.openP.add(pid);
+      renderRecords(); break;
+    }
+    case 'p-start': {
+      if(run){ toast('Finish your current run first'); break; }
+      openStartModal(t.dataset.pid);
+      break;
+    }
+    case 'del-period':
+      confirmDeletePeriod(t.dataset.pid); break;
+  }
+});
+
+/* ================= swipe-to-delete ================= */
+let suppressClickUntil = 0;
+function bindSwipe(container){
+  if(!container) return;
+  let sw = null;
+  container.addEventListener('touchstart', e => {
+    const c = e.target.closest('.swipe-content');
+    if(!c) return;
+    sw = { c, x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, horiz: null };
+  }, {passive:true});
+  container.addEventListener('touchmove', e => {
+    if(!sw) return;
+    const dx = e.touches[0].clientX - sw.x, dy = e.touches[0].clientY - sw.y;
+    if(sw.horiz === null){
+      if(Math.abs(dx) > 10 || Math.abs(dy) > 10) sw.horiz = Math.abs(dx) > Math.abs(dy);
+      else return;
+    }
+    if(!sw.horiz){ sw = null; return; }
+    e.preventDefault();
+    sw.dx = Math.max(-96, Math.min(0, dx));
+    sw.c.style.transition = 'none';
+    sw.c.style.transform = `translateX(${sw.dx}px)`;
+  }, {passive:false});
+  const end = () => {
+    if(!sw) return;
+    const { c, dx, horiz } = sw; sw = null;
+    c.style.transition = ''; c.style.transform = '';
+    if(horiz && Math.abs(dx) > 12) suppressClickUntil = Date.now() + 350;
+    if(dx < -60) requestSwipeDelete(c);
+  };
+  container.addEventListener('touchend', end);
+  container.addEventListener('touchcancel', end);
+}
+function requestSwipeDelete(el){
+  const kind = el.dataset.del;
+  if(kind === 'session')      confirmDeleteSession(el.dataset.sid);
+  else if(kind === 'item')    confirmDeleteItem(el.dataset.sid, +el.dataset.idx);
+  else if(kind === 'run-item')confirmDeleteRunItem(+el.dataset.idx);
+  else if(kind === 'period')  confirmDeletePeriod(el.dataset.pid);
+}
+
 /* ================= CSV export ================= */
  $('#btn-export').addEventListener('click', ()=>{
-  if(!db.sessions.length){ toast('Nothing to export yet — scan something first'); return; }
-  const rows = [['session_id','date','time','store','barcode','product','category','unit_price_php','qty','line_total_php','expiry_date','entry_currency','entry_amount']];
+  if(!db.sessions.length){ toast('Nothing to export yet'); return; }
+  const rows = [['session_id','date','time','store','period','barcode','product','category','unit_price_php','qty','line_total_php','expiry_date','entry_currency','entry_amount']];
   [...db.sessions].sort((a,b) => a.ts - b.ts).forEach(s => {
     const d = new Date(s.ts);
     const date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const p = s.periodId ? db.periods.find(x => x.id === s.periodId) : null;
     s.items.forEach(it => rows.push([
-      s.id, date, time, s.store, it.barcode, it.name, it.cat,
+      s.id, date, time, s.store, p ? periodName(p) : '', it.barcode, it.name, it.cat,
       it.price.toFixed(2), it.qty, lineTotal(it).toFixed(2), it.exp || '',
       it.cur || 'PHP', it.cur === 'USD' ? it.orig.toFixed(2) : it.price.toFixed(2)
     ]));
@@ -1486,8 +1841,13 @@ function askConfirm({title, body, yes='Delete', onYes}){
  $('#btn-sample').addEventListener('click', ()=>{
   const dOff = n => { const d = new Date(Date.now() + n * 864e5); return isoOf(d); };
   const y = new Date(Date.now() - 864e5); y.setHours(16,12,0,0);
+  const now = new Date();
+  const period = { id: uid(), type:'month', budget:3000,
+    start: new Date(now.getFullYear(), now.getMonth(), 1).getTime(),
+    end:   new Date(now.getFullYear(), now.getMonth()+1, 0).getTime() };
+  db.periods.push(period);
   db.sessions.unshift({
-    id: uid(), store: 'Puregold', ts: y.getTime(),
+    id: uid(), store: 'Puregold', ts: y.getTime(), periodId: period.id,
     items: [
       { barcode:'4800088106048', name:'Lucky Me Pancit Canton Chili-Mansi', price:17.75, qty:4, cat:'Processed', exp:dOff(240) },
       { barcode:'4800013512340', name:'555 Sardines in Green Sauce 155g',   price:24.00, qty:3, cat:'Canned',    exp:dOff(700) },
@@ -1498,16 +1858,17 @@ function askConfirm({title, body, yes='Delete', onYes}){
     ]
   });
   save(); setTab('records'); renderHome();
-  toast('Sample session added — explore, then delete it', {icon:true});
+  toast('Sample run + budget added', {icon:true});
 });
 
 /* ================= init ================= */
-buildHeroBars();
 buildQtySelect();
 buildExpSelects();
 buildChips(lastCat);
 renderHome();
+renderRecords();
 setTab('home');
+bindSwipe($('#rec-list'));
 const idle = window.requestIdleCallback || (fn => setTimeout(fn, 1500));
 idle(() => ensureZbar());
 </script>
