@@ -1814,8 +1814,8 @@ document.addEventListener('click', e => {
       renderRecords(); break;
     }
     case 'p-start': {
-      if(run){ toast('Finish your current run first'); break; }
-      openStartModal();
+      if(run){ openScanner(); break; }   // a run is already going — resume it
+      openStartModal(t.dataset.pid);
       break;
     }
     case 'del-period':
