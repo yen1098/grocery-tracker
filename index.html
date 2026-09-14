@@ -58,13 +58,14 @@
   .tagline{font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);opacity:.85;text-transform:uppercase}
   .tagline b{font-weight:600;opacity:.7}
 
-  /* bottom navigation — sticky IN FLOW: it is the last element of the page,
-     so it always ends at the true document bottom and pins to the viewport
-     while scrolling. No fixed-position or viewport-unit quirks possible. */
+  /* bottom navigation — sticky in flow, FIXED padding (no env()).
+     The safe-area inset was being double-counted in the installed app,
+     pushing the bar up. Fixed pixels render identically everywhere;
+     the home indicator floats over the bar's empty strip, like native apps. */
   .bottom-nav{position:sticky;bottom:0;z-index:60;display:flex;gap:4px;
     background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
     box-shadow:0 -8px 18px -12px rgba(34,30,21,.28);
-    padding:6px 10px calc(6px + env(safe-area-inset-bottom, 0px))}
+    padding:6px 10px 10px}
   .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     padding:4px 0 2px;border:none;background:transparent;border-radius:12px;color:var(--ink2);cursor:pointer;transition:.15s}
   .bn-btn .ic svg{width:19px;height:19px}
@@ -374,7 +375,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v20</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v21</b></span>
   </div>
 </header>
 
@@ -422,7 +423,7 @@
   </section>
 </main>
 
-<!-- bottom navigation — sticky, last element in flow -->
+<!-- bottom navigation — sticky, fixed padding, hugs the bottom everywhere -->
 <nav class="bottom-nav" aria-label="Sections">
   <button id="tab-home" class="bn-btn on"><span class="ic" data-ico="cart"></span><span>Run</span></button>
   <button id="tab-recs" class="bn-btn"><span class="ic" data-ico="receipt"></span><span>Records<sup id="rec-count" hidden></sup></span></button>
