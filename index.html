@@ -25,6 +25,7 @@
     --green:#2E6B45; --green-deep:#1E4A2F;
     --red:#C4402A; --amber:#A9700F; --laser:#FF3B30;
     --shadow:0 1px 2px rgba(34,30,21,.06), 0 12px 32px -14px rgba(34,30,21,.22);
+    --env-b: env(safe-area-inset-bottom, 0px);
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
@@ -47,7 +48,7 @@
   button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
-  #view-home .wrap,#view-records .wrap{padding-bottom:76px}
+  #view-home .wrap,#view-records .wrap{padding-bottom:calc(74px + var(--env-b))}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
   .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
@@ -58,14 +59,12 @@
   .tagline{font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);opacity:.85;text-transform:uppercase}
   .tagline b{font-weight:600;opacity:.7}
 
-  /* bottom navigation — sticky in flow, FIXED padding (no env()).
-     The safe-area inset was being double-counted in the installed app,
-     pushing the bar up. Fixed pixels render identically everywhere;
-     the home indicator floats over the bar's empty strip, like native apps. */
-  .bottom-nav{position:sticky;bottom:0;z-index:60;display:flex;gap:4px;
+  /* bottom navigation — fixed to the renderable bottom; the bar's background
+     extends through the safe-area inset when the OS reports one. */
+  .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:4px;
     background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
     box-shadow:0 -8px 18px -12px rgba(34,30,21,.28);
-    padding:6px 10px 10px}
+    padding:6px 10px calc(8px + var(--env-b))}
   .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     padding:4px 0 2px;border:none;background:transparent;border-radius:12px;color:var(--ink2);cursor:pointer;transition:.15s}
   .bn-btn .ic svg{width:19px;height:19px}
@@ -355,7 +354,7 @@
   #scan-count{color:#F2EDE0;font-weight:600}
   #scan-engine{opacity:.75}
 
-  #toasts{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);
+  #toasts{position:fixed;left:50%;bottom:calc(70px + var(--env-b));transform:translateX(-50%);
     z-index:200;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
     width:max-content;max-width:92vw}
   .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
@@ -375,7 +374,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v21</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v22</b></span>
   </div>
 </header>
 
@@ -397,6 +396,7 @@
       <div id="home-budgets"></div>
       <div class="stats" id="stats"></div>
       <p id="last-run" class="mut" hidden style="margin:14px 2px 0"></p>
+      <p id="diag" class="mut" style="margin:10px 2px 0"></p>
     </div>
   </section>
 
@@ -423,7 +423,6 @@
   </section>
 </main>
 
-<!-- bottom navigation — sticky, fixed padding, hugs the bottom everywhere -->
 <nav class="bottom-nav" aria-label="Sections">
   <button id="tab-home" class="bn-btn on"><span class="ic" data-ico="cart"></span><span>Run</span></button>
   <button id="tab-recs" class="bn-btn"><span class="ic" data-ico="receipt"></span><span>Records<sup id="rec-count" hidden></sup></span></button>
@@ -869,6 +868,16 @@ function renderHome(){
   b.hidden = !db.sessions.length;
   b.textContent = db.sessions.length || '';
 }
+
+/* ================= bottom-nav diagnostic (remove once settled) ================= */
+function updateDiag(){
+  const el = $('#diag'); if(!el) return;
+  const envB = getComputedStyle(document.documentElement).getPropertyValue('--env-b').trim() || '0';
+  const sa = (matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) ? 1 : 0;
+  el.textContent = `DIAG · H ${window.innerHeight} / ${screen.height} · E ${envB} · SA ${sa}`;
+}
+window.addEventListener('resize', updateDiag);
+window.addEventListener('orientationchange', ()=> setTimeout(updateDiag, 300));
 
 /* ================= start-run modal ================= */
 function tryStart(){ if(run) openScanner(); else openStartModal(null); }
@@ -2135,6 +2144,7 @@ renderHome();
 renderRecords();
 setTab('home');
 bindSwipe($('#rec-list'));
+updateDiag();
 const idle = window.requestIdleCallback || (fn => setTimeout(fn, 1500));
 idle(() => ensureZbar());
 </script>
