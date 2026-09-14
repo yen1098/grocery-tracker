@@ -36,14 +36,14 @@
   }
   body::before{
     content:""; position:fixed; inset:0; z-index:35; pointer-events:none; opacity:.05;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http group' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
   }
   body.no-scroll{overflow:hidden}
   ::selection{background:rgba(46,107,69,.25)}
   button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
-  #view-home .wrap,#view-records .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 96px)}
+  #view-home .wrap,#view-records .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 90px)}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
   .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
@@ -53,14 +53,14 @@
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
   .tagline{font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);opacity:.85;text-transform:uppercase}
 
-  /* bottom navigation — flush to the home-indicator zone */
+  /* bottom navigation — capped so it hugs the bottom on tall iPhones */
   .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:4px;
     background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
-    padding:6px 10px max(8px, env(safe-area-inset-bottom))}
+    padding:5px 10px min(20px, max(8px, env(safe-area-inset-bottom)))}
   .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-    padding:5px 0 3px;border:none;background:transparent;border-radius:12px;color:var(--ink2);cursor:pointer;transition:.15s}
-  .bn-btn .ic svg{width:20px;height:20px}
-  .bn-btn>span:last-child{font:600 11.5px "IBM Plex Sans"}
+    padding:4px 0 2px;border:none;background:transparent;border-radius:12px;color:var(--ink2);cursor:pointer;transition:.15s}
+  .bn-btn .ic svg{width:19px;height:19px}
+  .bn-btn>span:last-child{font:600 11px "IBM Plex Sans"}
   .bn-btn.on{color:var(--ink)}
   .bn-btn.on .ic{color:var(--green)}
   .bn-btn sup{font:600 9.5px "IBM Plex Mono";background:var(--ink);color:var(--paper);
@@ -119,13 +119,7 @@
 
   .rec-top{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 14px}
   .rec-top h2{font:600 30px "Fraunces";margin:0;letter-spacing:-.02em}
-  .rec-tools{display:flex;gap:6px;align-items:center;margin-bottom:14px}
-  .seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
-  .seg button{border:none;background:transparent;padding:6px 11px;border-radius:999px;font:600 12px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
-  .seg button.on{background:var(--ink);color:var(--paper)}
-  .seg.grow{display:flex;width:100%}
-  .seg.grow button{flex:1;padding:11px 0;font-size:14px}
-  .rec-tools-right{display:flex;gap:6px;align-items:center;margin-left:auto}
+  .rec-tools{display:flex;justify-content:flex-end;gap:6px;align-items:center;margin-bottom:14px}
 
   select.in{appearance:none;-webkit-appearance:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E6553' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -146,7 +140,6 @@
   .pc-hl{flex:1;min-width:0}
   .pc-name{font:600 18px "Fraunces";letter-spacing:-.01em}
   .pc-range{font:500 11px "IBM Plex Mono";color:var(--ink2);margin-top:2px;text-transform:uppercase}
-  /* carets: no hover background — iOS keeps :hover stuck after tap on touch screens */
   .pc-chev-btn,.rec-chev-btn{flex:none;border:none;background:none;color:var(--ink2);cursor:pointer;
     padding:10px 8px 10px 14px;min-width:48px;min-height:48px;display:grid;place-items:center;border-radius:12px}
   .pc-chev-btn svg,.rec-chev-btn svg{width:17px;height:17px;transition:transform .25s}
@@ -191,13 +184,6 @@
   .rec-foot{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0 3px;
     border-top:1px dashed var(--line);margin-top:2px;font:600 12.5px "IBM Plex Mono";letter-spacing:.14em}
   .rec-foot b{font-size:16.5px;letter-spacing:0}
-
-  .catgroup{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
-  .cg-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px dashed var(--line)}
-  .cg-head h3{font:600 17px "Fraunces";margin:0;flex:1}
-  .cg-sum{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
-  .catgroup .swipe-wrap{margin-inline:14px}
-  .catgroup .rec-foot{margin-inline:14px;padding-inline:0;border-top:1px dashed var(--line)}
 
   .swipe-wrap{position:relative}
   .swipe-del{position:absolute;inset:0;background:var(--red);color:#FBF3EE;display:flex;
@@ -244,6 +230,10 @@
   .prev-price span{font:600 9px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2)}
   .prev-price b{font:600 14px "IBM Plex Mono"}
   .prev-price small{font:500 10px "IBM Plex Mono";color:var(--amber)}
+  .locked-period{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    background:var(--paper-2);border:1px dashed var(--line);border-radius:10px;padding:11px 13px}
+  .locked-period b{font:600 15px "Fraunces"}
+  .locked-period span{font:500 11.5px "IBM Plex Mono";color:var(--ink2);text-align:right}
   .price-wrap{position:relative}
   .price-wrap::before{content:"₱";position:absolute;left:12px;top:50%;transform:translateY(-50%);
     font:600 14px "IBM Plex Mono";color:var(--ink2);pointer-events:none}
@@ -252,6 +242,12 @@
   .fx-hint{margin-top:6px;font:500 11.5px "IBM Plex Mono";color:var(--green);letter-spacing:.02em}
   .fx-hint.keep{color:var(--ink2)}
   .fx-hint .linkbtn{font-size:11.5px;padding:2px 4px}
+
+  .seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .seg button{border:none;background:transparent;padding:6px 11px;border-radius:999px;font:600 12px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--ink);color:var(--paper)}
+  .seg.grow{display:flex;width:100%}
+  .seg.grow button{flex:1;padding:11px 0;font-size:14px}
 
   .cur-seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:2px}
   .cur-seg button{border:none;background:transparent;padding:4px 11px;border-radius:999px;
@@ -401,17 +397,12 @@
     <div class="wrap">
       <div class="rec-top"><h2>Ledger</h2></div>
       <div class="rec-tools" id="rec-tools">
-        <div class="seg" role="tablist" aria-label="Group records">
-          <button id="seg-session" class="on">Session</button>
-          <button id="seg-cat">Category</button>
-        </div>
-        <div class="rec-tools-right">
-          <select id="rec-sort" class="in" aria-label="Sort sessions">
-            <option value="new">Newest</option>
-            <option value="old">Oldest</option>
-          </select>
-          <button id="btn-export" class="btn primary compact"><span class="ic" data-ico="download"></span>CSV</button>
-        </div>
+        <select id="rec-sort" class="in" aria-label="Sort sessions">
+          <option value="new">Newest</option>
+          <option value="old">Oldest</option>
+        </select>
+        <button id="btn-import" class="btn compact"><span class="ic" data-ico="upload"></span>Import</button>
+        <button id="btn-export" class="btn primary compact"><span class="ic" data-ico="download"></span>CSV</button>
       </div>
       <div id="rec-empty" class="empty" hidden>
         <span class="ic" data-ico="receipt"></span>
@@ -441,7 +432,10 @@
     <label class="fld" id="new-store-wrap" hidden><span>NEW STORE</span>
       <input id="new-store-input" class="in" placeholder="e.g. Landers" autocomplete="off">
     </label>
-    <div class="fld"><span>BUDGET</span>
+    <div class="fld" id="budget-locked" hidden><span>COUNTING TOWARD</span>
+      <div class="locked-period" id="budget-locked-line"></div>
+    </div>
+    <div class="fld" id="budget-row"><span>BUDGET</span>
       <div class="seg grow" role="group" aria-label="Use a budget">
         <button type="button" id="bg-on" class="">Budget</button>
         <button type="button" id="bg-off" class="on">No budget</button>
@@ -616,6 +610,7 @@
 </div>
 
 <div id="toasts" role="status" aria-live="polite"></div>
+<input type="file" id="file-import" accept=".csv,text/csv,text/plain" hidden>
 
 <script>
 'use strict';
@@ -657,6 +652,7 @@ const PATHS = {
   minus:'<path d="M5 12h14"/>',
   arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   download:'<path d="M12 3v12M8 11l4 4 4-4M4 21h16"/>',
+  upload:'<path d="M12 15V3M8 7l4-4 4 4M4 21h16"/>',
   cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 3h2l2.5 12.3a1.5 1.5 0 0 0 1.5 1.2h8a1.5 1.5 0 0 0 1.5-1.2L20.5 7H6"/>',
   receipt:'<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4L10 21l-2-1.4L6 21zM9.5 8h5M9.5 12h5"/>',
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
@@ -694,8 +690,8 @@ const rate = () => db.rate;
 
 let run = db.draft;
 let lastCat = 'Misc';
-let pendingItem = null, cfdCb = null, bgOn = false;
-const ui = { tab:'home', group:'session', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null };
+let pendingItem = null, cfdCb = null, bgOn = false, lockPid = null;
+const ui = { tab:'home', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null };
 
 /* ---- totals ---- */
 const lineTotal = it => it.price * it.qty;
@@ -851,7 +847,7 @@ function renderHome(){
     $('#ar-store').textContent = run.store;
     let meta = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} SO FAR`;
     if(p){
-      const rem = p.budget- periodSpent(p) - rt.sum;
+      const rem = p.budget - periodSpent(p) - rt.sum;
       meta += rem >= 0 ? ` · ${money(rem)} LEFT` : ` · ${money(-rem)} OVER`;
     }
     $('#ar-meta').textContent = meta;
@@ -865,8 +861,8 @@ function renderHome(){
   b.textContent = db.sessions.length || '';
 }
 
-/* ================= start-run modal (budget toggle) ================= */
-function tryStart(){ if(run) openScanner(); else openStartModal(); }
+/* ================= start-run modal ================= */
+function tryStart(){ if(run) openScanner(); else openStartModal(null); }
  $('#btn-start').addEventListener('click', tryStart);
  $('#btn-empty-start').addEventListener('click', tryStart);
  $('#ar-resume').addEventListener('click', openScanner);
@@ -877,22 +873,36 @@ function orderedStores(){
   db.sessions.forEach(s => { if(!(s.store in lastUse) || s.ts > lastUse[s.store]) lastUse[s.store] = s.ts; });
   return [...db.stores].sort((a,b) => (lastUse[b]||0) - (lastUse[a]||0));
 }
-function openStartModal(){
+function openStartModal(prePid){
+  lockPid = prePid || null;
   const sel = $('#store-select');
   sel.innerHTML = '';
   orderedStores().forEach(s => sel.append(new Option(s, s)));
   sel.append(new Option('+ Add a new store…', '__new'));
   $('#new-store-wrap').hidden = true;
   $('#new-store-input').value = '';
-  // budget toggle: default ON if an active period exists
-  const act = activePeriods();
-  setBudgetToggle(act.length > 0);
-  $('#budget-input').value = '';
-  $('#period-type').value = 'month';
-  $('#custom-range').hidden = true;
-  $('#fld-budget').classList.remove('err');
+
+  if(lockPid){
+    // run started from a budget card — locked to that period, no budget UI
+    const p = db.periods.find(x => x.id === lockPid);
+    const rem = p ? p.budget - periodSpent(p) : 0;
+    $('#budget-row').hidden = true;
+    $('#new-budget-wrap').hidden = true;
+    $('#budget-locked').hidden = false;
+    $('#budget-locked-line').innerHTML = `<b>${esc(p ? periodName(p) : '')}</b>
+      <span>${rem >= 0 ? money(rem)+' left' : money(-rem)+' over'} · limit ${money(p ? p.budget : 0)}</span>`;
+  } else {
+    const act = activePeriods();
+    $('#budget-locked').hidden = true;
+    $('#budget-row').hidden = false;
+    setBudgetToggle(act.length > 0);
+    $('#budget-input').value = '';
+    $('#period-type').value = 'month';
+    $('#custom-range').hidden = true;
+    $('#fld-budget').classList.remove('err');
+  }
   openModal('m-start');
-  closeFn['m-start'] = ()=> shut($('#m-start'));
+  closeFn['m-start'] = ()=>{ lockPid = null; shut($('#m-start')); };
 }
 function setBudgetToggle(on){
   bgOn = on;
@@ -903,6 +913,7 @@ function setBudgetToggle(on){
 }
  $('#bg-on').addEventListener('click', ()=> setBudgetToggle(true));
  $('#bg-off').addEventListener('click', ()=> setBudgetToggle(false));
+ $('#start-x').addEventListener('click', ()=>{ lockPid = null; shut($('#m-start')); });
  $('#store-select').addEventListener('change', e => {
   const isNew = e.target.value === '__new';
   $('#new-store-wrap').hidden = !isNew;
@@ -927,7 +938,9 @@ function setBudgetToggle(on){
   } else store = sel.value;
 
   let periodId = null;
-  if(bgOn){
+  if(lockPid){
+    periodId = lockPid;                    // started from a budget card
+  } else if(bgOn){
     const budget = parseFloat($('#budget-input').value);
     if(isNaN(budget) || budget <= 0){
       const f = $('#fld-budget'); f.classList.remove('err'); void f.offsetWidth; f.classList.add('err');
@@ -958,6 +971,7 @@ function setBudgetToggle(on){
     db.periods.push(p);
     periodId = p.id;
   }
+  lockPid = null;
   save();
   shut($('#m-start'));
   startRun(store, periodId);
@@ -1537,7 +1551,7 @@ function swipeWrap(inner, kind, attrs){
     <div class="swipe-content" data-del="${kind}"${attrs}>${inner}</div></div>`;
 }
 
-function itemRowHTML(it, sid, idx, meta){
+function itemRowHTML(it, sid, idx){
   const kind = sid === 'run' ? 'run-item' : 'item';
   const usdNote = it.cur === 'USD' && it.orig != null ? ` <span class="rl-usd">· ${usd(it.orig)}</span>` : '';
   const inner = `<div class="rec-line">
@@ -1547,7 +1561,7 @@ function itemRowHTML(it, sid, idx, meta){
     </div>
     <div class="rl-total">${money(lineTotal(it))}</div>
     <button class="rl-del" data-act="del-${kind}" data-sid="${sid}" data-idx="${idx}" aria-label="Delete item">${ico('trash')}</button>
-    <div class="rl-mult" style="grid-column:1">${it.qty} × ${money(it.price)}${meta || ''}</div>
+    <div class="rl-mult" style="grid-column:1">${it.qty} × ${money(it.price)}</div>
   </div>`;
   return swipeWrap(inner, kind, ` data-sid="${sid}" data-idx="${idx}"`);
 }
@@ -1623,7 +1637,7 @@ function budgetsHTML(){
               <div class="pc-range">${periodRangeText(p)} · ${runs.length} run${runs.length===1?'':'s'}</div>
             </div>
           </button>
-          <button class="btn sm accent" data-act="p-start" data-pid="${p.id}">Scan</button>
+          <button class="btn sm accent" data-act="p-start" data-pid="${p.id}"><span class="ic">${ico('scan')}</span>Scan</button>
           <button type="button" class="pc-chev-btn" data-act="p-toggle" data-pid="${p.id}" aria-label="Expand">${ico('chev')}</button>
         </div>
         <div class="pc-budget" data-act="p-toggle" data-pid="${p.id}">
@@ -1654,44 +1668,14 @@ function renderRecords(){
   let html = budgetsHTML();
   if(run) html += activeCardHTML();
   if(freeSessions.length){
-    if(ui.group === 'session'){
-      const sorted = [...freeSessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
-      html += sorted.map(s => swipeReceipt(s)).join('');
-    } else {
-      const byCat = {};
-      db.sessions.forEach(s => s.items.forEach((it, idx) => {
-        (byCat[it.cat] = byCat[it.cat] || []).push({ it, s, idx });
-      }));
-      const cats = Object.keys(byCat).sort((a,b) => a.localeCompare(b));
-      html += cats.map(cat => {
-        const rows = byCat[cat].sort((a,b) => (a.it.exp || '9999') < (b.it.exp || '9999') ? -1 : 1);
-        const sub = rows.reduce((a,r) => a + lineTotal(r.it), 0);
-        return `<section class="catgroup">
-          <div class="cg-head">
-            <span class="dot" style="--c:${CAT_COLOR[cat] || '#999'};width:10px;height:10px"></span>
-            <h3>${esc(cat)}</h3>
-            <span class="cg-sum">${rows.length} ITEM${rows.length===1?'':'S'} · ${money(sub)}</span>
-          </div>
-          ${rows.map(r => itemRowHTML(r.it, r.s.id, r.idx,
-            ` &nbsp;·&nbsp; ${esc(r.s.store)} · ${fmtTs(r.s.ts).split(' · ')[0]}`)).join('')}
-        </section>`;
-      }).join('');
-    }
-  } else if(ui.group === 'session' && db.periods.length){
+    const sorted = [...freeSessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
+    html += sorted.map(s => swipeReceipt(s)).join('');
+  } else if(db.periods.length){
     html += `<p class="mut" style="margin:14px 2px">All runs are inside budget periods.</p>`;
   }
   list.innerHTML = html;
 }
 
- $('#seg-session').addEventListener('click', ()=> setGroup('session'));
- $('#seg-cat').addEventListener('click', ()=> setGroup('category'));
-function setGroup(g){
-  ui.group = g;
-  $('#seg-session').classList.toggle('on', g === 'session');
-  $('#seg-cat').classList.toggle('on', g === 'category');
-  $('#rec-sort').hidden = g !== 'session';
-  renderRecords();
-}
  $('#rec-sort').addEventListener('change', e => { ui.sort = e.target.value; renderRecords(); });
 
 /* ================= delete flows (all confirmed) ================= */
@@ -1866,7 +1850,9 @@ function requestSwipeDelete(el){
   else if(kind === 'period')  confirmDeletePeriod(el.dataset.pid);
 }
 
-/* ================= drag a run into a budget ================= */
+/* ================= drag a run into a budget =================
+   Touch: hold ~0.3s anywhere on the card (buttons included) until it lifts.
+   A quick tap still behaves as a tap. Mouse: click-drag. */
 let dragState = null, holdPending = null, holdTimer = null, mouseDown = null;
 
 function startVisualDrag(c, x, y){
@@ -1925,10 +1911,9 @@ function confirmMoveToPeriod(sid, pid){
     }
   });
 }
-/* touch: long-press to lift */
+/* touch: hold anywhere on a run card to lift it — quick taps still fire clicks */
 document.addEventListener('touchstart', e => {
   if(dragState || suppressSwipe || e.touches.length !== 1) return;
-  if(e.target.closest('button, a, input, select, textarea')) return;
   const c = e.target.closest('.swipe-content[data-del="session"]');
   if(!c) return;
   const t = e.touches[0];
@@ -1943,7 +1928,7 @@ document.addEventListener('touchmove', e => {
   if(holdPending){
     const t = e.touches[0];
     if(Math.hypot(t.clientX - holdPending.x, t.clientY - holdPending.y) > 12){
-      clearTimeout(holdTimer); holdPending = null;
+      clearTimeout(holdTimer); holdPending = null;   // it was a scroll/swipe
     }
     return;
   }
@@ -1954,7 +1939,7 @@ document.addEventListener('touchmove', e => {
 }, {passive:false});
 document.addEventListener('touchend', e => {
   if(holdPending){ clearTimeout(holdTimer); holdPending = null; }
-  if(dragState){ e.preventDefault(); endDrag(true); }
+  if(dragState){ e.preventDefault(); endDrag(true); }   // swallow the click
 }, {passive:false});
 document.addEventListener('touchcancel', () => {
   if(holdPending){ clearTimeout(holdTimer); holdPending = null; }
@@ -1982,6 +1967,102 @@ document.addEventListener('mousemove', e => {
 document.addEventListener('mouseup', () => {
   mouseDown = null;
   if(dragState) endDrag(true);
+});
+
+/* ================= CSV import ================= */
+function parseCSV(text){
+  const rows = [];
+  let row = [], cell = '', inQ = false;
+  for(let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if(inQ){
+      if(ch === '"'){
+        if(text[i+1] === '"'){ cell += '"'; i++; }
+        else inQ = false;
+      } else cell += ch;
+    } else if(ch === '"'){ inQ = true; }
+    else if(ch === ','){ row.push(cell); cell = ''; }
+    else if(ch === '\n' || ch === '\r'){
+      if(ch === '\r' && text[i+1] === '\n') i++;
+      row.push(cell); cell = '';
+      if(row.some(c => c !== '')) rows.push(row);
+      row = [];
+    }
+    else cell += ch;
+  }
+  row.push(cell);
+  if(row.some(c => c !== '')) rows.push(row);
+  return rows;
+}
+function parseImport(raw){
+  const rows = parseCSV(raw.replace(/^\uFEFF/, ''));
+  if(rows.length < 2) return { error: 'That file looks empty' };
+  const head = rows[0].map(h => h.trim().toLowerCase());
+  const at = n => head.indexOf(n);
+  const cSid = at('session_id'), cDate = at('date'), cTime = at('time'), cStore = at('store'),
+        cBar = at('barcode'), cName = at('product'), cCat = at('category'),
+        cPrice = at('unit_price_php') > -1 ? at('unit_price_php') : at('unit_price'),
+        cQty = at('qty'), cExp = at('expiry_date'),
+        cCur = at('entry_currency'), cAmt = at('entry_amount');
+  if(cSid < 0 || cDate < 0 || cTime < 0 || cStore < 0 || cName < 0 || cPrice < 0 || cQty < 0)
+    return { error: "This isn't a Shelf Life export (columns don't match)" };
+  const byId = new Map();
+  let dup = 0, items = 0;
+  for(let r = 1; r < rows.length; r++){
+    const g = rows[r];
+    const sid = (g[cSid] || '').trim();
+    if(!sid) continue;
+    if(db.sessions.some(s => s.id === sid)){ dup++; continue; }   // already here — skip
+    const d = (g[cDate]||'').trim(), t = (g[cTime]||'').trim();
+    const ts = new Date(`${d}T${t.length === 5 ? t + ':00' : t}`).getTime();
+    const it = {
+      barcode: (g[cBar]||'').trim(),
+      name: (g[cName]||'').trim() || 'Unnamed item',
+      cat: CATS.includes((g[cCat]||'').trim()) ? g[cCat].trim() : 'Misc',
+      price: Math.max(0, parseFloat(g[cPrice]) || 0),
+      qty: Math.max(1, parseInt(g[cQty], 10) || 1),
+      exp: cExp > -1 ? (g[cExp]||'').trim() : ''
+    };
+    const cur = cCur > -1 ? (g[cCur]||'').trim().toUpperCase() : 'PHP';
+    if(cur === 'USD' && cAmt > -1){
+      it.cur = 'USD';
+      it.orig = Math.max(0, parseFloat(g[cAmt]) || 0);
+    }
+    if(!byId.has(sid)){
+      byId.set(sid, { id: sid, store: (g[cStore]||'').trim() || 'Unknown store',
+        ts: isNaN(ts) ? Date.now() : ts, periodId: null, items: [] });
+    }
+    byId.get(sid).items.push(it);
+    items++;
+  }
+  return { sessions: [...byId.values()].sort((a,b) => b.ts - a.ts), dup, items };
+}
+ $('#btn-import').addEventListener('click', ()=> $('#file-import').click());
+ $('#file-import').addEventListener('change', e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let res;
+    try{ res = parseImport(String(reader.result)); }
+    catch(err){ toast("Couldn't read that file"); return; }
+    if(res.error){ toast(res.error); return; }
+    if(!res.sessions.length){ toast(res.dup ? 'All runs in that file are already here' : 'No runs found in that file'); return; }
+    askConfirm({
+      title: 'Import runs?',
+      body: `${res.sessions.length} run(s) · ${res.items} item(s)` +
+            (res.dup ? ` · ${res.dup} duplicate row(s) skipped` : '') +
+            '. Runs return as individual runs (no budget grouping).',
+      yes: 'Import',
+      onYes(){
+        db.sessions.unshift(...res.sessions);
+        save(); renderRecords(); renderHome();
+        toast(`Imported ${res.sessions.length} run(s)`, {icon:true});
+      }
+    });
+  };
+  reader.readAsText(file);
 });
 
 /* ================= CSV export ================= */
