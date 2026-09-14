@@ -28,12 +28,16 @@
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
+  html{height:100%}
   html{scroll-behavior:smooth}
   body{
-    margin:0; background:var(--paper); color:var(--ink);
+    margin:0; min-height:100%;
+    display:flex; flex-direction:column;
+    background:var(--paper); color:var(--ink);
     font:400 15px/1.55 "IBM Plex Sans",sans-serif;
     -webkit-font-smoothing:antialiased;
   }
+  main{flex:1 0 auto}
   body::before{
     content:""; position:fixed; inset:0; z-index:35; pointer-events:none; opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");
@@ -43,7 +47,7 @@
   button{font:inherit;color:inherit;touch-action:manipulation}
   :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:4px}
   .wrap{width:min(560px,100%);margin-inline:auto;padding-inline:clamp(16px,5vw,28px)}
-  #view-home .wrap,#view-records .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 90px)}
+  #view-home .wrap,#view-records .wrap{padding-bottom:76px}
   .ic{display:inline-flex}.ic svg{width:17px;height:17px;display:block}
   .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
@@ -52,11 +56,15 @@
   .top-in{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 0 9px}
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
   .tagline{font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);opacity:.85;text-transform:uppercase}
+  .tagline b{font-weight:600;opacity:.7}
 
-  /* bottom navigation — capped so it hugs the bottom on tall iPhones */
-  .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:4px;
+  /* bottom navigation — sticky IN FLOW: it is the last element of the page,
+     so it always ends at the true document bottom and pins to the viewport
+     while scrolling. No fixed-position or viewport-unit quirks possible. */
+  .bottom-nav{position:sticky;bottom:0;z-index:60;display:flex;gap:4px;
     background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
-    padding:5px 10px min(20px, max(8px, env(safe-area-inset-bottom)))}
+    box-shadow:0 -8px 18px -12px rgba(34,30,21,.28);
+    padding:6px 10px calc(6px + env(safe-area-inset-bottom, 0px))}
   .bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     padding:4px 0 2px;border:none;background:transparent;border-radius:12px;color:var(--ink2);cursor:pointer;transition:.15s}
   .bn-btn .ic svg{width:19px;height:19px}
@@ -338,16 +346,15 @@
     border-radius:10px;padding:11px 12px;font:500 16px "IBM Plex Mono"}
   .scan-manual input::placeholder{color:#8B8271}
   .scan-manual input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(46,107,69,.25)}
-  .scan-hint{margin:0;padding:0 16px 14px;padding-bottom:calc(env(safe-area-inset-bottom) + 14px);
-    text-align:center;font:500 10.5px "IBM Plex Mono";letter-spacing:.16em;color:#A79E8C;
-    display:flex;flex-direction:column;gap:3px}
+  .scan-hint{margin:0;padding:0 16px 16px;text-align:center;font:500 10.5px "IBM Plex Mono";
+    letter-spacing:.16em;color:#A79E8C;display:flex;flex-direction:column;gap:3px}
   #scan-budget{font-weight:600}
   #scan-budget.ok{color:#8FCDA4}
   #scan-budget.over{color:#FF8A7A}
   #scan-count{color:#F2EDE0;font-weight:600}
   #scan-engine{opacity:.75}
 
-  #toasts{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%);
+  #toasts{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);
     z-index:200;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
     width:max-content;max-width:92vw}
   .toast{display:flex;align-items:center;gap:9px;background:var(--ink);color:var(--paper);padding:10px 17px;
@@ -367,7 +374,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy</span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v20</b></span>
   </div>
 </header>
 
@@ -415,6 +422,7 @@
   </section>
 </main>
 
+<!-- bottom navigation — sticky, last element in flow -->
 <nav class="bottom-nav" aria-label="Sections">
   <button id="tab-home" class="bn-btn on"><span class="ic" data-ico="cart"></span><span>Run</span></button>
   <button id="tab-recs" class="bn-btn"><span class="ic" data-ico="receipt"></span><span>Records<sup id="rec-count" hidden></sup></span></button>
@@ -883,7 +891,6 @@ function openStartModal(prePid){
   $('#new-store-input').value = '';
 
   if(lockPid){
-    // run started from a budget card — locked to that period, no budget UI
     const p = db.periods.find(x => x.id === lockPid);
     const rem = p ? p.budget - periodSpent(p) : 0;
     $('#budget-row').hidden = true;
@@ -939,7 +946,7 @@ function setBudgetToggle(on){
 
   let periodId = null;
   if(lockPid){
-    periodId = lockPid;                    // started from a budget card
+    periodId = lockPid;
   } else if(bgOn){
     const budget = parseFloat($('#budget-input').value);
     if(isNaN(budget) || budget <= 0){
@@ -1798,7 +1805,7 @@ document.addEventListener('click', e => {
       renderRecords(); break;
     }
     case 'p-start': {
-      if(run){ openScanner(); break; }   // a run is already going — resume it
+      if(run){ openScanner(); break; }
       openStartModal(t.dataset.pid);
       break;
     }
@@ -1850,9 +1857,7 @@ function requestSwipeDelete(el){
   else if(kind === 'period')  confirmDeletePeriod(el.dataset.pid);
 }
 
-/* ================= drag a run into a budget =================
-   Touch: hold ~0.3s anywhere on the card (buttons included) until it lifts.
-   A quick tap still behaves as a tap. Mouse: click-drag. */
+/* ================= drag a run into a budget ================= */
 let dragState = null, holdPending = null, holdTimer = null, mouseDown = null;
 
 function startVisualDrag(c, x, y){
@@ -1911,7 +1916,6 @@ function confirmMoveToPeriod(sid, pid){
     }
   });
 }
-/* touch: hold anywhere on a run card to lift it — quick taps still fire clicks */
 document.addEventListener('touchstart', e => {
   if(dragState || suppressSwipe || e.touches.length !== 1) return;
   const c = e.target.closest('.swipe-content[data-del="session"]');
@@ -1928,7 +1932,7 @@ document.addEventListener('touchmove', e => {
   if(holdPending){
     const t = e.touches[0];
     if(Math.hypot(t.clientX - holdPending.x, t.clientY - holdPending.y) > 12){
-      clearTimeout(holdTimer); holdPending = null;   // it was a scroll/swipe
+      clearTimeout(holdTimer); holdPending = null;
     }
     return;
   }
@@ -1939,13 +1943,12 @@ document.addEventListener('touchmove', e => {
 }, {passive:false});
 document.addEventListener('touchend', e => {
   if(holdPending){ clearTimeout(holdTimer); holdPending = null; }
-  if(dragState){ e.preventDefault(); endDrag(true); }   // swallow the click
+  if(dragState){ e.preventDefault(); endDrag(true); }
 }, {passive:false});
 document.addEventListener('touchcancel', () => {
   if(holdPending){ clearTimeout(holdTimer); holdPending = null; }
   if(dragState) endDrag(false);
 });
-/* mouse: drag directly */
 document.addEventListener('mousedown', e => {
   if(dragState || e.button !== 0) return;
   if(e.target.closest('button, a, input, select, textarea')) return;
@@ -2012,7 +2015,7 @@ function parseImport(raw){
     const g = rows[r];
     const sid = (g[cSid] || '').trim();
     if(!sid) continue;
-    if(db.sessions.some(s => s.id === sid)){ dup++; continue; }   // already here — skip
+    if(db.sessions.some(s => s.id === sid)){ dup++; continue; }
     const d = (g[cDate]||'').trim(), t = (g[cTime]||'').trim();
     const ts = new Date(`${d}T${t.length === 5 ? t + ':00' : t}`).getTime();
     const it = {
