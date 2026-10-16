@@ -5,11 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F4EEE1">
 <title>Shelf Life — a grocery ledger</title>
+<link rel="manifest" href="manifest.json">
 
 <!-- iOS home-screen app -->
+<!-- status-bar-style: default (NOT black-translucent). black-translucent makes iOS
+     compose the viewport under the status bar, which on current iOS shrinks the
+     standalone layout viewport at the BOTTOM by ~60px and reports 0 inset —
+     the exact "floating nav" bug. 'default' restores the true full-height viewport
+     with a properly reported safe-area inset (verified via FinTrack). -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Shelf Life">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,14 +59,13 @@
   .mut{font:500 11px "IBM Plex Mono";color:var(--ink2);opacity:.8}
 
   header.top{position:sticky;top:0;z-index:40;background:rgba(244,238,225,.92);backdrop-filter:blur(6px);
-    border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+    border-bottom:1px solid var(--line);padding-top:max(env(safe-area-inset-top), 12px)}
   .top-in{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 0 9px}
   .wordmark{display:flex;align-items:center;gap:9px;font:italic 650 1.3rem "Fraunces";color:var(--ink);text-decoration:none;letter-spacing:-.01em}
   .tagline{font:500 10.5px "IBM Plex Mono";letter-spacing:.14em;color:var(--ink2);opacity:.85;text-transform:uppercase}
   .tagline b{font-weight:600;opacity:.7}
 
-  /* bottom navigation — fixed to the renderable bottom; the bar's background
-     extends through the safe-area inset when the OS reports one. */
+  /* bottom navigation — background extends through the reported inset */
   .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:4px;
     background:rgba(244,238,225,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);
     box-shadow:0 -8px 18px -12px rgba(34,30,21,.28);
@@ -315,7 +320,7 @@
     backdrop-filter:none;-webkit-backdrop-filter:none}
   .scan-stage{width:min(560px,100%);margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column}
   .scan-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;
-    padding-top:calc(env(safe-area-inset-top) + 14px);color:#F2EDE0}
+    padding-top:calc(max(env(safe-area-inset-top), 0px) + 14px);color:#F2EDE0}
   .scan-title{font:600 11px "IBM Plex Mono";letter-spacing:.24em;color:#A79E8C}
   .scan-store{font:600 21px "Fraunces";margin-top:2px}
   .scan-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
@@ -374,7 +379,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v22</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v25</b></span>
   </div>
 </header>
 
@@ -651,6 +656,12 @@ function fmtRange(s, e){
   if(sameY) return `${mon(s)} ${s.getDate()} – ${mon(e)} ${e.getDate()}, ${e.getFullYear()}`;
   return `${mon(s)} ${s.getDate()}, ${s.getFullYear()} – ${mon(e)} ${e.getDate()}, ${e.getFullYear()}`;
 }
+/* status-bar strip tinting — with status-bar-style:default, the OS strip at the
+   top is tinted by theme-color; flip it for the dark scanner screen. */
+function setThemeColor(c){
+  const m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute('content', c);
+}
 const PATHS = {
   x:'<path d="M6 6l12 12M18 6L6 18"/>',
   check:'<path d="M4 12.5l5 5L20 6.5"/>',
@@ -869,7 +880,7 @@ function renderHome(){
   b.textContent = db.sessions.length || '';
 }
 
-/* ================= bottom-nav diagnostic (remove once settled) ================= */
+/* ================= diagnostic (remove once settled) ================= */
 function updateDiag(){
   const el = $('#diag'); if(!el) return;
   const envB = getComputedStyle(document.documentElement).getPropertyValue('--env-b').trim() || '0';
@@ -1274,6 +1285,7 @@ function releaseWakeLock(){ try{ wakeLock && wakeLock.release(); }catch(e){} wak
 async function openScanner(){
   if(!run) return;
   primeAudio();
+  setThemeColor('#121110');            // dark status-bar strip while scanning
   $('#scan-video').hidden = false; $('#scan-error').hidden = true;
   $('#scan-code').value = '';
   $('#torch-btn').hidden = true; $('#zoom-wrap').hidden = true; $('#cam-btn').hidden = true;
@@ -1310,7 +1322,7 @@ function onDecode(text){
   shut($('#m-scan'));
   setTimeout(()=>{ openItemModal(code); scanLock = false; }, 160);
 }
-function closeScan(){ stopScan(); shut($('#m-scan')); renderHome(); }
+function closeScan(){ stopScan(); setThemeColor('#F4EEE1'); shut($('#m-scan')); renderHome(); }
 function updateScanCount(){
   const rt = runTotals();
   $('#scan-count').textContent = `${rt.n} ITEM${rt.n===1?'':'S'} · ${money(rt.sum)} THIS RUN`;
@@ -1333,11 +1345,12 @@ function updateScanCount(){
   e.preventDefault();
   const code = $('#scan-code').value.trim();
   if(code.length < 3){ const f = $('#scan-code'); f.classList.add('shake'); setTimeout(()=>f.classList.remove('shake'),350); f.focus(); return; }
-  stopScan(); shut($('#m-scan')); openItemModal(code);
+  stopScan(); setThemeColor('#F4EEE1'); shut($('#m-scan')); openItemModal(code);
 });
 
 function finishRun(){
   stopScan();
+  setThemeColor('#F4EEE1');
   if(!run){ return; }
   if(!run.items.length){
     db.draft = null; run = null; save();
