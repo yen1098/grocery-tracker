@@ -1138,7 +1138,7 @@ function friendlyAuthError(msg){
   const btn = $('#acct-go'); btn.disabled = true;
   try{
     if(acctMode === 'signup'){
-      const { data, error } = await sb.auth.signUp({ email, password: pass });
+      const { data, error } = await sb.auth.signUp({ email, password: pass, options: { emailRedirectTo: location.origin + location.pathname } });
       if(error) throw error;
       if(data.session){
         acctClear();   // onAuthStateChange signs us in + syncs
