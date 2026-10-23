@@ -386,7 +386,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v26.1</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v26.2</b></span>
   </div>
 </header>
 
@@ -1072,7 +1072,8 @@ if(sb){
       recovering = true; openAcctModal(); renderAcct();
       return;
     }
-    if(nowId && nowId !== prevId){
+     if(nowId && nowId !== prevId){
+      if(evt === 'SIGNED_IN') shut($('#m-acct'));
       syncNow().then(()=>{
         if(evt === 'SIGNED_IN') toast('Signed in — cloud sync on', {icon:true});
         renderAcct();
@@ -1181,7 +1182,17 @@ function friendlyAuthError(msg){
  $('#acct-sync').addEventListener('click', ()=>{ lastSyncAt = null; syncNow().then(()=>{ if(syncState==='ok') toast('Synced', {icon:true}); }); });
  $('#acct-signout').addEventListener('click', async ()=>{
   if(!sb) return;
-  await sb.auth.signOut();   // local data is kept
+  const btn = $('#acct-signout'); btn.disabled = true;
+  try{
+    try{ await sb.auth.signOut(); }catch(_){}
+    try{ await sb.auth.signOut({ scope: 'local' }); }catch(_){}
+    const ref = (SUPABASE_URL.match(/\/\/([^.]+)\./) || [])[1];
+    if(ref) Object.keys(localStorage).filter(k => k.indexOf('sb-' + ref) === 0).forEach(k => localStorage.removeItem(k));
+    currentUser = null;
+    updateAcctBtn(); setSyncStatus('idle'); renderAcct();
+    shut($('#m-acct'));
+    toast('Signed out — data stays on this device');
+  }finally{ btn.disabled = false; }
 });
 
 /* ================= start-run modal ================= */
