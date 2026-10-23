@@ -262,6 +262,15 @@
   .fx-hint.err{color:var(--red)}
   .fx-hint .linkbtn{font-size:11.5px;padding:2px 4px}
 
+  /* ---- auth gate ---- */
+  #auth-screen{display:none;position:fixed;inset:0;z-index:70;background:var(--paper);overflow:auto;padding:22px}
+  body.locked #auth-screen{display:flex}
+  body.locked{background:var(--paper)}
+  body.locked > header, body.locked > main, body.locked > nav{display:none!important}
+  .auth-card{margin:auto;width:min(400px,100%)}
+  .auth-logo{display:flex;align-items:center;justify-content:center;gap:9px;font:600 26px "Fraunces";letter-spacing:-.01em;color:var(--ink);margin-bottom:7px}
+  .auth-tag{color:var(--ink2);font-size:13px;text-align:center;margin:0 0 24px}
+
   .seg{display:flex;gap:2px;background:var(--paper-2);border:1px solid var(--line);border-radius:999px;padding:3px}
   .seg button{border:none;background:transparent;padding:6px 11px;border-radius:999px;font:600 12px "IBM Plex Sans";color:var(--ink2);cursor:pointer}
   .seg button.on{background:var(--ink);color:var(--paper)}
@@ -377,6 +386,36 @@
 </head>
 <body>
 
+<!-- ============ AUTH GATE — shown whenever signed out ============ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg width="24" height="22" viewBox="0 0 20 18" aria-hidden="true"><g fill="currentColor">
+        <rect width="3" height="18"/><rect x="5" width="1.6" height="18"/><rect x="8.6" width="4.6" height="18"/>
+        <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
+      Shelf Life
+    </div>
+    <p class="auth-tag">A quiet ledger for everything you buy</p>
+
+    <div class="seg grow" style="margin-bottom:16px">
+      <button type="button" id="ai-tab" class="on">Sign in</button>
+      <button type="button" id="au-tab">Sign up</button>
+    </div>
+    <form id="acct-form">
+      <label class="fld"><span>EMAIL</span>
+        <input id="acct-email" class="in" type="email" autocomplete="email" placeholder="you@email.com"></label>
+      <label class="fld"><span>PASSWORD · 6+ CHARACTERS</span>
+        <input id="acct-pass" class="in" type="password" autocomplete="current-password" placeholder="••••••••"></label>
+      <div class="fx-hint" id="acct-msg" hidden style="margin:0 0 12px"></div>
+      <button type="submit" id="acct-go" class="btn primary wide">Sign in</button>
+    </form>
+    <div style="text-align:center;margin-top:10px">
+      <button type="button" class="linkbtn" id="acct-forgot">Forgot password?</button>
+    </div>
+    <p class="auth-tag" style="margin:28px 0 0;font-size:12px">Sign in to see your ledger — your data stays safely saved on this device while signed out.</p>
+  </div>
+</div>
+
 <header class="top">
   <div class="wrap top-in">
     <button type="button" class="acct-btn" id="acct-open" aria-label="Account"><span class="ic" data-ico="user"></span></button>
@@ -386,7 +425,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v26.2</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v27.0</b></span>
   </div>
 </header>
 
@@ -489,24 +528,7 @@
     <button type="button" class="x" id="acct-x" aria-label="Close"><span class="ic" data-ico="x"></span></button>
     <h2 class="modal-title" id="acct-title">Account</h2>
 
-    <!-- signed out -->
-    <div id="acct-out">
-      <div class="seg grow" style="margin-bottom:14px">
-        <button type="button" id="ai-tab" class="on">Sign in</button>
-        <button type="button" id="au-tab">Sign up</button>
-      </div>
-      <form id="acct-form">
-        <label class="fld"><span>EMAIL</span>
-          <input id="acct-email" class="in" type="email" autocomplete="email" placeholder="you@email.com"></label>
-        <label class="fld"><span>PASSWORD · 6+ CHARACTERS</span>
-          <input id="acct-pass" class="in" type="password" autocomplete="current-password" placeholder="••••••••"></label>
-        <div class="fx-hint" id="acct-msg" hidden style="margin:0 0 12px"></div>
-        <button type="submit" id="acct-go" class="btn primary wide">Sign in</button>
-      </form>
-      <div style="text-align:center;margin-top:10px">
-        <button type="button" class="linkbtn" id="acct-forgot">Forgot password?</button>
-      </div>
-    </div>
+    <!-- sign in / sign up form lives on the auth screen (top of <body>) -->
 
     <!-- signed in -->
     <div id="acct-in" hidden>
@@ -789,6 +811,14 @@ let lastCat = 'Misc';
 let pendingItem = null, cfdCb = null, bgOn = false, lockPid = null;
 const ui = { tab:'home', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null };
 
+/* wipe local data when a DIFFERENT account signs in on this device (their data comes from the cloud) */
+function resetLocalForNewUser(){
+  db = { stores:[...DEFAULT_STORES], sessions:[], draft:null, rate:DEFAULT_RATE, periods:[], tombstones:[] };
+  migrateDb(db); persistLocal();
+  run = null; ui.open.clear(); ui.openP.clear();
+  renderHome(); renderRecords();
+}
+
 /* ---- totals ---- */
 const lineTotal = it => it.price * it.qty;
 const sessionTotal = s => s.items.reduce((a, it) => a + lineTotal(it), 0);
@@ -1060,6 +1090,7 @@ function schedulePush(){
   syncTimer = setTimeout(()=>{ if(currentUser) syncNow(); }, 1800);
 }
 function updateAcctBtn(){ const b = $('#acct-open'); if(b) b.classList.toggle('on', !!currentUser); }
+function updateAuthGate(){ document.body.classList.toggle('locked', !!sb && !currentUser); }
 
 /* ---- auth state ---- */
 if(sb){
@@ -1067,21 +1098,25 @@ if(sb){
     const prevId = currentUser ? currentUser.id : null;
     currentUser = session?.user || null;
     const nowId = currentUser ? currentUser.id : null;
-    updateAcctBtn();
+    updateAcctBtn(); updateAuthGate();
     if(evt === 'PASSWORD_RECOVERY'){
       recovering = true; openAcctModal(); renderAcct();
       return;
     }
-     if(nowId && nowId !== prevId){
-      if(evt === 'SIGNED_IN') shut($('#m-acct'));
+    if(nowId && nowId !== prevId){
+      if(evt === 'SIGNED_IN'){
+        // a different account than last time on this device? start them clean — their data comes from the cloud
+        const lastUser = localStorage.getItem('shelf-life.lastuser');
+        if(lastUser && lastUser !== nowId) resetLocalForNewUser();
+        localStorage.setItem('shelf-life.lastuser', nowId);
+        const em = $('#acct-email'), pw = $('#acct-pass');
+        if(em) em.value = ''; if(pw) pw.value = '';
+        acctClear(); shut($('#m-acct'));
+      }
       syncNow().then(()=>{
         if(evt === 'SIGNED_IN') toast('Signed in — cloud sync on', {icon:true});
         renderAcct();
       });
-    }
-    if(!currentUser && prevId && evt === 'SIGNED_OUT'){
-      setSyncStatus('idle'); renderAcct();
-      toast('Signed out — data stays on this device');
     }
   });
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && currentUser) syncNow(); });
@@ -1107,15 +1142,13 @@ function setAcctMode(m){
   acctClear();
 }
 function renderAcct(){
-  const out = $('#acct-out'), inn = $('#acct-in'), rec = $('#acct-recovery');
-  if(recovering){ out.hidden = true; inn.hidden = true; rec.hidden = false; return; }
+  const inn = $('#acct-in'), rec = $('#acct-recovery');
+  if(recovering){ inn.hidden = true; rec.hidden = false; return; }
   rec.hidden = true;
+  inn.hidden = !currentUser;
   if(currentUser){
-    out.hidden = true; inn.hidden = false;
     $('#acct-email-show').textContent = currentUser.email || '';
     setSyncStatus(syncState, syncErr);
-  } else {
-    inn.hidden = true; out.hidden = false;
   }
 }
  $('#acct-open').addEventListener('click', openAcctModal);
@@ -1144,8 +1177,8 @@ function friendlyAuthError(msg){
       if(data.session){
         acctClear();   // onAuthStateChange signs us in + syncs
       } else {
-        acctMsg('Account created — check your email to confirm, then sign in.');
         setAcctMode('signin');
+        acctMsg('Account created — check your email to confirm, then sign in.');
       }
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pass });
@@ -1185,11 +1218,12 @@ function friendlyAuthError(msg){
   const btn = $('#acct-signout'); btn.disabled = true;
   try{
     try{ await sb.auth.signOut(); }catch(_){}
-    try{ await sb.auth.signOut({ scope: 'local' }); }catch(_){}
+    try{ await sb.auth.signOut({ scope: 'local' }); }catch(_){}   // force-clear local session no matter what
+    // belt & braces: purge any leftover auth tokens (incl. chunked keys) so we are REALLY signed out
     const ref = (SUPABASE_URL.match(/\/\/([^.]+)\./) || [])[1];
     if(ref) Object.keys(localStorage).filter(k => k.indexOf('sb-' + ref) === 0).forEach(k => localStorage.removeItem(k));
     currentUser = null;
-    updateAcctBtn(); setSyncStatus('idle'); renderAcct();
+    updateAcctBtn(); updateAuthGate(); setSyncStatus('idle'); renderAcct();
     shut($('#m-acct'));
     toast('Signed out — data stays on this device');
   }finally{ btn.disabled = false; }
@@ -2519,13 +2553,14 @@ renderHome();
 renderRecords();
 setTab('home');
 bindSwipe($('#rec-list'));
-updateAcctBtn();
+updateAcctBtn(); updateAuthGate();   // lock the app behind the sign-in screen until the session check completes
 /* restore session (if signed in on this device) and sync */
 if(sb){
   sb.auth.getSession().then(({ data })=>{
     if(data && data.session){
       currentUser = data.session.user;
-      updateAcctBtn();
+      localStorage.setItem('shelf-life.lastuser', currentUser.id);
+      updateAcctBtn(); updateAuthGate();
       syncNow();
     }
   });
