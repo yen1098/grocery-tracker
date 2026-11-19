@@ -427,7 +427,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v27.1</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v27.2</b></span>
   </div>
 </header>
 
@@ -493,13 +493,11 @@
     <label class="fld" id="new-store-wrap" hidden><span>NEW STORE</span>
       <input id="new-store-input" class="in" placeholder="e.g. Landers" autocomplete="off">
     </label>
-    <div class="fld" id="budget-locked" hidden><span>COUNTING TOWARD</span>
-      <div class="locked-period" id="budget-locked-line"></div>
-    </div>
     <div class="fld" id="budget-row"><span>BUDGET</span>
-      <div class="seg grow" role="group" aria-label="Use a budget">
-        <button type="button" id="bg-on" class="">Budget</button>
-        <button type="button" id="bg-off" class="on">No budget</button>
+      <div class="seg grow" role="group" aria-label="How this run counts">
+        <button type="button" id="st-budget">Budget</button>
+        <button type="button" id="st-none">No budget</button>
+        <button type="button" id="st-pick">Select period</button>
       </div>
     </div>
     <div id="new-budget-wrap" hidden>
@@ -520,6 +518,13 @@
           <input type="date" id="p-to" class="in date-in" aria-label="End date">
         </div>
       </div>
+    </div>
+    <div id="pick-period-wrap" hidden>
+      <label class="fld"><span>PERIOD GROUP</span>
+        <select id="period-pick" class="in"></select>
+      </label>
+      <div class="fx-hint" id="pick-info" hidden></div>
+      <div class="fx-hint err" id="pick-warn" hidden style="margin-top:2px"></div>
     </div>
     <button type="submit" class="btn primary wide">Start scanning<span class="ic" data-ico="arrow"></span></button>
   </form>
@@ -811,7 +816,7 @@ const rate = () => db.rate;
 
 let run = db.draft;
 let lastCat = 'Misc';
-let pendingItem = null, cfdCb = null, bgOn = false, lockPid = null;
+let pendingItem = null, cfdCb = null, startMode = 'budget', lockPid = null;
 const ui = { tab:'home', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null, autoRun:null };
 
 /* wipe local data when a DIFFERENT account signs in on this device (their data comes from the cloud) */
@@ -950,7 +955,7 @@ function renderHome(){
   const act = activePeriods();
   box.innerHTML = act.length
     ? `<div class="sec-title" style="margin:26px 2px 10px">ACTIVE BUDGETS</div>` + act.map(p => {
-        const spent = periodSpent(p), rem = p.budget - spent;
+        const spent = periodSpent(p) + (run && run.periodId === p.id ? runTotals().sum : 0), rem = p.budget - spent;
         const pct = p.budget > 0 ? Math.min(100, spent / p.budget * 100) : 100;
         const cls = rem < 0 ? 'over' : (pct >= 75 ? 'warn' : '');
         return `<button class="mini-budget" type="button" data-act="go-records">
@@ -1257,36 +1262,59 @@ function openStartModal(prePid){
   $('#new-store-wrap').hidden = true;
   $('#new-store-input').value = '';
 
-  if(lockPid){
-    const p = db.periods.find(x => x.id === lockPid);
-    const rem = p ? p.budget - periodSpent(p) : 0;
-    $('#budget-row').hidden = true;
-    $('#new-budget-wrap').hidden = true;
-    $('#budget-locked').hidden = false;
-    $('#budget-locked-line').innerHTML = `<b>${esc(p ? periodName(p) : '')}</b>
-      <span>${rem >= 0 ? money(rem)+' left' : money(-rem)+' over'} · limit ${money(p ? p.budget : 0)}</span>`;
-  } else {
-    const act = activePeriods();
-    $('#budget-locked').hidden = true;
-    $('#budget-row').hidden = false;
-    setBudgetToggle(act.length > 0);
-    $('#budget-input').value = '';
-    $('#period-type').value = 'month';
-    $('#custom-range').hidden = true;
-    $('#fld-budget').classList.remove('err');
-  }
+  $('#budget-input').value = '';
+  $('#period-type').value = 'month';
+  $('#custom-range').hidden = true;
+  $('#fld-budget').classList.remove('err');
+  fillPeriodPicker(lockPid || null);
+  // opened from a period's Scan button → continue scanning that group; otherwise last-used default
+  setStartMode(lockPid ? 'pick' : (activePeriods().length ? 'budget' : 'none'));
   openModal('m-start');
   closeFn['m-start'] = ()=>{ lockPid = null; shut($('#m-start')); };
 }
-function setBudgetToggle(on){
-  bgOn = on;
-  $('#bg-on').classList.toggle('on', on);
-  $('#bg-off').classList.toggle('on', !on);
-  $('#new-budget-wrap').hidden = !on;
-  if(on) setTimeout(()=> $('#budget-input').focus(), 120);
+function setStartMode(mode){
+  startMode = mode;
+  $('#st-budget').classList.toggle('on', mode === 'budget');
+  $('#st-none').classList.toggle('on', mode === 'none');
+  $('#st-pick').classList.toggle('on', mode === 'pick');
+  $('#new-budget-wrap').hidden = mode !== 'budget';
+  $('#pick-period-wrap').hidden = mode !== 'pick';
+  if(mode === 'budget') setTimeout(()=> $('#budget-input').focus(), 120);
+  if(mode === 'pick') updatePickInfo();
 }
- $('#bg-on').addEventListener('click', ()=> setBudgetToggle(true));
- $('#bg-off').addEventListener('click', ()=> setBudgetToggle(false));
+function fillPeriodPicker(preselect){
+  const el = $('#period-pick');
+  const list = [...db.periods].sort((a,b) => b.end - a.end);
+  el.innerHTML = '';
+  if(!list.length){
+    el.disabled = true;
+    el.append(new Option('No period groups yet — use Budget or No budget', ''));
+    return;
+  }
+  el.disabled = false;
+  list.forEach(p => {
+    const rem = p.budget - periodSpent(p);
+    el.append(new Option(`${periodName(p)} · ${rem >= 0 ? money(rem) + ' left' : money(-rem) + ' over'}`, p.id));
+  });
+  if(preselect && list.some(p => p.id === preselect)) el.value = preselect;
+}
+function updatePickInfo(){
+  const info = $('#pick-info'), warn = $('#pick-warn');
+  info.hidden = true; warn.hidden = true;
+  const p = db.periods.find(x => x.id === $('#period-pick').value);
+  if(!p) return;
+  const spent = periodSpent(p), rem = p.budget - spent;
+  info.textContent = `SPENT ${money(spent)} · ${rem >= 0 ? 'LEFT ' + money(rem) : 'OVER ' + money(-rem)} OF ${money(p.budget)}`;
+  info.hidden = false;
+  if(rem <= 0){
+    warn.textContent = 'No budget left in this group — scanning still works, the total just goes negative.';
+    warn.hidden = false;
+  }
+}
+ $('#st-budget').addEventListener('click', ()=> setStartMode('budget'));
+ $('#st-none').addEventListener('click', ()=> setStartMode('none'));
+ $('#st-pick').addEventListener('click', ()=> setStartMode('pick'));
+ $('#period-pick').addEventListener('change', updatePickInfo);
  $('#start-x').addEventListener('click', ()=>{ lockPid = null; shut($('#m-start')); });
  $('#store-select').addEventListener('change', e => {
   const isNew = e.target.value === '__new';
@@ -1311,10 +1339,11 @@ function setBudgetToggle(on){
     else store = db.stores.find(s => s.toLowerCase() === store.toLowerCase());
   } else store = sel.value;
 
-  let periodId = null;
+  let periodId = null, picked = null;
   if(lockPid){
     periodId = lockPid;
-  } else if(bgOn){
+    picked = db.periods.find(x => x.id === periodId) || null;
+  } else if(startMode === 'budget'){
     const budget = parseFloat($('#budget-input').value);
     if(isNaN(budget) || budget <= 0){
       const f = $('#fld-budget'); f.classList.remove('err'); void f.offsetWidth; f.classList.add('err');
@@ -1344,15 +1373,31 @@ function setBudgetToggle(on){
     const p = { id: uid(), type, budget: Math.round(budget*100)/100, start: start.getTime(), end: end.getTime() };
     db.periods.push(p);
     periodId = p.id;
-  } else {
-    // no new budget requested — the run still belongs in the current period covering today, if one exists
-    const cur = activePeriods().sort((a,b) => b.end - a.end)[0];
-    if(cur) periodId = cur.id;
+  } else if(startMode === 'pick'){
+    periodId = $('#period-pick').value || null;
+    picked = db.periods.find(x => x.id === periodId) || null;
   }
-  lockPid = null;
-  save();
-  shut($('#m-start'));
-  startRun(store, periodId);
+  // startMode === 'none' → spontaneous run: counts toward no period group, even if one is active today
+
+  const go = ()=>{
+    lockPid = null;
+    save();
+    shut($('#m-start'));
+    startRun(store, periodId);
+  };
+  if(picked){
+    const rem = picked.budget - periodSpent(picked);
+    if(rem <= 0){
+      askConfirm({
+        title: 'No budget left',
+        body: `${periodName(picked)} is ${rem < 0 ? money(-rem) + ' over' : 'right at'} its ${money(picked.budget)} limit. You can still scan — the budget will just go negative.`,
+        yes: 'Scan anyway',
+        onYes: go
+      });
+      return;
+    }
+  }
+  go();
 });
 
 function startRun(store, periodId){
