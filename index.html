@@ -117,6 +117,8 @@
   .ar-txt span{font:500 11.5px "IBM Plex Mono";color:var(--ink2)}
 
   .cta-row{margin-top:22px}
+  .cta-row.two{display:flex;gap:10px}
+  .cta-row.two .btn{width:auto;flex:1;padding:14px 10px;font-size:14px}
   .stats{display:flex;margin:20px 0 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
   .stat{flex:1;padding:13px 14px;border-left:1px solid var(--line)}
   .stat:first-child{border-left:0}
@@ -425,7 +427,7 @@
         <rect x="15.2" width="1.8" height="18"/><rect x="18.4" width="1.6" height="18"/></g></svg>
       Shelf Life
     </a>
-    <span class="tagline">A quiet ledger for everything you buy · <b>v27.0</b></span>
+    <span class="tagline">A quiet ledger for everything you buy · <b>v27.1</b></span>
   </div>
 </header>
 
@@ -440,7 +442,8 @@
         <button id="ar-finish" class="btn sm accent"><span class="ic" data-ico="check"></span>Finish</button>
       </div>
 
-      <div class="cta-row">
+      <div class="cta-row" id="cta-row">
+        <button id="btn-resume" class="btn accent big" hidden><span class="ic" data-ico="scan"></span>Resume scan</button>
         <button id="btn-start" class="btn primary big"><span class="ic" data-ico="cart"></span>Start grocery run</button>
       </div>
 
@@ -809,13 +812,13 @@ const rate = () => db.rate;
 let run = db.draft;
 let lastCat = 'Misc';
 let pendingItem = null, cfdCb = null, bgOn = false, lockPid = null;
-const ui = { tab:'home', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null };
+const ui = { tab:'home', sort:'new', open:new Set(), openP:new Set(), openRun:false, freshId:null, autoRun:null };
 
 /* wipe local data when a DIFFERENT account signs in on this device (their data comes from the cloud) */
 function resetLocalForNewUser(){
   db = { stores:[...DEFAULT_STORES], sessions:[], draft:null, rate:DEFAULT_RATE, periods:[], tombstones:[] };
   migrateDb(db); persistLocal();
-  run = null; ui.open.clear(); ui.openP.clear();
+  run = null; ui.open.clear(); ui.openP.clear(); ui.autoRun = null;
   renderHome(); renderRecords();
 }
 
@@ -966,6 +969,7 @@ function renderHome(){
   } else lr.hidden = true;
 
   const bar = $('#active-run');
+  const cta = $('#cta-row');
   if(run){
     const rt = runTotals();
     const p = run.periodId ? db.periods.find(x => x.id === run.periodId) : null;
@@ -977,10 +981,12 @@ function renderHome(){
       meta += rem >= 0 ? ` · ${money(rem)} LEFT` : ` · ${money(-rem)} OVER`;
     }
     $('#ar-meta').textContent = meta;
-    $('#btn-start').innerHTML = `<span class="ic">${ico('scan')}</span>Resume scan`;
+    $('#btn-resume').hidden = false;
+    if(cta) cta.classList.add('two');
   } else {
     bar.hidden = true;
-    $('#btn-start').innerHTML = `<span class="ic">${ico('cart')}</span>Start grocery run`;
+    $('#btn-resume').hidden = true;
+    if(cta) cta.classList.remove('two');
   }
   const b = $('#rec-count');
   b.hidden = !db.sessions.length;
@@ -1234,6 +1240,7 @@ function tryStart(){ if(run) openScanner(); else openStartModal(null); }
  $('#btn-start').addEventListener('click', tryStart);
  $('#btn-empty-start').addEventListener('click', tryStart);
  $('#ar-resume').addEventListener('click', openScanner);
+ $('#btn-resume').addEventListener('click', openScanner);
  $('#ar-finish').addEventListener('click', finishRun);
 
 function orderedStores(){
@@ -1337,6 +1344,10 @@ function setBudgetToggle(on){
     const p = { id: uid(), type, budget: Math.round(budget*100)/100, start: start.getTime(), end: end.getTime() };
     db.periods.push(p);
     periodId = p.id;
+  } else {
+    // no new budget requested — the run still belongs in the current period covering today, if one exists
+    const cur = activePeriods().sort((a,b) => b.end - a.end)[0];
+    if(cur) periodId = cur.id;
   }
   lockPid = null;
   save();
@@ -1994,8 +2005,10 @@ function budgetsHTML(){
   if(!db.periods.length) return '';
   const sorted = [...db.periods].sort((a,b) => b.end - a.end);
   return `<div class="sec-title" style="margin:4px 2px 10px">BUDGETS</div>` + sorted.map(p => {
-    const spent = periodSpent(p);
+    const act = run && run.periodId === p.id;   // run still in progress inside this period
+    const spent = periodSpent(p) + (act ? runTotals().sum : 0);
     const runs  = db.sessions.filter(s => s.periodId === p.id);
+    const nRuns = runs.length + (act ? 1 : 0);
     const pct   = p.budget > 0 ? Math.min(100, spent / p.budget * 100) : 100;
     const rem   = p.budget - spent;
     const cls   = rem < 0 ? 'over' : (pct >= 75 ? 'warn' : '');
@@ -2005,7 +2018,7 @@ function budgetsHTML(){
           <button type="button" class="pc-toggle" data-act="p-toggle" data-pid="${p.id}">
             <div class="pc-hl">
               <div class="pc-name">${esc(periodName(p))}</div>
-              <div class="pc-range">${periodRangeText(p)} · ${runs.length} run${runs.length===1?'':'s'}</div>
+              <div class="pc-range">${periodRangeText(p)} · ${nRuns} run${nRuns===1?'':'s'}</div>
             </div>
           </button>
           <button class="btn sm accent" data-act="p-start" data-pid="${p.id}"><span class="ic">${ico('scan')}</span>Scan</button>
@@ -2019,9 +2032,10 @@ function budgetsHTML(){
           <div class="bbar"><i class="${cls}" style="width:${pct}%"></i></div>
         </div>`, 'period', ` data-pid="${p.id}" data-act="p-toggle"`)}
       <div class="pc-sessions">
+        ${act ? activeCardHTML() : ''}
         ${runs.length
           ? [...runs].sort((a,b)=>b.ts-a.ts).map(s => swipeReceipt(s)).join('')
-          : '<p class="mut" style="margin:4px 6px 10px">No runs yet.</p>'}
+          : (act ? '' : '<p class="mut" style="margin:4px 6px 10px">No runs yet.</p>')}
         <div class="pc-foot"><button class="danger-link" data-act="del-period" data-pid="${p.id}">Delete period</button></div>
       </div>
     </article>`;
@@ -2029,6 +2043,11 @@ function budgetsHTML(){
 }
 
 function renderRecords(){
+  // the in-progress run lives inside its budget group — expand that group by default (once per run)
+  const runGrouped = !!(run && run.periodId && db.periods.some(p => p.id === run.periodId));
+  if(runGrouped && ui.autoRun !== run.id){
+    ui.openP.add(run.periodId); ui.autoRun = run.id;
+  }
   const freeSessions = db.sessions.filter(s => !s.periodId);
   const showEmpty = !db.sessions.length && !run && !db.periods.length;
   $('#rec-empty').hidden = !showEmpty;
@@ -2036,7 +2055,7 @@ function renderRecords(){
   if(showEmpty){ list.innerHTML = ''; return; }
 
   let html = budgetsHTML();
-  if(run) html += activeCardHTML();
+  if(run && !runGrouped) html += activeCardHTML();
   if(freeSessions.length){
     const sorted = [...freeSessions].sort((a,b) => ui.sort === 'new' ? b.ts - a.ts : a.ts - b.ts);
     html += sorted.map(s => swipeReceipt(s)).join('');
@@ -2125,6 +2144,7 @@ function confirmDeletePeriod(pid){
     onYes(){
       tomb(pid);
       db.sessions.forEach(s => { if(s.periodId === pid) delete s.periodId; });
+      if(run && run.periodId === pid){ run.periodId = null; db.draft = run; }
       db.periods = db.periods.filter(x => x.id !== pid);
       ui.openP.delete(pid); save();
       renderRecords(); renderHome();
